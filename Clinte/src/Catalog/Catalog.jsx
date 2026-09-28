@@ -4,12 +4,9 @@ import "./Catalog.css";
 
 const PAGE = 24;
 
-// تحويل الشيت لمصفوفة أصناف
-// بيلاقي صف العناوين لوحده مهما كان مكانه، والعمود الأول (الترقيم) ملوش عنوان
 function parseSheet(ws) {
   const all = XLSX.utils.sheet_to_json(ws, { header: 1, defval: null });
 
-  // دور على صف العناوين بنفسه: الصف اللي فيه "اسم الصنف"
   const headIdx = all.findIndex((r) =>
     r.some((c) => typeof c === "string" && c.trim() === "اسم الصنف")
   );
@@ -52,7 +49,6 @@ function ProductCard({ p }) {
     <article className="card">
       <div className="pic">
         <img
-          // الصورة الحقيقية: /images/رقم-الصنف.jpg (جوه فولدر public/images)
           src={`/images/${p.id}.jpg`}
           alt={p.name}
           loading="lazy"
@@ -136,9 +132,8 @@ export default function Catalog() {
     <div className="wrap" dir="rtl">
       <h1>كتالوج المنتجات</h1>
 
-      <div className="tools">
+      <div className="tools one">
         <input type="file" accept=".xlsx,.xls" onChange={handleFile} />
-        <button onClick={loadFromSite}>تحميل الملف من الموقع</button>
       </div>
 
       {error && <p className="error">{error}</p>}
