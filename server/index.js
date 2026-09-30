@@ -1,3 +1,5 @@
+console.log("=== UDNyn SERVER STARTING ===");
+
 require("dotenv").config();
 
 const express = require("express");
@@ -489,18 +491,11 @@ app.post(
 // نشغل السيرفر أولًا حتى Back4App يجد الـ port
 // وبعد ذلك نحاول الاتصال بـ MongoDB.
 
-app.listen(
-  PORT,
-  "0.0.0.0",
-  () => {
-    console.log(
-      `Server running on port ${PORT}`
-    );
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`=== SERVER RUNNING ON PORT ${PORT} ===`);
+});
 
-    connectMongoDB();
-  }
-);
-
+connectMongoDB();
 // ======================================================
 // الاتصال بـ MongoDB Atlas
 // ======================================================
