@@ -1,7 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./Catalog.css";
 
-const API_URL = "http://localhost:5000";
+// ======================================================
+// رابط السيرفر على Back4App
+// ======================================================
+
+const API_URL =
+  "https://udnynclothing23-qpvb1v2q.b4a.run";
 
 const PAGE_SIZE = 40;
 
@@ -41,9 +46,18 @@ export default function Products() {
 
       const data = await response.json();
 
+      if (!Array.isArray(data)) {
+        throw new Error(
+          "السيرفر أرسل بيانات غير صحيحة"
+        );
+      }
+
       setProducts(data);
     } catch (err) {
-      console.error(err);
+      console.error(
+        "Load products error:",
+        err
+      );
 
       setError(
         "تعذر تحميل المنتجات حاليًا"
@@ -117,18 +131,12 @@ export default function Products() {
       .toLowerCase();
 
     return products.filter((product) => {
-      // ----------------------------------------
       // إخفاء المنتجات التي كميتها صفر أو سالبة
-      // ----------------------------------------
-
       if (Number(product.qty) <= 0) {
         return false;
       }
 
-      // ----------------------------------------
       // فلتر المصنع
-      // ----------------------------------------
-
       if (
         selectedManufacturer &&
         String(product.manufacturer || "").trim() !==
@@ -137,10 +145,7 @@ export default function Products() {
         return false;
       }
 
-      // ----------------------------------------
       // فلتر التصنيف
-      // ----------------------------------------
-
       if (
         selectedCategory &&
         String(product.category || "").trim() !==
@@ -149,10 +154,7 @@ export default function Products() {
         return false;
       }
 
-      // ----------------------------------------
       // البحث
-      // ----------------------------------------
-
       if (!value) {
         return true;
       }
@@ -467,4 +469,3 @@ export default function Products() {
     </div>
   );
 }
-Products.css

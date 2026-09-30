@@ -1,13 +1,23 @@
+
 import React, { useState } from "react";
 import "./ExcelUpload.css";
 
-const API_URL = "http://localhost:5000";
+// ======================================================
+// رابط السيرفر على Back4App
+// ======================================================
+
+const API_URL =
+  "https://udnynclothing23-qpvb1v2q.b4a.run";
 
 export default function ExcelUpload() {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+
+  // ======================================================
+  // اختيار ملف Excel
+  // ======================================================
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0];
@@ -28,12 +38,18 @@ export default function ExcelUpload() {
 
     if (!isExcel) {
       setFile(null);
-      setError("من فضلك اختر ملف Excel بصيغة XLSX أو XLS");
+      setError(
+        "من فضلك اختر ملف Excel بصيغة XLSX أو XLS"
+      );
       return;
     }
 
     setFile(selectedFile);
   };
+
+  // ======================================================
+  // رفع ملف Excel
+  // ======================================================
 
   const handleUpload = async () => {
     if (!file) {
@@ -49,9 +65,10 @@ export default function ExcelUpload() {
       const formData = new FormData();
 
       // مهم جدًا:
-      // اسم الحقل لازم يكون file
-      // لأنه نفس الاسم الموجود في:
+      // لازم يكون اسم الحقل "file"
+      // لأنه مطابق للسيرفر:
       // excelUpload.single("file")
+
       formData.append("file", file);
 
       const response = await fetch(
@@ -62,13 +79,31 @@ export default function ExcelUpload() {
         }
       );
 
-      const data = await response.json();
+      // محاولة قراءة الرد كـ JSON
+      let data;
+
+      try {
+        data = await response.json();
+      } catch {
+        throw new Error(
+          "السيرفر أرسل ردًا غير صالح"
+        );
+      }
+
+      // ==================================================
+      // التعامل مع أخطاء السيرفر
+      // ==================================================
 
       if (!response.ok) {
         throw new Error(
-          data.error || "حدث خطأ أثناء رفع الملف"
+          data?.error ||
+            "حدث خطأ أثناء رفع الملف"
         );
       }
+
+      // ==================================================
+      // نجاح الاستيراد
+      // ==================================================
 
       setMessage(
         `تم رفع الملف بنجاح — تم استيراد ${data.total} صنف`
@@ -84,9 +119,15 @@ export default function ExcelUpload() {
         input.value = "";
       }
 
-      console.log("Import result:", data);
+      console.log(
+        "Import result:",
+        data
+      );
     } catch (err) {
-      console.error(err);
+      console.error(
+        "Excel upload error:",
+        err
+      );
 
       setError(
         err.message ||
@@ -96,6 +137,10 @@ export default function ExcelUpload() {
       setUploading(false);
     }
   };
+
+  // ======================================================
+  // الواجهة
+  // ======================================================
 
   return (
     <div className="excel-upload">
@@ -175,4 +220,3 @@ export default function ExcelUpload() {
     </div>
   );
 }
-ExcelUpload.css
