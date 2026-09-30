@@ -19,23 +19,31 @@ app.get("/api/test", (req, res) => {
   res.json({
     success: true,
     message: "API is working",
+    mongoConfigured: !!process.env.MONGO_URI,
   });
 });
 
-console.log("Starting server...");
-console.log("PORT:", PORT);
-console.log("MONGO_URI exists:", !!process.env.MONGO_URI);
+// ======================================================
+// تشغيل السيرفر أولًا
+// ======================================================
 
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB connected");
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
 
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`Server running on port ${PORT}`);
+  // نحاول الاتصال بـ MongoDB بعد تشغيل السيرفر
+  if (!process.env.MONGO_URI) {
+    console.error("MONGO_URI is missing!");
+    return;
+  }
+
+  mongoose
+    .connect(process.env.MONGO_URI, {
+      serverSelectionTimeoutMS: 10000,
+    })
+    .then(() => {
+      console.log("MongoDB connected");
+    })
+    .catch((err) => {
+      console.error("MongoDB connection error:", err.message);
     });
-  })
-  .catch((err) => {
-    console.error("MongoDB connection error:", err.message);
-    process.exit(1);
-  });
+});
