@@ -8,8 +8,7 @@ const fs = require("fs");
 const multer = require("multer");
 const XLSX = require("xlsx");
 
-const Product = require("./models/Product");
-
+const Product = require("./Models/Product");
 const app = express();
 
 // ======================================================
