@@ -4,11 +4,19 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const path = require("path");
+const fs = require("fs");
 const multer = require("multer");
 const XLSX = require("xlsx");
+
 const Product = require("./models/Product");
 
 const app = express();
+
+// ======================================================
+// إعدادات السيرفر
+// ======================================================
+
+const PORT = process.env.PORT || 8080;
 
 app.use(cors());
 app.use(express.json());
@@ -17,11 +25,47 @@ app.use(express.json());
 // الصور
 // ======================================================
 
+// مجلد الصور
 const uploadDir = path.join(__dirname, "uploads");
 
-// جعل فولدر الصور متاح من خلال:
+// إنشاء المجلد لو مش موجود
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, {
+    recursive: true,
+  });
+}
+
+// جعل الصور متاحة:
 // /uploads/اسم_الصورة
-app.use("/uploads", express.static(uploadDir));
+app.use(
+  "/uploads",
+  express.static(uploadDir)
+);
+
+// ======================================================
+// Health Check
+// ======================================================
+
+app.get("/", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    message: "Udnyn Clothing API is running",
+    mongodb:
+      mongoose.connection.readyState === 1
+        ? "connected"
+        : "connecting",
+  });
+});
+
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "healthy",
+    mongodb:
+      mongoose.connection.readyState === 1
+        ? "connected"
+        : "not-connected",
+  });
+});
 
 // ======================================================
 // إعداد Multer للصور
@@ -33,10 +77,14 @@ const storage = multer.diskStorage({
   },
 
   filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
+    const ext = path.extname(
+      file.originalname
+    );
 
-    // الصورة يتم حفظها باسم رقم الصنف
-    cb(null, `${req.params.itemId}${ext}`);
+    cb(
+      null,
+      `${req.params.itemId}${ext}`
+    );
   },
 });
 
@@ -44,12 +92,16 @@ const upload = multer({
   storage,
 
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5 MB
+    fileSize: 5 * 1024 * 1024,
   },
 
   fileFilter: (req, file, cb) => {
-    if (!file.mimetype.startsWith("image/")) {
-      return cb(new Error("لازم يكون ملف صورة"));
+    if (
+      !file.mimetype.startsWith("image/")
+    ) {
+      return cb(
+        new Error("لازم يكون ملف صورة")
+      );
     }
 
     cb(null, true);
@@ -61,12 +113,12 @@ const upload = multer({
 // ======================================================
 
 function parseSheet(ws) {
-  const all = XLSX.utils.sheet_to_json(ws, {
-    header: 1,
-    defval: null,
-  });
+  const all =
+    XLSX.utils.sheet_to_json(ws, {
+      header: 1,
+      defval: null,
+    });
 
-  // البحث عن صف العناوين
   const headIdx = all.findIndex((r) =>
     r.some(
       (c) =>
@@ -76,10 +128,13 @@ function parseSheet(ws) {
   );
 
   if (headIdx === -1) {
-    throw new Error("مش لاقي عمود اسمه: اسم الصنف");
+    throw new Error(
+      "مش لاقي عمود اسمه: اسم الصنف"
+    );
   }
 
-  const [head, ...body] = all.slice(headIdx);
+  const [head, ...body] =
+    all.slice(headIdx);
 
   const keys = head.map((h, i) =>
     typeof h === "string"
@@ -92,7 +147,10 @@ function parseSheet(ws) {
   return body
     .map((r) =>
       Object.fromEntries(
-        keys.map((k, i) => [k, r[i] ?? null])
+        keys.map((k, i) => [
+          k,
+          r[i] ?? null,
+        ])
       )
     )
 
@@ -100,15 +158,21 @@ function parseSheet(ws) {
     .filter((r) => r["اسم الصنف"])
 
     .map((r) => ({
-      itemId: Number(r["رقم الصنف"]),
+      itemId: Number(
+        r["رقم الصنف"]
+      ),
 
       name: r["اسم الصنف"],
 
-      qty: Number(r["إجمالى الكمية"] ?? 0),
+      qty: Number(
+        r["إجمالى الكمية"] ?? 0
+      ),
 
-      category: r["التصنيف"] ?? null,
+      category:
+        r["التصنيف"] ?? null,
 
-      manufacturer: r["المصنع"] ?? null,
+      manufacturer:
+        r["المصنع"] ?? null,
 
       barcode:
         r["باركود"] != null
@@ -132,43 +196,47 @@ const excelUpload = multer({
 app.post(
   "/api/products/import",
   excelUpload.single("file"),
+
   async (req, res) => {
     try {
-      // التأكد من وجود الملف
       if (!req.file) {
         return res.status(400).json({
-          error: "من فضلك اختر ملف Excel",
+          error:
+            "من فضلك اختر ملف Excel",
         });
       }
 
-      // قراءة Excel
-      const wb = XLSX.read(req.file.buffer, {
-        type: "buffer",
-      });
+      const wb = XLSX.read(
+        req.file.buffer,
+        {
+          type: "buffer",
+        }
+      );
 
       if (!wb.SheetNames.length) {
         return res.status(400).json({
-          error: "ملف Excel لا يحتوي على Sheets",
+          error:
+            "ملف Excel لا يحتوي على Sheets",
         });
       }
 
-      const ws = wb.Sheets[wb.SheetNames[0]];
+      const ws =
+        wb.Sheets[
+          wb.SheetNames[0]
+        ];
 
-      // استخراج المنتجات
-      const items = parseSheet(ws);
+      const items =
+        parseSheet(ws);
 
       if (!items.length) {
         return res.status(400).json({
-          error: "لم يتم العثور على أصناف في ملف Excel",
+          error:
+            "لم يتم العثور على أصناف في ملف Excel",
         });
       }
 
       // ==================================================
-      // كل Upload جديد = قائمة العمل الحالية الجديدة
-      //
-      // أولًا نعطل كل المنتجات القديمة
-      // لكن لا نحذفها من MongoDB
-      // وبالتالي الصور تظل محفوظة
+      // تعطيل المنتجات القديمة
       // ==================================================
 
       await Product.updateMany(
@@ -181,99 +249,132 @@ app.post(
       );
 
       // ==================================================
-      // تحديث المنتجات الموجودة في Excel
-      //
-      // $set لا يحتوي imagePath
-      // لذلك الصورة القديمة لن تتأثر
+      // تحديث المنتجات الجديدة
       // ==================================================
 
-      const ops = items.map((item) => ({
-        updateOne: {
-          filter: {
-            itemId: item.itemId,
-          },
-
-          update: {
-            $set: {
-              itemId: item.itemId,
-              name: item.name,
-              qty: item.qty,
-              category: item.category,
-              manufacturer: item.manufacturer,
-              barcode: item.barcode,
-
-              // المنتج موجود في Excel الحالي
-              active: true,
+      const ops = items.map(
+        (item) => ({
+          updateOne: {
+            filter: {
+              itemId:
+                item.itemId,
             },
 
-            // لو المنتج جديد فقط، يتم إنشاء imagePath
-            // بدون التأثير على الصورة الموجودة
-            $setOnInsert: {
-              imagePath: null,
+            update: {
+              $set: {
+                itemId:
+                  item.itemId,
+
+                name:
+                  item.name,
+
+                qty:
+                  item.qty,
+
+                category:
+                  item.category,
+
+                manufacturer:
+                  item.manufacturer,
+
+                barcode:
+                  item.barcode,
+
+                active: true,
+              },
+
+              // فقط عند إنشاء منتج جديد
+              $setOnInsert: {
+                imagePath: null,
+              },
             },
+
+            upsert: true,
           },
+        })
+      );
 
-          upsert: true,
-        },
-      }));
-
-      const result = await Product.bulkWrite(ops);
+      const result =
+        await Product.bulkWrite(
+          ops
+        );
 
       // ==================================================
       // إحصائيات
       // ==================================================
 
-      const activeCount = await Product.countDocuments({
-        active: true,
-      });
+      const activeCount =
+        await Product.countDocuments({
+          active: true,
+        });
 
-      const inactiveCount = await Product.countDocuments({
-        active: false,
-      });
+      const inactiveCount =
+        await Product.countDocuments({
+          active: false,
+        });
 
       res.json({
         message:
           "تم استيراد الملف واستبدال قائمة الشغل الحالية",
 
-        total: items.length,
+        total:
+          items.length,
 
-        inserted: result.upsertedCount || 0,
+        inserted:
+          result.upsertedCount || 0,
 
-        updated: result.modifiedCount || 0,
+        updated:
+          result.modifiedCount || 0,
 
-        active: activeCount,
+        active:
+          activeCount,
 
-        inactive: inactiveCount,
+        inactive:
+          inactiveCount,
       });
     } catch (err) {
-      console.error("Excel import error:", err);
+      console.error(
+        "Excel import error:",
+        err
+      );
 
       res.status(400).json({
-        error: err.message,
+        error:
+          err.message,
       });
     }
   }
 );
 
 // ======================================================
-// كل الأصناف الموجودة في Excel الحالي فقط
+// كل الأصناف الموجودة حاليًا
 // ======================================================
 
-app.get("/api/products", async (req, res) => {
-  try {
-    const products = await Product.find({
-      active: true,
-    }).sort({
-      itemId: 1,
-    });
+app.get(
+  "/api/products",
+  async (req, res) => {
+    try {
+      const products =
+        await Product.find({
+          active: true,
+        }).sort({
+          itemId: 1,
+        });
 
-    res.json(products);
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-    });
+      res.json(products);
+    } catch (err) {
+      console.error(
+        "Products error:",
+        err
+      );
+
+      res.status(500).json({
+        error:
+          err.message,
+      });
+    }
   }
-});
+);
 
 // ======================================================
 // صنف واحد برقمه
@@ -281,25 +382,35 @@ app.get("/api/products", async (req, res) => {
 
 app.get(
   "/api/products/:itemId",
+
   async (req, res) => {
     try {
-      const product = await Product.findOne({
-        itemId: Number(req.params.itemId),
+      const product =
+        await Product.findOne({
+          itemId: Number(
+            req.params.itemId
+          ),
 
-        // نجيب فقط المنتجات الموجودة حاليًا
-        active: true,
-      });
+          active: true,
+        });
 
       if (!product) {
         return res.status(404).json({
-          error: "الصنف مش موجود في ملف العمل الحالي",
+          error:
+            "الصنف مش موجود في ملف العمل الحالي",
         });
       }
 
       res.json(product);
     } catch (err) {
+      console.error(
+        "Single product error:",
+        err
+      );
+
       res.status(500).json({
-        error: err.message,
+        error:
+          err.message,
       });
     }
   }
@@ -311,27 +422,35 @@ app.get(
 
 app.post(
   "/api/products/:itemId/image",
+
   upload.single("image"),
+
   async (req, res) => {
     try {
       if (!req.file) {
         return res.status(400).json({
-          error: "من فضلك اختر صورة",
+          error:
+            "من فضلك اختر صورة",
         });
       }
 
-      const imagePath = `/uploads/${req.file.filename}`;
+      const imagePath =
+        `/uploads/${req.file.filename}`;
 
       const product =
         await Product.findOneAndUpdate(
           {
-            itemId: Number(req.params.itemId),
+            itemId: Number(
+              req.params.itemId
+            ),
+
             active: true,
           },
 
           {
             $set: {
-              imagePath: imagePath,
+              imagePath:
+                imagePath,
             },
           },
 
@@ -342,16 +461,21 @@ app.post(
 
       if (!product) {
         return res.status(404).json({
-          error: "الصنف مش موجود في ملف العمل الحالي",
+          error:
+            "الصنف مش موجود في ملف العمل الحالي",
         });
       }
 
       res.json(product);
     } catch (err) {
-      console.error("Image upload error:", err);
+      console.error(
+        "Image upload error:",
+        err
+      );
 
       res.status(400).json({
-        error: err.message,
+        error:
+          err.message,
       });
     }
   }
@@ -361,23 +485,73 @@ app.post(
 // تشغيل السيرفر
 // ======================================================
 
-const PORT = process.env.PORT || 5000;
+// مهم جدًا:
+// نشغل السيرفر أولًا حتى Back4App يجد الـ port
+// وبعد ذلك نحاول الاتصال بـ MongoDB.
 
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB connected");
+app.listen(
+  PORT,
+  "0.0.0.0",
+  () => {
+    console.log(
+      `Server running on port ${PORT}`
+    );
 
-    // مهم عند النشر على Render
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(
-        `Server running on port ${PORT}`
+    connectMongoDB();
+  }
+);
+
+// ======================================================
+// الاتصال بـ MongoDB Atlas
+// ======================================================
+
+async function connectMongoDB() {
+  try {
+    if (!process.env.MONGO_URI) {
+      console.error(
+        "ERROR: MONGO_URI is not defined"
       );
-    });
-  })
-  .catch((err) => {
+
+      return;
+    }
+
+    await mongoose.connect(
+      process.env.MONGO_URI,
+      {
+        serverSelectionTimeoutMS: 10000,
+      }
+    );
+
+    console.log(
+      "MongoDB connected"
+    );
+  } catch (err) {
     console.error(
       "MongoDB connection error:",
       err.message
     );
-  });
+  }
+}
+
+// ======================================================
+// التعامل مع أخطاء MongoDB
+// ======================================================
+
+mongoose.connection.on(
+  "error",
+  (err) => {
+    console.error(
+      "MongoDB runtime error:",
+      err.message
+    );
+  }
+);
+
+mongoose.connection.on(
+  "disconnected",
+  () => {
+    console.log(
+      "MongoDB disconnected"
+    );
+  }
+);
