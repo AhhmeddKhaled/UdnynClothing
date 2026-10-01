@@ -5,9 +5,7 @@ import "./ProductImageUpload.css";
 // رابط السيرفر على Back4App
 // ======================================================
 
-const API_URL =
-  "https://udnynclothing23-qpvb1v2q.b4a.run";
-
+  const API_URL = "https://udnynclothing23-w873pt63.b4a.run";
 export default function ProductImageUpload() {
   const [itemId, setItemId] = useState("");
   const [file, setFile] = useState(null);
