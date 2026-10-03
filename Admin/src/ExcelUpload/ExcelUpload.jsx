@@ -7,7 +7,7 @@ import "./ExcelUpload.css";
 // ======================================================
 
 
-const API_URL = "https://udnynclothing23-w873pt63.b4a.run";
+const API_URL = "http://72.62.37.66:5000";"https://udnynclothing23-w873pt63.b4a.run";
 
 export default function ExcelUpload() {
   const [file, setFile] = useState(null);
