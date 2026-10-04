@@ -1,19 +1,27 @@
 import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
 import './App.css'
 import ExcelUpload from './ExcelUpload/ExcelUpload.jsx';
 import ProductImageUpload from './ProductImageUpload/ProductImageUpload.jsx'
-
+import Login from './pages/Login/Login.jsx';
+import { isLoggedIn, getUser, logout } from './pages/Login/auth.js';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [user, setUser] = useState(getUser())
+
+  if (!isLoggedIn()) {
+    return <Login onSuccess={setUser} />
+  }
 
   return (
     <>
-    <ExcelUpload />
-    <ProductImageUpload />
+      <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 16px" }}>
+        <span>مرحبًا، {user?.name}</span>
+        <button onClick={() => { logout(); setUser(null); }}>
+          تسجيل الخروج
+        </button>
+      </div>
+      <ExcelUpload />
+      <ProductImageUpload />
     </>
   )
 }

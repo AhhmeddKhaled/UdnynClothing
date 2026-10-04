@@ -8,16 +8,22 @@ const {
   deleteUser,
 } = require("../controllers/userController");
 
+const authenticate = require("../middleware/auth");
+const authorize = require("../middleware/authorize");
+
 const router = express.Router();
 
-router.post("/", createUser);
+// كل الراوتس هنا محتاجة تسجيل دخول الأول
+router.use(authenticate);
 
-router.get("/", getUsers);
+router.post("/", authorize("users.create"), createUser);
 
-router.get("/:id", getUser);
+router.get("/", authorize("users.read"), getUsers);
 
-router.patch("/:id", updateUser);
+router.get("/:id", authorize("users.read"), getUser);
 
-router.delete("/:id", deleteUser);
+router.patch("/:id", authorize("users.update"), updateUser);
+
+router.delete("/:id", authorize("users.delete"), deleteUser);
 
 module.exports = router;
