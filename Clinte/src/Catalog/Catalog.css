@@ -1,0 +1,321 @@
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 20px 16px 48px;
+  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  direction: rtl;
+}
+
+.wrap h1 {
+  font-size: 20px;
+  margin: 0 0 14px;
+}
+
+/* =========================
+   أدوات البحث والفلترة
+========================= */
+
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.tools input[type="search"] {
+  flex: 1 1 220px;
+  min-width: 200px;
+  font: inherit;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.tools input[type="search"]:focus {
+  border-color: #1f6f5c;
+}
+
+.tools select {
+  font: inherit;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fff;
+  color: #333;
+  cursor: pointer;
+  min-width: 150px;
+  outline: none;
+}
+
+.tools select:focus {
+  border-color: #1f6f5c;
+}
+
+.tools button {
+  cursor: pointer;
+  font: inherit;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #1f6f5c;
+  color: #fff;
+}
+
+.tools button:hover {
+  background: #185847;
+}
+
+.tools .clear-btn {
+  background: #777;
+}
+
+.tools .clear-btn:hover {
+  background: #555;
+}
+
+/* =========================
+   العدد
+========================= */
+
+.count {
+  color: #68716c;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.count strong {
+  color: #1d2320;
+}
+
+/* =========================
+   Grid
+========================= */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(170px, 1fr)
+  );
+  gap: 14px;
+}
+
+@media (max-width: 420px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+/* =========================
+   Card
+========================= */
+
+.card {
+  background: #fff;
+  border: 1px solid #e3e1db;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 4px 14px
+    rgba(0, 0, 0, 0.08);
+}
+
+/* =========================
+   الصورة
+========================= */
+
+.pic {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  background: #eee;
+  overflow: hidden;
+}
+
+.pic img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.no-image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-size: 13px;
+}
+
+/* =========================
+   رقم الصنف
+========================= */
+
+.chip {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background:
+    rgba(255, 255, 255, 0.92);
+  font-size: 12px;
+  padding: 2px 9px;
+  border-radius: 99px;
+}
+
+/* =========================
+   البيانات
+========================= */
+
+.info {
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.name {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.45;
+  min-height: 2.9em;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+
+  overflow: hidden;
+}
+
+/* =========================
+   الكمية
+========================= */
+
+.qty {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+
+  border-top: 1px solid #e3e1db;
+  padding-top: 6px;
+
+  font-size: 13px;
+  color: #68716c;
+}
+
+.qty b {
+  font-size: 16px;
+  color: #1d2320;
+}
+
+/* =========================
+   عرض المزيد
+========================= */
+
+.morewrap {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.morewrap button {
+  font: inherit;
+  padding: 10px 26px;
+  border: 0;
+  border-radius: 8px;
+  background: #1f6f5c;
+  color: #fff;
+  cursor: pointer;
+}
+
+.morewrap button:hover {
+  background: #185847;
+}
+
+/* =========================
+   Loading
+========================= */
+
+.products-loading {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 50px 16px;
+  text-align: center;
+  color: #68716c;
+  font-family:
+    "Segoe UI",
+    Tahoma,
+    Arial,
+    sans-serif;
+}
+
+/* =========================
+   Error
+========================= */
+
+.products-error {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 50px 16px;
+  text-align: center;
+  color: #b3261e;
+}
+
+.retry-btn {
+  font: inherit;
+  padding: 9px 20px;
+  border: 0;
+  border-radius: 8px;
+  background: #1f6f5c;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* =========================
+   لا توجد نتائج
+========================= */
+
+.no-results {
+  text-align: center;
+  padding: 40px 10px;
+  color: #68716c;
+  font-size: 14px;
+}
+
+/* =========================
+   موبايل
+========================= */
+
+@media (max-width: 600px) {
+  .tools {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .tools input[type="search"] {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+
+  .tools select {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .tools button {
+    width: 100%;
+  }
+}

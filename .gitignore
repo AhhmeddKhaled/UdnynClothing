@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Environment secrets
+.env
+server/.env
+Admin/.env
+Clinte/.env
+
+# Uploads
+uploads/
+server/uploads/
+
+# Build files
+dist/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
