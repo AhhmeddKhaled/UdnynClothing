@@ -1,0 +1,193 @@
+.excel-upload {
+  width: 100%;
+  padding: 30px 16px;
+  box-sizing: border-box;
+  direction: rtl;
+  font-family:
+    "Segoe UI",
+    Tahoma,
+    Arial,
+    sans-serif;
+}
+
+.excel-upload-box {
+  max-width: 600px;
+  margin: 0 auto;
+
+  background: #fff;
+
+  border: 1px solid #e3e1db;
+  border-radius: 12px;
+
+  padding: 24px;
+
+  box-sizing: border-box;
+}
+
+.excel-upload-box h2 {
+  margin: 0 0 8px;
+  font-size: 21px;
+}
+
+.excel-upload-hint {
+  margin: 0 0 20px;
+
+  color: #68716c;
+
+  font-size: 14px;
+}
+
+/* =========================
+   اختيار الملف
+========================= */
+
+.excel-file-label {
+  display: block;
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  padding: 14px;
+
+  border: 2px dashed #1f6f5c;
+
+  border-radius: 10px;
+
+  text-align: center;
+
+  color: #1f6f5c;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s;
+}
+
+.excel-file-label:hover {
+  background: #f5faf8;
+}
+
+.excel-file-input {
+  display: none;
+}
+
+/* =========================
+   الملف المختار
+========================= */
+
+.selected-file {
+  margin-top: 14px;
+
+  padding: 10px 12px;
+
+  background: #f5f5f5;
+
+  border-radius: 8px;
+
+  font-size: 13px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.selected-file span {
+  color: #68716c;
+}
+
+.selected-file strong {
+  color: #1d2320;
+
+  word-break: break-word;
+}
+
+/* =========================
+   زر الرفع
+========================= */
+
+.excel-upload-button {
+  width: 100%;
+
+  margin-top: 16px;
+
+  padding: 12px;
+
+  border: 0;
+
+  border-radius: 8px;
+
+  background: #1f6f5c;
+
+  color: #fff;
+
+  font: inherit;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+.excel-upload-button:hover:not(:disabled) {
+  background: #185847;
+}
+
+.excel-upload-button:disabled {
+  background: #aaa;
+
+  cursor: not-allowed;
+}
+
+/* =========================
+   Success
+========================= */
+
+.excel-success {
+  margin-top: 15px;
+
+  padding: 11px 12px;
+
+  border-radius: 8px;
+
+  background: #eaf7f0;
+
+  color: #176b42;
+
+  font-size: 14px;
+}
+
+/* =========================
+   Error
+========================= */
+
+.excel-error {
+  margin-top: 15px;
+
+  padding: 11px 12px;
+
+  border-radius: 8px;
+
+  background: #fff0ef;
+
+  color: #b3261e;
+
+  font-size: 14px;
+}
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 600px) {
+  .excel-upload {
+    padding: 20px 10px;
+  }
+
+  .excel-upload-box {
+    padding: 18px;
+  }
+}

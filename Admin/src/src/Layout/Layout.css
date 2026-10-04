@@ -1,0 +1,19 @@
+.lo-shell {
+  display: flex;
+  min-height: 100dvh;
+}
+
+.lo-content {
+  flex: 1;
+  min-width: 0;
+  background: var(--color-sand, #F3EDE4);
+  padding: 24px;
+  padding-top: calc(24px + env(safe-area-inset-top, 0px));
+}
+
+@media (max-width: 860px) {
+  .lo-content {
+    /* مساحة للـ topbar بتاع الموبايل اللي بيظهر من Sidebar */
+    padding-top: calc(70px + env(safe-area-inset-top, 0px));
+  }
+}
