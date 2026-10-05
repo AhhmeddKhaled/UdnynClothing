@@ -1,0 +1,16 @@
+.users-search {
+  font: inherit;
+  font-size: 13px;
+  width: 100%;
+  max-width: 320px;
+  padding: 9px 12px;
+  border: 1px solid var(--d-border);
+  border-radius: 8px;
+  background: var(--d-bg);
+  color: var(--d-ink);
+  margin-bottom: 16px;
+}
+.users-search:focus-visible { outline: 2px solid var(--d-accent); outline-offset: 1px; }
+
+.users-table th, .users-table td { padding: 10px 16px; }
+.users-email { color: var(--d-ink-soft); }

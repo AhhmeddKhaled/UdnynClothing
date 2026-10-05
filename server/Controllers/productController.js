@@ -8,49 +8,42 @@ const parseSheet = require("../utils/excelParser");
 // Import Products From Excel
 // ======================================================
 
-async function importProducts(req, res) {
+async function importProducts(req, res, next) {
   try {
     if (!req.file) {
       return res.status(400).json({
-        error: "من فضلك اختر ملف Excel",
+        success: false,
+        message: "من فضلك اختر ملف Excel",
       });
     }
 
     // التأكد من اتصال MongoDB
-    if (
-      mongoose.connection.readyState !== 1
-    ) {
+    if (mongoose.connection.readyState !== 1) {
       return res.status(503).json({
-        error:
-          "قاعدة البيانات غير متصلة حاليًا",
+        success: false,
+        message: "قاعدة البيانات غير متصلة حاليًا",
       });
     }
 
-    const wb = XLSX.read(
-      req.file.buffer,
-      {
-        type: "buffer",
-      }
-    );
+    const wb = XLSX.read(req.file.buffer, {
+      type: "buffer",
+    });
 
     if (!wb.SheetNames.length) {
       return res.status(400).json({
-        error:
-          "ملف Excel لا يحتوي على Sheets",
+        success: false,
+        message: "ملف Excel لا يحتوي على Sheets",
       });
     }
 
-    const ws =
-      wb.Sheets[
-        wb.SheetNames[0]
-      ];
+    const ws = wb.Sheets[wb.SheetNames[0]];
 
     const items = parseSheet(ws);
 
     if (!items.length) {
       return res.status(400).json({
-        error:
-          "لم يتم العثور على أصناف في ملف Excel",
+        success: false,
+        message: "لم يتم العثور على أصناف في ملف Excel",
       });
     }
 
@@ -83,8 +76,7 @@ async function importProducts(req, res) {
             name: item.name,
             qty: item.qty,
             category: item.category,
-            manufacturer:
-              item.manufacturer,
+            manufacturer: item.manufacturer,
             barcode: item.barcode,
             active: true,
           },
@@ -98,22 +90,19 @@ async function importProducts(req, res) {
       },
     }));
 
-    const result =
-      await Product.bulkWrite(ops);
+    const result = await Product.bulkWrite(ops);
 
     // ==================================================
     // Statistics
     // ==================================================
 
-    const activeCount =
-      await Product.countDocuments({
-        active: true,
-      });
+    const activeCount = await Product.countDocuments({
+      active: true,
+    });
 
-    const inactiveCount =
-      await Product.countDocuments({
-        active: false,
-      });
+    const inactiveCount = await Product.countDocuments({
+      active: false,
+    });
 
     res.json({
       success: true,
@@ -123,26 +112,17 @@ async function importProducts(req, res) {
 
       total: items.length,
 
-      inserted:
-        result.upsertedCount || 0,
+      inserted: result.upsertedCount || 0,
 
-      updated:
-        result.modifiedCount || 0,
+      updated: result.modifiedCount || 0,
 
       active: activeCount,
 
       inactive: inactiveCount,
     });
-  } catch (err) {
-    console.error(
-      "Excel import error:",
-      err
-    );
-
-    res.status(400).json({
-      success: false,
-      error: err.message,
-    });
+  } catch (error) {
+    console.error("Excel import error:", error);
+    next(error);
   }
 }
 
@@ -152,9 +132,53 @@ async function importProducts(req, res) {
 
 async function getProducts(req, res, next) {
   try {
-    const itemId = Number(req.params.itemId);
+    // التأكد من اتصال MongoDB
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: "قاعدة البيانات غير متصلة حاليًا",
+      });
+    }
 
-    console.log("Requested itemId:", req.params.itemId);
+    // ================================================
+    // هنا لا نستخدم req.params.itemId
+    // لأن الـ route هو:
+    // GET /api/products
+    // ================================================
+
+    const products = await Product.find({
+      active: true,
+    }).sort({
+      itemId: 1,
+    });
+
+    res.json(products);
+  } catch (error) {
+    console.error("Get products error:", error);
+    next(error);
+  }
+}
+
+// ======================================================
+// Get One Product
+// ======================================================
+
+async function getProduct(req, res, next) {
+  try {
+    // التأكد من اتصال MongoDB
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({
+        success: false,
+        message: "قاعدة البيانات غير متصلة حاليًا",
+      });
+    }
+
+    const rawItemId = req.params.itemId;
+
+    console.log("Requested itemId:", rawItemId);
+
+    const itemId = Number(rawItemId);
+
     console.log("Parsed itemId:", itemId);
 
     if (!Number.isInteger(itemId) || itemId <= 0) {
@@ -166,7 +190,7 @@ async function getProducts(req, res, next) {
 
     const product = await Product.findOne({
       itemId,
-      isActive: true,
+      active: true,
     });
 
     if (!product) {
@@ -176,58 +200,10 @@ async function getProducts(req, res, next) {
       });
     }
 
-    res.json({
-      success: true,
-      product,
-    });
-  } catch (error) {
-    next(error);
-  }
-}
-
-
-// ======================================================
-// Get One Product
-// ======================================================
-
-async function getProduct(req, res) {
-  try {
-    if (
-      mongoose.connection.readyState !== 1
-    ) {
-      return res.status(503).json({
-        error:
-          "قاعدة البيانات غير متصلة حاليًا",
-      });
-    }
-
-    const itemId = Number(
-      req.params.itemId
-    );
-
-    const product =
-      await Product.findOne({
-        itemId,
-        active: true,
-      });
-
-    if (!product) {
-      return res.status(404).json({
-        error:
-          "الصنف مش موجود في ملف العمل الحالي",
-      });
-    }
-
     res.json(product);
-  } catch (err) {
-    console.error(
-      "Get product error:",
-      err
-    );
-
-    res.status(500).json({
-      error: err.message,
-    });
+  } catch (error) {
+    console.error("Get product error:", error);
+    next(error);
   }
 }
 
@@ -235,69 +211,63 @@ async function getProduct(req, res) {
 // Upload / Update Product Image
 // ======================================================
 
-async function uploadProductImage(
-  req,
-  res
-) {
+async function uploadProductImage(req, res, next) {
   try {
     if (!req.file) {
       return res.status(400).json({
-        error:
-          "من فضلك اختر صورة",
+        success: false,
+        message: "من فضلك اختر صورة",
       });
     }
 
-    if (
-      mongoose.connection.readyState !== 1
-    ) {
+    if (mongoose.connection.readyState !== 1) {
       return res.status(503).json({
-        error:
-          "قاعدة البيانات غير متصلة حاليًا",
+        success: false,
+        message: "قاعدة البيانات غير متصلة حاليًا",
       });
     }
 
-    const imagePath =
-      `/uploads/${req.file.filename}`;
+    const rawItemId = req.params.itemId;
+    const itemId = Number(rawItemId);
 
-    const product =
-      await Product.findOneAndUpdate(
-        {
-          itemId: Number(
-            req.params.itemId
-          ),
+    if (!Number.isInteger(itemId) || itemId <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid product itemId",
+      });
+    }
 
-          active: true,
+    const imagePath = `/uploads/${req.file.filename}`;
+
+    const product = await Product.findOneAndUpdate(
+      {
+        itemId,
+        active: true,
+      },
+      {
+        $set: {
+          imagePath,
         },
-
-        {
-          $set: {
-            imagePath,
-          },
-        },
-
-        {
-          new: true,
-        }
-      );
+      },
+      {
+        new: true,
+      }
+    );
 
     if (!product) {
       return res.status(404).json({
-        error:
-          "الصنف مش موجود في ملف العمل الحالي",
+        success: false,
+        message: "الصنف مش موجود في ملف العمل الحالي",
       });
     }
 
-    res.json(product);
-  } catch (err) {
-    console.error(
-      "Image upload error:",
-      err
-    );
-
-    res.status(400).json({
-      success: false,
-      error: err.message,
+    res.json({
+      success: true,
+      product,
     });
+  } catch (error) {
+    console.error("Image upload error:", error);
+    next(error);
   }
 }
 

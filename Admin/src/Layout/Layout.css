@@ -1,19 +1,35 @@
 .lo-shell {
   display: flex;
   min-height: 100dvh;
+  --lo-bg: #FFFFFF;
+  --lo-bg-subtle: #FAFAFA;
+  --lo-border: rgba(0,0,0,.08);
+  --lo-ink: #1A1A1A;
+  --lo-ink-soft: #6B6B6B;
+  --lo-accent: #3B2436;
+}
+
+.lo-shell[data-theme="dark"] {
+  --lo-bg: #121212;
+  --lo-bg-subtle: #1A1A1A;
+  --lo-border: rgba(255,255,255,.1);
+  --lo-ink: #F2F2F2;
+  --lo-ink-soft: #A0A0A0;
+  --lo-accent: #D7B7CE;
 }
 
 .lo-content {
   flex: 1;
   min-width: 0;
-  background: var(--color-sand, #F3EDE4);
+  background: var(--lo-bg);
+  color: var(--lo-ink);
   padding: 24px;
   padding-top: calc(24px + env(safe-area-inset-top, 0px));
+  font-family: "Inter", -apple-system, "Segoe UI", sans-serif;
 }
 
 @media (max-width: 860px) {
   .lo-content {
-    /* مساحة للـ topbar بتاع الموبايل اللي بيظهر من Sidebar */
     padding-top: calc(70px + env(safe-area-inset-top, 0px));
   }
 }

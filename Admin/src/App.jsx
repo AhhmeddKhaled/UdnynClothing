@@ -4,6 +4,7 @@ import Layout from './Layout/Layout.jsx'
 import ProtectedRoute from './Layout/ProtectedRoute.jsx'
 import Dashboard from './pages/Dashboard/Dashboard.jsx'
 import Products from './pages/Products/Products.jsx'
+import Users from './pages/Users/Users.jsx'
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="products" element={<Products />} />
+        <Route path="users" element={<Users />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

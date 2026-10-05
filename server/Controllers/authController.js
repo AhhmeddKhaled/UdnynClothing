@@ -95,6 +95,13 @@ async function login(req, res, next) {
       .select("+password")
       .populate("role", "name permissions");
 
+    console.log("LOGIN USER:", {
+      found: !!user,
+      email: user?.email,
+      role: user?.role?.name,
+      passwordHash: user?.password,
+    });
+
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -109,10 +116,7 @@ async function login(req, res, next) {
       });
     }
 
-    const passwordMatch = await bcrypt.compare(
-      password,
-      user.password
-    );
+    const passwordMatch = await bcrypt.compare(password, user.password);
 
     if (!passwordMatch) {
       return res.status(401).json({
@@ -130,7 +134,7 @@ async function login(req, res, next) {
       process.env.JWT_SECRET,
       {
         expiresIn: "7d",
-      }
+      },
     );
 
     res.json({
