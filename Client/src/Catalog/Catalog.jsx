@@ -5,7 +5,7 @@ import "./Catalog.css";
 // رابط السيرفر على Back4App
 // ======================================================
 
-const API_URL = "https://udnyn.com";;"https://udnynclothing23-w873pt63.b4a.run";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const PAGE_SIZE = 40;
 
