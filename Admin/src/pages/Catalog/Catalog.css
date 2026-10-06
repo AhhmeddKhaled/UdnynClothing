@@ -1,0 +1,389 @@
+/* ======================================================
+   Catalog Page
+   ====================================================== */
+
+.catalog-page {
+  padding: var(--space-8);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+/* ======================================================
+   Header
+   ====================================================== */
+
+.catalog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-6);
+}
+
+.catalog-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  color: var(--color-plum);
+}
+
+/* ======================================================
+   Buttons
+   ====================================================== */
+
+.catalog-add-btn,
+.catalog-save-btn {
+  border: none;
+  border-radius: var(--radius-md);
+
+  padding: var(--space-3) var(--space-5);
+
+  background: var(--color-plum);
+  color: var(--color-paper);
+
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    opacity 0.2s ease,
+    background 0.2s ease;
+}
+
+.catalog-add-btn:hover,
+.catalog-save-btn:hover {
+  opacity: 0.88;
+}
+
+.catalog-save-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ======================================================
+   Error
+   ====================================================== */
+
+.catalog-error {
+  margin-bottom: var(--space-5);
+
+  padding: var(--space-3) var(--space-4);
+
+  border: 1px solid var(--color-clay);
+  border-radius: var(--radius-sm);
+
+  background: var(--color-clay-bg);
+  color: var(--color-clay);
+
+  font-size: var(--text-sm);
+}
+
+/* ======================================================
+   Add Product Form
+   ====================================================== */
+
+.catalog-form {
+  margin-bottom: var(--space-8);
+
+  padding: var(--space-6);
+
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+
+  background: var(--color-paper);
+  box-shadow: var(--shadow-card);
+}
+
+.catalog-form-title {
+  margin: 0 0 var(--space-6);
+
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+
+  color: var(--color-plum);
+}
+
+/* ======================================================
+   Form Fields
+   ====================================================== */
+
+.catalog-form-group {
+  display: flex;
+  flex-direction: column;
+
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.catalog-form-group label {
+  color: var(--color-plum-soft);
+
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.catalog-form-group input,
+.catalog-form-group textarea {
+  width: 100%;
+  box-sizing: border-box;
+
+  padding: var(--space-3);
+
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+
+  background: var(--color-paper);
+  color: var(--color-ink);
+
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+
+  outline: none;
+
+  transition: border-color 0.2s ease;
+}
+
+.catalog-form-group input:focus,
+.catalog-form-group textarea:focus {
+  border-color: var(--color-gold);
+}
+
+.catalog-form-group textarea {
+  min-height: 100px;
+
+  resize: vertical;
+}
+
+/* ======================================================
+   Featured Checkbox
+   ====================================================== */
+
+.catalog-checkbox {
+  display: flex;
+  align-items: center;
+
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+
+  color: var(--color-plum-soft);
+
+  font-size: var(--text-sm);
+}
+
+.catalog-checkbox input {
+  width: auto;
+}
+
+/* ======================================================
+   Catalog Table
+   ====================================================== */
+
+.catalog-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-card);
+}
+
+.catalog-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  color: var(--color-ink);
+
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+}
+
+/* ======================================================
+   Table Header
+   ====================================================== */
+
+.catalog-table th {
+  padding: var(--space-4);
+
+  border-bottom: 1px solid var(--color-line);
+
+  color: var(--color-plum-soft);
+
+  font-size: var(--text-xs);
+  font-weight: 600;
+
+  text-align: left;
+
+  white-space: nowrap;
+}
+
+/* ======================================================
+   Table Body
+   ====================================================== */
+
+.catalog-table td {
+  padding: var(--space-4);
+
+  border-bottom: 1px solid var(--color-line);
+
+  color: var(--color-ink);
+
+  vertical-align: middle;
+}
+
+.catalog-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.catalog-table tbody tr {
+  transition: background 0.2s ease;
+}
+
+/* No colored hover */
+
+.catalog-table tbody tr:hover {
+  background: transparent;
+}
+
+/* ======================================================
+   Product Column
+   ====================================================== */
+
+.catalog-table-product {
+  min-width: 220px;
+}
+
+.catalog-table-product-name {
+  display: block;
+
+  color: var(--color-plum);
+
+  font-size: var(--text-base);
+  font-weight: 600;
+}
+
+.catalog-table-product-description {
+  display: block;
+
+  max-width: 300px;
+
+  margin-top: var(--space-1);
+
+  color: var(--color-plum-soft);
+
+  font-size: var(--text-xs);
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ======================================================
+   Price
+   ====================================================== */
+
+.catalog-table-price {
+  color: var(--color-gold-deep);
+
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+/* ======================================================
+   Featured Badge
+   ====================================================== */
+
+.catalog-featured {
+  display: inline-block;
+
+  padding: var(--space-1) var(--space-2);
+
+  border-radius: var(--radius-md);
+
+  background: var(--color-sage-bg);
+  color: var(--color-sage);
+
+  font-size: var(--text-xs);
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+/* ======================================================
+   Standard Status
+   ====================================================== */
+
+.catalog-status {
+  display: inline-block;
+
+  padding: var(--space-1) var(--space-2);
+
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+
+  background: transparent;
+  color: var(--color-plum-soft);
+
+  font-size: var(--text-xs);
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+/* ======================================================
+   Empty State
+   ====================================================== */
+
+.catalog-empty {
+  padding: var(--space-8);
+
+  border: 1px dashed var(--color-line);
+  border-radius: var(--radius-sm);
+
+  background: var(--color-paper);
+  color: var(--color-plum-soft);
+
+  text-align: center;
+
+  font-size: var(--text-base);
+}
+
+/* ======================================================
+   Loading State
+   ====================================================== */
+
+.catalog-loading {
+  padding: var(--space-8);
+
+  text-align: center;
+}
+
+.catalog-loading-text {
+  margin: var(--space-3) 0 0;
+
+  color: var(--color-plum-soft);
+
+  font-size: var(--text-sm);
+}
+
+/* ======================================================
+   Responsive
+   ====================================================== */
+
+@media (max-width: 768px) {
+  .catalog-page {
+    padding: var(--space-5);
+  }
+
+  .catalog-header {
+    align-items: flex-start;
+    flex-direction: column;
+
+    gap: var(--space-4);
+  }
+
+  .catalog-table {
+    min-width: 800px;
+  }
+}

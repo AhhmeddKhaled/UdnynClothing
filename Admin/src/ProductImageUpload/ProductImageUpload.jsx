@@ -86,7 +86,7 @@ export default function ProductImageUpload() {
       formData.append("image", file);
 
       const response = await fetch(
-        `${API_URL}/api/products/${itemId.trim()}/image`,
+        `${API_URL}/api/availableStock/${itemId.trim()}/image`,
         {
           method: "POST",
           body: formData,

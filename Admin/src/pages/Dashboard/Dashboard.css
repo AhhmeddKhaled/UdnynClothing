@@ -1,164 +1,501 @@
+/* ======================================================
+   Dashboard
+   Uses Global Design System Tokens
+   ====================================================== */
+
 .dash {
-  --d-bg: #FFFFFF;
-  --d-bg-subtle: #FAFAFA;
-  --d-border: rgba(0,0,0,.08);
-  --d-ink: #1A1A1A;
-  --d-ink-soft: #6B6B6B;
-  --d-accent: #3B2436;
-  --d-accent-soft: rgba(59,36,54,.08);
-  --d-gold: #B08968;
-  --d-gold-soft: rgba(176,137,104,.12);
-  --d-success: #2F7D5C;
-  --d-success-bg: #E8F2ED;
-  --d-danger: #C0493A;
-  --d-danger-bg: #FBEAE7;
-
-  font-family: "Inter", -apple-system, "Segoe UI", sans-serif;
-  color: var(--d-ink);
-  background: var(--d-bg);
   min-height: 100%;
+
+  background: var(--color-paper);
+  color: var(--color-ink);
+
+  font-family: var(--font-body);
 }
 
-.dash[data-theme="dark"] {
-  --d-bg: #121212;
-  --d-bg-subtle: #1C1C1C;
-  --d-border: rgba(255,255,255,.1);
-  --d-ink: #F2F2F2;
-  --d-ink-soft: #A0A0A0;
-  --d-accent: #D7B7CE;
-  --d-accent-soft: rgba(215,183,206,.14);
-  --d-gold: #D2AE87;
-  --d-gold-soft: rgba(210,174,135,.14);
-  --d-success: #6FBE94;
-  --d-success-bg: #1C2B22;
-  --d-danger: #E08476;
-  --d-danger-bg: #2E1C19;
+.dash * {
+  box-sizing: border-box;
 }
 
-.dash * { box-sizing: border-box; }
-.dash table { font-variant-numeric: tabular-nums; }
+.dash table {
+  font-variant-numeric: tabular-nums;
+}
 
-/* ===== Header ===== */
+/* ======================================================
+   Header
+   ====================================================== */
+
 .dash-top {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 16px;
-  margin-bottom: 28px;
+
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
 }
-.dash-title { font-size: 22px; font-weight: 700; margin: 0 0 4px; letter-spacing: -.01em; }
-.dash-subtitle { font-size: 13px; color: var(--d-ink-soft); margin: 0; }
-.dash-actions { display: flex; gap: 8px; }
+
+.dash-title {
+  margin: 0 0 var(--space-1);
+
+  color: var(--color-plum);
+
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+
+  letter-spacing: -0.01em;
+}
+
+.dash-subtitle {
+  margin: 0;
+
+  color: var(--color-plum-soft);
+
+  font-size: var(--text-sm);
+}
+
+.dash-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+/* ======================================================
+   Buttons
+   ====================================================== */
 
 .dash-btn {
-  font: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  border-radius: 8px;
-  padding: 9px 16px;
-  cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--d-border);
-  transition: background .15s, border-color .15s, opacity .15s;
+
+  padding: var(--space-2) var(--space-4);
+
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+
+  background: var(--color-paper);
+  color: var(--color-ink);
+
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 500;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease;
 }
-.dash-btn:disabled { opacity: .5; cursor: default; }
+
+.dash-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .dash-btn-primary {
-  background: var(--d-accent);
-  color: var(--d-bg);
-  border-color: var(--d-accent);
+  background: var(--color-plum);
+  color: var(--color-paper);
+  border-color: var(--color-plum);
 }
-.dash-btn-primary:hover:not(:disabled) { opacity: .88; }
+
+.dash-btn-primary:hover:not(:disabled) {
+  opacity: 0.88;
+}
+
 .dash-btn-ghost {
-  background: var(--d-bg);
-  color: var(--d-ink-soft);
-  width: 36px; height: 36px; padding: 0;
-}
-.dash-btn-ghost:hover { color: var(--d-ink); border-color: var(--d-ink-soft); }
+  width: 36px;
+  height: 36px;
 
-/* ===== Cards ===== */
+  padding: 0;
+
+  background: transparent;
+  color: var(--color-plum-soft);
+}
+
+.dash-btn-ghost:hover {
+  color: var(--color-ink);
+  border-color: var(--color-plum-soft);
+}
+
+/* ======================================================
+   Cards
+   ====================================================== */
+
 .dash-card {
-  background: var(--d-bg);
-  border: 1px solid var(--d-border);
-  border-radius: 12px;
-  padding: 18px 20px;
+  padding: var(--space-4) var(--space-5);
+
+  background: var(--color-paper);
+
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+
+  box-shadow: var(--shadow-card);
 }
 
-/* ===== Stat row ===== */
+/* ======================================================
+   Stat Row
+   ====================================================== */
+
 .dash-stats {
   display: grid;
+
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 12px;
-  margin-bottom: 36px;
+
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
 }
-.dash-stat .dash-label { font-size: 12px; color: var(--d-ink-soft); margin-bottom: 2px; }
-.dash-stat .dash-value { font-size: 24px; font-weight: 700; letter-spacing: -.01em; }
-.dash-hint { font-size: 11px; color: var(--d-ink-soft); margin-top: 4px; }
-@media (max-width: 760px) { .dash-stats { grid-template-columns: repeat(2, 1fr); } }
+
+.dash-stat .dash-label {
+  margin-bottom: var(--space-1);
+
+  color: var(--color-plum-soft);
+
+  font-size: var(--text-xs);
+}
+
+.dash-stat .dash-value {
+  color: var(--color-ink);
+
+  font-size: var(--text-2xl);
+  font-weight: 700;
+
+  letter-spacing: -0.01em;
+}
+
+.dash-hint {
+  margin-top: var(--space-1);
+
+  color: var(--color-plum-soft);
+
+  font-size: var(--text-xs);
+}
+
+/* ======================================================
+   Stat Icons
+   ====================================================== */
 
 .dash-stat-icon {
-  width: 32px; height: 32px;
-  display: flex; align-items: center; justify-content: center;
-  border-radius: 8px;
-  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 32px;
+  height: 32px;
+
+  margin-bottom: var(--space-3);
+
+  border-radius: var(--radius-md);
 }
-.dash-icon-accent  { background: var(--d-accent-soft); color: var(--d-accent); }
-.dash-icon-success { background: var(--d-success-bg); color: var(--d-success); }
-.dash-icon-gold     { background: var(--d-gold-soft); color: var(--d-gold); }
-.dash-icon-danger   { background: var(--d-danger-bg); color: var(--d-danger); }
-.dash-icon-neutral  { background: var(--d-bg-subtle); color: var(--d-ink-soft); }
 
-/* ===== Section headers ===== */
-.dash-section-head { margin-bottom: 14px; }
-.dash-section-head h2 { font-size: 14px; font-weight: 600; margin: 0 0 2px; }
-.dash-section-head p { font-size: 12px; color: var(--d-ink-soft); margin: 0; }
+.dash-icon-accent {
+  background: rgba(59, 36, 54, 0.08);
+  color: var(--color-plum);
+}
 
-section { margin-bottom: 36px; }
+.dash-icon-success {
+  background: var(--color-sage-bg);
+  color: var(--color-sage);
+}
 
-/* ===== Alerts ===== */
-.dash-alert-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-@media (max-width: 760px) { .dash-alert-grid { grid-template-columns: 1fr; } }
-.dash-alert-card .dash-what { font-size: 13px; color: var(--d-ink-soft); margin: 8px 0 10px; }
-.dash-alert-list { font-size: 12px; max-height: 120px; overflow-y: auto; }
-.dash-alert-list div { padding: 4px 0; border-top: 1px solid var(--d-border); }
+.dash-icon-gold {
+  background: var(--color-sand);
+  color: var(--color-gold-deep);
+}
+
+.dash-icon-danger {
+  background: var(--color-clay-bg);
+  color: var(--color-clay);
+}
+
+.dash-icon-neutral {
+  background: var(--color-sand);
+  color: var(--color-plum-soft);
+}
+
+/* ======================================================
+   Section Headers
+   ====================================================== */
+
+.dash-section-head {
+  margin-bottom: var(--space-3);
+}
+
+.dash-section-head h2 {
+  margin: 0 0 var(--space-1);
+
+  color: var(--color-plum);
+
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.dash-section-head p {
+  margin: 0;
+
+  color: var(--color-plum-soft);
+
+  font-size: var(--text-xs);
+}
+
+.dash section {
+  margin-bottom: var(--space-8);
+}
+
+/* ======================================================
+   Alerts
+   ====================================================== */
+
+.dash-alert-grid {
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+
+  gap: var(--space-3);
+}
+
+.dash-alert-card .dash-what {
+  margin: var(--space-2) 0 var(--space-3);
+
+  color: var(--color-plum-soft);
+
+  font-size: var(--text-sm);
+}
+
+.dash-alert-list {
+  max-height: 120px;
+
+  overflow-y: auto;
+
+  font-size: var(--text-xs);
+}
+
+.dash-alert-list div {
+  padding: var(--space-1) 0;
+
+  border-top: 1px solid var(--color-line);
+}
+
+/* ======================================================
+   Badges
+   ====================================================== */
 
 .dash-badge {
   display: inline-flex;
   align-items: center;
-  font-size: 15px;
+
+  padding: var(--space-1) var(--space-3);
+
+  border-radius: var(--radius-full);
+
+  font-size: var(--text-base);
   font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 999px;
 }
-.dash-badge-danger  { background: var(--d-danger-bg); color: var(--d-danger); }
-.dash-badge-accent  { background: var(--d-accent-soft); color: var(--d-accent); }
-.dash-badge-neutral { background: var(--d-bg-subtle); color: var(--d-ink-soft); }
 
-/* ===== Two column layout ===== */
-.dash-cols { display: grid; grid-template-columns: 1.3fr 1fr; gap: 20px; }
-@media (max-width: 900px) { .dash-cols { grid-template-columns: 1fr; } }
+.dash-badge-danger {
+  background: var(--color-clay-bg);
+  color: var(--color-clay);
+}
 
-/* ===== Category swatches ===== */
-.dash-swatches { display: flex; flex-direction: column; gap: 10px; }
-.dash-swatch-row { display: grid; grid-template-columns: 110px 1fr 40px; align-items: center; gap: 12px; }
-.dash-swatch-name { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dash-swatch-track { height: 6px; background: var(--d-bg-subtle); border-radius: 3px; }
-.dash-swatch-fill { height: 100%; background: var(--d-accent); border-radius: 3px; }
-.dash-swatch-count { font-size: 12px; color: var(--d-ink-soft); text-align: left; }
+.dash-badge-accent {
+  background: rgba(59, 36, 54, 0.08);
+  color: var(--color-plum);
+}
 
-/* ===== Progress ring ===== */
-.dash-ring-box { display: flex; align-items: center; gap: 18px; }
-.dash-ring-track { stroke: var(--d-bg-subtle); }
-.dash-ring-fill { stroke: var(--d-accent); }
-.dash-ring-label { font-size: 12px; color: var(--d-ink-soft); line-height: 1.6; }
-.dash-ring-label b { display: block; font-size: 20px; font-weight: 700; color: var(--d-ink); }
+.dash-badge-neutral {
+  background: var(--color-sand);
+  color: var(--color-plum-soft);
+}
 
-/* ===== Manufacturer table ===== */
-.dash-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-.dash-table th { text-align: left; color: var(--d-ink-soft); font-weight: 500; padding: 6px 0; border-bottom: 1px solid var(--d-border); }
-.dash-table td { padding: 7px 0; border-bottom: 1px solid var(--d-border); }
+/* ======================================================
+   Two Column Layout
+   ====================================================== */
 
-/* ===== States ===== */
-.dash-state { padding: 60px 20px; text-align: center; color: var(--d-ink-soft); font-size: 13px; }
-.dash-state b { display: block; color: var(--d-danger); font-size: 15px; margin-bottom: 6px; }
+.dash-cols {
+  display: grid;
+
+  grid-template-columns: 1.3fr 1fr;
+
+  gap: var(--space-5);
+}
+
+/* ======================================================
+   Category Swatches
+   ====================================================== */
+
+.dash-swatches {
+  display: flex;
+  flex-direction: column;
+
+  gap: var(--space-3);
+}
+
+.dash-swatch-row {
+  display: grid;
+
+  grid-template-columns: 110px 1fr 40px;
+
+  align-items: center;
+
+  gap: var(--space-3);
+}
+
+.dash-swatch-name {
+  overflow: hidden;
+
+  color: var(--color-ink);
+
+  font-size: var(--text-xs);
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.dash-swatch-track {
+  height: 6px;
+
+  background: var(--color-sand);
+
+  border-radius: var(--radius-md);
+}
+
+.dash-swatch-fill {
+  height: 100%;
+
+  background: var(--color-plum);
+
+  border-radius: var(--radius-md);
+}
+
+.dash-swatch-count {
+  color: var(--color-plum-soft);
+
+  font-size: var(--text-xs);
+
+  text-align: left;
+}
+
+/* ======================================================
+   Progress Ring
+   ====================================================== */
+
+.dash-ring-box {
+  display: flex;
+  align-items: center;
+
+  gap: var(--space-4);
+}
+
+.dash-ring-track {
+  stroke: var(--color-sand);
+}
+
+.dash-ring-fill {
+  stroke: var(--color-plum);
+}
+
+.dash-ring-label {
+  color: var(--color-plum-soft);
+
+  font-size: var(--text-xs);
+  line-height: 1.6;
+}
+
+.dash-ring-label b {
+  display: block;
+
+  color: var(--color-ink);
+
+  font-size: var(--text-xl);
+  font-weight: 700;
+}
+
+/* ======================================================
+   Manufacturer Table
+   ====================================================== */
+
+.dash-table {
+  width: 100%;
+
+  border-collapse: collapse;
+
+  color: var(--color-ink);
+
+  font-size: var(--text-xs);
+}
+
+.dash-table th {
+  padding: var(--space-2) 0;
+
+  border-bottom: 1px solid var(--color-line);
+
+  color: var(--color-plum-soft);
+
+  font-weight: 500;
+
+  text-align: left;
+}
+
+.dash-table td {
+  padding: var(--space-2) 0;
+
+  border-bottom: 1px solid var(--color-line);
+}
+
+/* ======================================================
+   States
+   ====================================================== */
+
+.dash-state {
+  padding: var(--space-10) var(--space-5);
+
+  color: var(--color-plum-soft);
+
+  font-size: var(--text-sm);
+
+  text-align: center;
+}
+
+.dash-state b {
+  display: block;
+
+  margin-bottom: var(--space-1);
+
+  color: var(--color-clay);
+
+  font-size: var(--text-base);
+}
+
+.dash-retry-btn {
+  margin-top: var(--space-4);
+}
+
+.dash-manufacturers-head {
+  margin-top: var(--space-8);
+}
+
+.dash-table-number {
+  text-align: right;
+}
+
+.dash-table-empty {
+  color: var(--color-plum-soft);
+}
+/* ======================================================
+   Responsive
+   ====================================================== */
+
+@media (max-width: 900px) {
+  .dash-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .dash-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dash-alert-grid {
+    grid-template-columns: 1fr;
+  }
+}

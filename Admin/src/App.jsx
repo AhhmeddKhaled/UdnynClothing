@@ -3,8 +3,10 @@ import Login from './pages/Login/Login.jsx'
 import Layout from './Layout/Layout.jsx'
 import ProtectedRoute from './Layout/ProtectedRoute.jsx'
 import Dashboard from './pages/Dashboard/Dashboard.jsx'
-import Products from './pages/Products/Products.jsx'
+import AvailableStock from './pages/AvailableStock/AvailableStock.jsx'
+import Products from './pages/Products/Products'
 import Users from './pages/Users/Users.jsx'
+import Catalog from './pages/Catalog/Catalog.jsx'
 
 function App() {
   return (
@@ -24,7 +26,9 @@ function App() {
       >
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="availableStock" element={<AvailableStock />} />
         <Route path="products" element={<Products />} />
+        <Route path="catalog" element={<Catalog />} />
         <Route path="users" element={<Users />} />
       </Route>
 

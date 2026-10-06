@@ -73,7 +73,7 @@ export default function ExcelUpload() {
       formData.append("file", file);
 
       const response = await fetch(
-        `${API_URL}/api/products/import`,
+        `${API_URL}/api/availableStock/import`,
         {
           method: "POST",
           body: formData,

@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 const XLSX = require("xlsx");
 
-const Product = require("../models/Product");
+const AvailableStock = require("../models/AvailableStock");
 const parseSheet = require("../utils/excelParser");
 
 // ======================================================
-// Import Products From Excel
+// Import Available Stock From Excel
 // ======================================================
 
 async function importProducts(req, res, next) {
@@ -17,7 +17,6 @@ async function importProducts(req, res, next) {
       });
     }
 
-    // التأكد من اتصال MongoDB
     if (mongoose.connection.readyState !== 1) {
       return res.status(503).json({
         success: false,
@@ -25,20 +24,21 @@ async function importProducts(req, res, next) {
       });
     }
 
-    const wb = XLSX.read(req.file.buffer, {
+    const workbook = XLSX.read(req.file.buffer, {
       type: "buffer",
     });
 
-    if (!wb.SheetNames.length) {
+    if (!workbook.SheetNames.length) {
       return res.status(400).json({
         success: false,
         message: "ملف Excel لا يحتوي على Sheets",
       });
     }
 
-    const ws = wb.Sheets[wb.SheetNames[0]];
+    const worksheet =
+      workbook.Sheets[workbook.SheetNames[0]];
 
-    const items = parseSheet(ws);
+    const items = parseSheet(worksheet);
 
     if (!items.length) {
       return res.status(400).json({
@@ -47,11 +47,11 @@ async function importProducts(req, res, next) {
       });
     }
 
-    // ==================================================
+    // --------------------------------------------------
     // تعطيل القائمة القديمة
-    // ==================================================
+    // --------------------------------------------------
 
-    await Product.updateMany(
+    await AvailableStock.updateMany(
       {},
       {
         $set: {
@@ -60,11 +60,11 @@ async function importProducts(req, res, next) {
       }
     );
 
-    // ==================================================
-    // تحديث المنتجات
-    // ==================================================
+    // --------------------------------------------------
+    // تحديث البضاعة الحالية
+    // --------------------------------------------------
 
-    const ops = items.map((item) => ({
+    const operations = items.map((item) => ({
       updateOne: {
         filter: {
           itemId: item.itemId,
@@ -90,49 +90,64 @@ async function importProducts(req, res, next) {
       },
     }));
 
-    const result = await Product.bulkWrite(ops);
+    const result =
+      await AvailableStock.bulkWrite(
+        operations
+      );
 
-    // ==================================================
+    // --------------------------------------------------
     // Statistics
-    // ==================================================
+    // --------------------------------------------------
 
-    const activeCount = await Product.countDocuments({
-      active: true,
+    const totalCount =
+      await AvailableStock.countDocuments();
+
+    const activeCount =
+      await AvailableStock.countDocuments({
+        active: true,
+      });
+
+    const inactiveCount =
+      await AvailableStock.countDocuments({
+        active: false,
+      });
+
+    console.log("Excel import completed:", {
+      totalCount,
+      activeCount,
+      inactiveCount,
+      importedFromExcel: items.length,
+      inserted: result.upsertedCount || 0,
+      modified: result.modifiedCount || 0,
     });
 
-    const inactiveCount = await Product.countDocuments({
-      active: false,
-    });
-
-    res.json({
+    return res.json({
       success: true,
-
       message:
         "تم استيراد الملف واستبدال قائمة الشغل الحالية",
-
       total: items.length,
-
       inserted: result.upsertedCount || 0,
-
       updated: result.modifiedCount || 0,
-
       active: activeCount,
-
       inactive: inactiveCount,
+      databaseTotal: totalCount,
     });
   } catch (error) {
-    console.error("Excel import error:", error);
+    console.error(
+      "Excel import error:",
+      error
+    );
+
     next(error);
   }
 }
 
 // ======================================================
-// Get All Active Products
+// Get All Active Available Stock
 // ======================================================
 
 async function getProducts(req, res, next) {
   try {
-    // التأكد من اتصال MongoDB
     if (mongoose.connection.readyState !== 1) {
       return res.status(503).json({
         success: false,
@@ -140,32 +155,57 @@ async function getProducts(req, res, next) {
       });
     }
 
-    // ================================================
-    // هنا لا نستخدم req.params.itemId
-    // لأن الـ route هو:
-    // GET /api/products
-    // ================================================
+    const totalCount =
+      await AvailableStock.countDocuments();
 
-    const products = await Product.find({
-      active: true,
-    }).sort({
-      itemId: 1,
+    const activeCount =
+      await AvailableStock.countDocuments({
+        active: true,
+      });
+
+    const inactiveCount =
+      await AvailableStock.countDocuments({
+        active: false,
+      });
+
+    console.log("Available Stock:", {
+      totalCount,
+      activeCount,
+      inactiveCount,
     });
 
-    res.json(products);
+    const products =
+      await AvailableStock.find({
+        active: true,
+      }).sort({
+        itemId: 1,
+      });
+
+    return res.json({
+      success: true,
+      products,
+      stats: {
+        total: totalCount,
+        active: activeCount,
+        inactive: inactiveCount,
+      },
+    });
   } catch (error) {
-    console.error("Get products error:", error);
+    console.error(
+      "Get available stock error:",
+      error
+    );
+
     next(error);
   }
 }
 
 // ======================================================
-// Get One Product
+// Get One Available Stock Item
 // ======================================================
 
 async function getProduct(req, res, next) {
   try {
-    // التأكد من اتصال MongoDB
     if (mongoose.connection.readyState !== 1) {
       return res.status(503).json({
         success: false,
@@ -173,25 +213,25 @@ async function getProduct(req, res, next) {
       });
     }
 
-    const rawItemId = req.params.itemId;
+    const itemId = Number(
+      req.params.itemId
+    );
 
-    console.log("Requested itemId:", rawItemId);
-
-    const itemId = Number(rawItemId);
-
-    console.log("Parsed itemId:", itemId);
-
-    if (!Number.isInteger(itemId) || itemId <= 0) {
+    if (
+      !Number.isInteger(itemId) ||
+      itemId <= 0
+    ) {
       return res.status(400).json({
         success: false,
         message: "Invalid product itemId",
       });
     }
 
-    const product = await Product.findOne({
-      itemId,
-      active: true,
-    });
+    const product =
+      await AvailableStock.findOne({
+        itemId,
+        active: true,
+      });
 
     if (!product) {
       return res.status(404).json({
@@ -200,18 +240,29 @@ async function getProduct(req, res, next) {
       });
     }
 
-    res.json(product);
+    return res.json({
+      success: true,
+      product,
+    });
   } catch (error) {
-    console.error("Get product error:", error);
+    console.error(
+      "Get available stock item error:",
+      error
+    );
+
     next(error);
   }
 }
 
 // ======================================================
-// Upload / Update Product Image
+// Upload / Update Available Stock Image
 // ======================================================
 
-async function uploadProductImage(req, res, next) {
+async function uploadProductImage(
+  req,
+  res,
+  next
+) {
   try {
     if (!req.file) {
       return res.status(400).json({
@@ -227,49 +278,64 @@ async function uploadProductImage(req, res, next) {
       });
     }
 
-    const rawItemId = req.params.itemId;
-    const itemId = Number(rawItemId);
+    const itemId = Number(
+      req.params.itemId
+    );
 
-    if (!Number.isInteger(itemId) || itemId <= 0) {
+    if (
+      !Number.isInteger(itemId) ||
+      itemId <= 0
+    ) {
       return res.status(400).json({
         success: false,
         message: "Invalid product itemId",
       });
     }
 
-    const imagePath = `/uploads/${req.file.filename}`;
+    const imagePath =
+      `/uploads/${req.file.filename}`;
 
-    const product = await Product.findOneAndUpdate(
-      {
-        itemId,
-        active: true,
-      },
-      {
-        $set: {
-          imagePath,
+    const product =
+      await AvailableStock.findOneAndUpdate(
+        {
+          itemId,
+          active: true,
         },
-      },
-      {
-        new: true,
-      }
-    );
+        {
+          $set: {
+            imagePath,
+          },
+        },
+        {
+          new: true,
+        }
+      );
 
     if (!product) {
       return res.status(404).json({
         success: false,
-        message: "الصنف مش موجود في ملف العمل الحالي",
+        message:
+          "الصنف مش موجود في ملف العمل الحالي",
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
       product,
     });
   } catch (error) {
-    console.error("Image upload error:", error);
+    console.error(
+      "Image upload error:",
+      error
+    );
+
     next(error);
   }
 }
+
+// ======================================================
+// Exports
+// ======================================================
 
 module.exports = {
   importProducts,

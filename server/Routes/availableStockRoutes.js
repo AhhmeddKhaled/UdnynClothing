@@ -5,7 +5,7 @@ const {
   getProduct,
   importProducts,
   uploadProductImage,
-} = require("../controllers/productController");
+} = require("../controllers/availableStockController");
 
 const authenticate = require("../middleware/auth");
 const authorize = require("../middleware/authorize");
@@ -17,7 +17,7 @@ const {
 
 const router = express.Router();
 
-// Import products from Excel
+// Import available stock from Excel
 router.post(
   "/import",
   authenticate,
@@ -26,7 +26,7 @@ router.post(
   importProducts
 );
 
-// Get all products
+// Get all available stock
 router.get(
   "/",
   authenticate,
@@ -34,7 +34,7 @@ router.get(
   getProducts
 );
 
-// Get single product
+// Get one available-stock item
 router.get(
   "/:itemId",
   authenticate,
@@ -42,7 +42,7 @@ router.get(
   getProduct
 );
 
-// Upload product image
+// Upload available-stock image
 router.post(
   "/:itemId/image",
   authenticate,

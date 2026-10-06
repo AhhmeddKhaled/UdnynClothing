@@ -1,5 +1,34 @@
 const API_URL = import.meta.env.VITE_API_URL;
 
+export async function login(email, password) {
+  const response = await fetch(`${API_URL}/api/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email,
+      password,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Login failed");
+  }
+
+  if (data.token) {
+    localStorage.setItem("token", data.token);
+  }
+
+  if (data.user) {
+    localStorage.setItem("user", JSON.stringify(data.user));
+  }
+
+  return data;
+}
+
 export async function authFetch(path, options = {}) {
   const token = localStorage.getItem("token");
 
@@ -18,14 +47,35 @@ export async function authFetch(path, options = {}) {
     headers,
   });
 
-  // لو التوكن انتهى أو غير صالح
   if (response.status === 401) {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-
-    // لو عندك React Router، ممكن بدل دي تستخدم navigate
+    logout();
     window.location.href = "/login";
   }
 
   return response;
+}
+
+export function isLoggedIn() {
+  return Boolean(localStorage.getItem("token"));
+}
+
+export function getUser() {
+  const user = localStorage.getItem("user");
+
+  if (!user) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(user);
+  } catch {
+    return null;
+  }
+}
+
+export function logout() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+
+  window.location.href = "/login";
 }

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const productSchema = new mongoose.Schema(
+const AvailableStockSchema = new mongoose.Schema(
   {
     itemId: {
       type: Number,
@@ -50,4 +50,4 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Product", productSchema);
+module.exports = mongoose.model("AvailableStock", AvailableStockSchema);

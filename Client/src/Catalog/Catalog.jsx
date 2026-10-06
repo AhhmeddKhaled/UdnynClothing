@@ -32,7 +32,7 @@ export default function Products() {
       setLoading(true);
       setError("");
 
-      const response = await fetch(`${API_URL}/api/products`);
+      const response = await fetch(`${API_URL}/api/availableStock`);
 
       if (!response.ok) {
         throw new Error("فشل تحميل المنتجات");

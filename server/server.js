@@ -8,44 +8,74 @@ const connectMongoDB = require("./config/database");
 
 const healthRoutes = require("./routes/healthRoutes");
 const userRoutes = require("./routes/userRoutes");
-const productRoutes = require("./routes/productRoutes");
+const availableStockRoutes = require("./routes/availableStockRoutes");
 const authRoutes = require("./routes/authRoutes");
+const catalogRoutes = require("./routes/catalogRoutes");
+
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
 
 const PORT = Number(process.env.PORT) || 8080;
 
+// ======================================================
 // Middleware
+// ======================================================
+
 app.use(cors());
+
 app.use(express.json());
 
+// ======================================================
 // Static uploads
+// ======================================================
+
 const uploadDir = path.join(__dirname, "uploads");
 
 app.use("/uploads", express.static(uploadDir));
 
+// ======================================================
 // Routes
+// ======================================================
+
 app.use("/", healthRoutes);
-app.use("/api/products", productRoutes);
+
+app.use("/api/availableStock", availableStockRoutes);
+
+app.use("/api/catalog", catalogRoutes);
+
 app.use("/api/users", userRoutes);
+
 app.use("/api/auth", authRoutes);
 
+// ======================================================
 // Error handler
+// ======================================================
+
 app.use(errorHandler);
 
+// ======================================================
 // Start server
+// ======================================================
+
 const server = app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
+
   console.log(
     `MongoDB configured: ${!!process.env.MONGO_URI}`
   );
 });
 
+// ======================================================
 // MongoDB
+// ======================================================
+
 connectMongoDB();
 
+// ======================================================
 // Graceful shutdown
+// ======================================================
+
 async function shutdown(signal) {
   console.log(`${signal} received`);
 
@@ -68,4 +98,5 @@ async function shutdown(signal) {
 }
 
 process.on("SIGTERM", () => shutdown("SIGTERM"));
+
 process.on("SIGINT", () => shutdown("SIGINT"));

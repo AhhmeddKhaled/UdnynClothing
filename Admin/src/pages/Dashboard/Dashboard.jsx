@@ -1,13 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
-import { useOutletContext } from "react-router-dom";
 import { authFetch } from "../Login/auth.js";
+
 import "./Dashboard.css";
 
 const fmt = (n) => Number(n || 0).toLocaleString("en-US");
 
 export default function Dashboard() {
-  const { theme } = useOutletContext() ?? { theme: "light" };
-
   const [products, setProducts] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -18,27 +16,32 @@ export default function Dashboard() {
     setError("");
 
     try {
-      // authFetch بيضيف Authorization: Bearer <token> تلقائيًا
-      const res = await authFetch("/api/products", {
+      const response = await authFetch("/api/availableStock", {
         cache: "no-store",
       });
 
-      const data = await res.json();
+      const data = await response.json();
 
-      if (!res.ok) {
+      if (!response.ok) {
         throw new Error(
-          data.message || data.error || "Unexpected response from server"
+          data.message ||
+            data.error ||
+            "Unexpected response from server"
         );
       }
 
-      if (!Array.isArray(data)) {
-        throw new Error("Unexpected data shape");
+      if (!Array.isArray(data.products)) {
+        throw new Error("Unexpected products data");
       }
 
-      setProducts(data);
+      setProducts(data.products);
       setSyncedAt(new Date());
     } catch (err) {
-      setError(err.message || "Couldn't reach the store data");
+      console.error("Dashboard loading error:", err);
+
+      setError(
+        err.message || "Couldn't reach the store data"
+      );
     } finally {
       setLoading(false);
     }
@@ -50,24 +53,25 @@ export default function Dashboard() {
 
   if (loading && !products) {
     return (
-      <div className="dash" data-theme={theme}>
-        <div className="dash-state">Loading dashboard…</div>
+      <div className="dash">
+        <div className="dash-state">
+          Loading dashboard…
+        </div>
       </div>
     );
   }
 
   if (error && !products) {
     return (
-      <div className="dash" data-theme={theme}>
+      <div className="dash">
         <div className="dash-state">
           <b>Couldn't load store data</b>
+
           <span>{error}</span>
 
-          <br />
-
           <button
-            className="dash-btn dash-btn-primary"
-            style={{ marginTop: 14 }}
+            type="button"
+            className="dash-btn dash-btn-primary dash-retry-btn"
             onClick={load}
           >
             Retry
@@ -79,89 +83,90 @@ export default function Dashboard() {
 
   const active = products || [];
 
-  const totalValue = active.reduce(
-    (s, p) =>
-      s +
-      (Number(p.qty) || 0) *
-        (Number(p.wholesalePrice ?? p.price ?? 0) || 0),
+  const totalQuantity = active.reduce(
+    (sum, product) =>
+      sum + (Number(product.qty) || 0),
     0
   );
 
-  // سعر الشراء مش موجود في البيانات لسه؛
-  // هيظهر رقم حقيقي أول ما الحقل يتضاف في الباك إند
-  const hasPurchaseField = active.some(
-    (p) => p.purchasePrice != null
-  );
+  const low = active.filter((product) => {
+    const qty = Number(product.qty);
 
-  const totalPurchases = active.reduce(
-    (s, p) =>
-      s +
-      (Number(p.qty) || 0) *
-        (Number(p.purchasePrice) || 0),
-    0
-  );
-
-  const low = active.filter(
-    (p) => Number(p.qty) > 0 && Number(p.qty) <= 5
-  );
-
-  const neg = active.filter(
-    (p) => Number(p.qty) < 0
-  );
-
-  const noCat = active.filter(
-    (p) => !p.category
-  );
-
-  const noImg = active.filter(
-    (p) => !p.imagePath
-  );
-
-  const noPrice = active.filter(
-    (p) =>
-      !Number(
-        p.wholesalePrice ?? p.price ?? 0
-      )
-  );
-
-  const catMap = {};
-
-  active.forEach((p) => {
-    const c = p.category || "Uncategorized";
-    catMap[c] = (catMap[c] || 0) + 1;
+    return qty > 0 && qty <= 5;
   });
 
-  const cats = Object.entries(catMap)
+  const negative = active.filter(
+    (product) => Number(product.qty) < 0
+  );
+
+  const noCategory = active.filter(
+    (product) =>
+      !product.category ||
+      !String(product.category).trim()
+  );
+
+  const noImage = active.filter(
+    (product) => !product.imagePath
+  );
+
+  const categoryMap = {};
+
+  active.forEach((product) => {
+    const category =
+      product.category &&
+      String(product.category).trim()
+        ? String(product.category).trim()
+        : "Uncategorized";
+
+    categoryMap[category] =
+      (categoryMap[category] || 0) + 1;
+  });
+
+  const categories = Object.entries(categoryMap)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 10);
 
-  const maxCat = cats[0]?.[1] || 1;
+  const maxCategory =
+    categories[0]?.[1] || 1;
 
-  const mfrMap = {};
+  const manufacturerMap = {};
 
-  active.forEach((p) => {
-    if (p.manufacturer) {
-      mfrMap[p.manufacturer] =
-        (mfrMap[p.manufacturer] || 0) + 1;
+  active.forEach((product) => {
+    if (
+      product.manufacturer &&
+      String(product.manufacturer).trim()
+    ) {
+      const manufacturer = String(
+        product.manufacturer
+      ).trim();
+
+      manufacturerMap[manufacturer] =
+        (manufacturerMap[manufacturer] || 0) + 1;
     }
   });
 
-  const mfrs = Object.entries(mfrMap)
+  const manufacturers = Object.entries(
+    manufacturerMap
+  )
     .sort((a, b) => b[1] - a[1])
     .slice(0, 8);
 
-  const withImg = active.length - noImg.length;
+  const withImage =
+    active.length - noImage.length;
 
-  const pct = active.length
+  const photoPercentage = active.length
     ? Math.round(
-        (withImg / active.length) * 100
+        (withImage / active.length) * 100
       )
     : 0;
 
-  const circ = 251.2;
+  const circumference = 251.2;
+
+  const missingDataTotal =
+    noImage.length + noCategory.length;
 
   return (
-    <div className="dash" data-theme={theme}>
+    <div className="dash">
       <div className="dash-top">
         <div>
           <h1 className="dash-title">
@@ -179,6 +184,7 @@ export default function Dashboard() {
 
         <div className="dash-actions">
           <button
+            type="button"
             className="dash-btn dash-btn-primary"
             onClick={load}
             disabled={loading}
@@ -194,45 +200,17 @@ export default function Dashboard() {
         <StatCard
           icon={<BoxIcon />}
           tone="accent"
-          label="Active items"
+          label="Total items"
           value={fmt(active.length)}
+          hint="Available stock records"
         />
 
         <StatCard
-          icon={<CoinsIcon />}
+          icon={<QuantityIcon />}
           tone="success"
-          label="Inventory value"
-          value={
-            totalValue
-              ? fmt(Math.round(totalValue))
-              : "—"
-          }
-          hint="EGP, wholesale"
-        />
-
-        <StatCard
-          icon={<ReceiptIcon />}
-          tone="gold"
-          label="Total purchases"
-          value={
-            hasPurchaseField
-              ? fmt(
-                  Math.round(totalPurchases)
-                )
-              : "—"
-          }
-          hint={
-            hasPurchaseField
-              ? "EGP, cost basis"
-              : "Needs purchase price field"
-          }
-        />
-
-        <StatCard
-          icon={<TrendIcon />}
-          tone="neutral"
-          label="Total sales"
-          badge="Coming soon"
+          label="Total quantity"
+          value={fmt(totalQuantity)}
+          hint="Units currently available"
         />
 
         <StatCard
@@ -240,29 +218,54 @@ export default function Dashboard() {
           tone="danger"
           label="Low stock"
           value={fmt(low.length)}
-          hint="5 units or fewer"
+          hint="1–5 units"
         />
 
         <StatCard
           icon={<ImageIcon />}
-          tone="danger"
+          tone="gold"
           label="Missing photo"
-          value={fmt(noImg.length)}
+          value={fmt(noImage.length)}
           hint={
             active.length
-              ? Math.round(
-                  (noImg.length /
+              ? `${Math.round(
+                  (noImage.length /
                     active.length) *
                     100
-                ) + "% of total"
-              : ""
+                )}% of items`
+              : "No items"
           }
+        />
+
+        <StatCard
+          icon={<CategoryIcon />}
+          tone="neutral"
+          label="Missing category"
+          value={fmt(noCategory.length)}
+          hint={
+            active.length
+              ? `${Math.round(
+                  (noCategory.length /
+                    active.length) *
+                    100
+                )}% of items`
+              : "No items"
+          }
+        />
+
+        <StatCard
+          icon={<DatabaseIcon />}
+          tone="accent"
+          label="Data issues"
+          value={fmt(missingDataTotal)}
+          hint="Missing photo or category"
         />
       </div>
 
       <section>
         <div className="dash-section-head">
           <h2>Needs attention</h2>
+
           <p>
             Items that need review or correction
           </p>
@@ -271,19 +274,19 @@ export default function Dashboard() {
         <div className="dash-alert-grid">
           <AlertCard
             title="Negative quantity"
-            items={neg}
+            items={negative}
             tone="danger"
           />
 
           <AlertCard
             title="No category"
-            items={noCat}
+            items={noCategory}
             tone="neutral"
           />
 
           <AlertCard
-            title="No wholesale price"
-            items={noPrice}
+            title="Missing photo"
+            items={noImage}
             tone="accent"
           />
         </div>
@@ -295,47 +298,62 @@ export default function Dashboard() {
             <h2>Stock by category</h2>
 
             <p>
-              {Object.keys(catMap).length}{" "}
+              {fmt(
+                Object.keys(categoryMap).length
+              )}{" "}
               categories
             </p>
           </div>
 
-          <div className="dash-swatches">
-            {cats.map(([name, count]) => (
-              <div
-                className="dash-swatch-row"
-                key={name}
-              >
-                <div
-                  className="dash-swatch-name"
-                  title={name}
-                >
-                  {name}
-                </div>
-
-                <div className="dash-swatch-track">
+          {categories.length === 0 ? (
+            <div className="dash-hint">
+              No category data
+            </div>
+          ) : (
+            <div className="dash-swatches">
+              {categories.map(
+                ([name, count]) => (
                   <div
-                    className="dash-swatch-fill"
-                    style={{
-                      width: `${
-                        (count / maxCat) *
-                        100
-                      }%`,
-                    }}
-                  />
-                </div>
+                    className="dash-swatch-row"
+                    key={name}
+                  >
+                    <div
+                      className="dash-swatch-name"
+                      title={name}
+                    >
+                      {name}
+                    </div>
 
-                <div className="dash-swatch-count">
-                  {fmt(count)}
-                </div>
-              </div>
-            ))}
-          </div>
+                    <div className="dash-swatch-track">
+                      <div
+                        className="dash-swatch-fill"
+                        style={{
+                          width: `${
+                            (count /
+                              maxCategory) *
+                            100
+                          }%`,
+                        }}
+                      />
+                    </div>
+
+                    <div className="dash-swatch-count">
+                      {fmt(count)}
+                    </div>
+                  </div>
+                )
+              )}
+            </div>
+          )}
         </div>
 
         <div className="dash-card">
           <div className="dash-section-head">
             <h2>Photo coverage</h2>
+
+            <p>
+              Products with uploaded images
+            </p>
           </div>
 
           <div className="dash-ring-box">
@@ -343,6 +361,7 @@ export default function Dashboard() {
               width="96"
               height="96"
               viewBox="0 0 96 96"
+              aria-label={`${photoPercentage}% photo coverage`}
             >
               <circle
                 cx="48"
@@ -360,10 +379,12 @@ export default function Dashboard() {
                 fill="none"
                 className="dash-ring-fill"
                 strokeWidth="10"
-                strokeDasharray={circ}
+                strokeDasharray={circumference}
                 strokeDashoffset={
-                  circ -
-                  (circ * pct) / 100
+                  circumference -
+                  (circumference *
+                    photoPercentage) /
+                    100
                 }
                 strokeLinecap="round"
                 transform="rotate(-90 48 48)"
@@ -371,20 +392,17 @@ export default function Dashboard() {
             </svg>
 
             <div className="dash-ring-label">
-              <b>{pct}%</b>
+              <b>{photoPercentage}%</b>
 
               <span>
-                {fmt(withImg)} of{" "}
+                {fmt(withImage)} of{" "}
                 {fmt(active.length)} items
                 have a photo
               </span>
             </div>
           </div>
 
-          <div
-            className="dash-section-head"
-            style={{ marginTop: 28 }}
-          >
+          <div className="dash-section-head dash-manufacturers-head">
             <h2>Top manufacturers</h2>
           </div>
 
@@ -393,40 +411,34 @@ export default function Dashboard() {
               <tr>
                 <th>Manufacturer</th>
 
-                <th
-                  style={{
-                    textAlign: "right",
-                  }}
-                >
+                <th className="dash-table-number">
                   Items
                 </th>
               </tr>
             </thead>
 
             <tbody>
-              {mfrs.length === 0 ? (
+              {manufacturers.length === 0 ? (
                 <tr>
                   <td
                     colSpan={2}
-                    className="dash-hint"
+                    className="dash-table-empty"
                   >
                     No manufacturer data
                   </td>
                 </tr>
               ) : (
-                mfrs.map(([name, count]) => (
-                  <tr key={name}>
-                    <td>{name}</td>
+                manufacturers.map(
+                  ([name, count]) => (
+                    <tr key={name}>
+                      <td>{name}</td>
 
-                    <td
-                      style={{
-                        textAlign: "right",
-                      }}
-                    >
-                      {fmt(count)}
-                    </td>
-                  </tr>
-                ))
+                      <td className="dash-table-number">
+                        {fmt(count)}
+                      </td>
+                    </tr>
+                  )
+                )
               )}
             </tbody>
           </table>
@@ -442,7 +454,6 @@ function StatCard({
   label,
   value,
   hint,
-  badge,
 }) {
   return (
     <div className="dash-card dash-stat">
@@ -456,25 +467,14 @@ function StatCard({
         {label}
       </div>
 
-      {badge ? (
-        <span
-          className="dash-badge dash-badge-neutral"
-          style={{ marginTop: 4 }}
-        >
-          {badge}
-        </span>
-      ) : (
-        <>
-          <div className="dash-value">
-            {value}
-          </div>
+      <div className="dash-value">
+        {value}
+      </div>
 
-          {hint && (
-            <div className="dash-hint">
-              {hint}
-            </div>
-          )}
-        </>
+      {hint && (
+        <div className="dash-hint">
+          {hint}
+        </div>
       )}
     </div>
   );
@@ -503,20 +503,22 @@ function AlertCard({
             None
           </div>
         ) : (
-          items
-            .slice(0, 6)
-            .map((p) => (
-              <div key={p.itemId}>
-                #{p.itemId} — {p.name}
-              </div>
-            ))
+          items.slice(0, 6).map((product) => (
+            <div
+              key={
+                product._id ||
+                product.itemId
+              }
+            >
+              #{product.itemId} —{" "}
+              {product.name}
+            </div>
+          ))
         )}
       </div>
     </div>
   );
 }
-
-/* ===== أيقونات بسيطة ===== */
 
 const strokeProps = {
   fill: "none",
@@ -541,7 +543,7 @@ function BoxIcon() {
   );
 }
 
-function CoinsIcon() {
+function QuantityIcon() {
   return (
     <svg
       width="18"
@@ -549,48 +551,11 @@ function CoinsIcon() {
       viewBox="0 0 24 24"
       {...strokeProps}
     >
-      <circle
-        cx="9"
-        cy="9"
-        r="5"
-      />
-
-      <path d="M14.5 10a5 5 0 1 0-4.5 7" />
-
-      <circle
-        cx="15"
-        cy="15"
-        r="5"
-      />
-    </svg>
-  );
-}
-
-function ReceiptIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      {...strokeProps}
-    >
-      <path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2V3Z" />
-
-      <path d="M8 8h8M8 12h8M8 16h5" />
-    </svg>
-  );
-}
-
-function TrendIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      {...strokeProps}
-    >
-      <path d="m3 17 6-6 4 4 7-8" />
-      <path d="M14 7h6v6" />
+      <path d="M4 7h16" />
+      <path d="M4 12h16" />
+      <path d="M4 17h16" />
+      <path d="M8 4v16" />
+      <path d="M16 4v16" />
     </svg>
   );
 }
@@ -605,7 +570,6 @@ function AlertIcon() {
     >
       <path d="M12 3 2 21h20L12 3Z" />
       <path d="M12 9v5" />
-
       <circle
         cx="12"
         cy="17"
@@ -639,6 +603,44 @@ function ImageIcon() {
       />
 
       <path d="m21 16-5-5-4 4-3-3-6 6" />
+    </svg>
+  );
+}
+
+function CategoryIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      {...strokeProps}
+    >
+      <path d="M4 5h7v7H4z" />
+      <path d="M13 5h7v7h-7z" />
+      <path d="M4 14h7v5H4z" />
+      <path d="M13 14h7v5h-7z" />
+    </svg>
+  );
+}
+
+function DatabaseIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      {...strokeProps}
+    >
+      <ellipse
+        cx="12"
+        cy="5"
+        rx="8"
+        ry="3"
+      />
+
+      <path d="M4 5v7c0 1.7 3.6 3 8 3s8-1.3 8-3V5" />
+
+      <path d="M4 12v7c0 1.7 3.6 3 8 3s8-1.3 8-3v-7" />
     </svg>
   );
 }
