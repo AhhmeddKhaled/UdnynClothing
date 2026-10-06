@@ -18,17 +18,32 @@ const AvailableStockSchema = new mongoose.Schema(
       default: 0,
     },
 
+    purchasePrice: {
+      type: Number,
+      default: 0,
+    },
+
+    wholesalePrice: {
+      type: Number,
+      default: 0,
+    },
+
+    retailPrice: {
+      type: Number,
+      default: 0,
+    },
+
+    offerPrice: {
+      type: Number,
+      default: 0,
+    },
+
     category: {
       type: String,
       default: null,
     },
 
     manufacturer: {
-      type: String,
-      default: null,
-    },
-
-    barcode: {
       type: String,
       default: null,
     },
@@ -50,4 +65,7 @@ const AvailableStockSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("AvailableStock", AvailableStockSchema);
+module.exports = mongoose.model(
+  "AvailableStock",
+  AvailableStockSchema
+);

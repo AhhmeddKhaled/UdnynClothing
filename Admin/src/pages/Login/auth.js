@@ -34,29 +34,52 @@ export async function authFetch(path, options = {}) {
 
   const headers = new Headers(options.headers || {});
 
-  if (!headers.has("Content-Type") && options.body) {
+  /*
+   * FormData:
+   * لا نضع Content-Type يدويًا.
+   * المتصفح هو الذي يضيف multipart/form-data
+   * مع الـ boundary الصحيح.
+   */
+  const isFormData =
+    typeof FormData !== "undefined" &&
+    options.body instanceof FormData;
+
+  if (isFormData) {
+    headers.delete("Content-Type");
+  } else if (
+    !headers.has("Content-Type") &&
+    options.body
+  ) {
     headers.set("Content-Type", "application/json");
   }
 
   if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
+    headers.set(
+      "Authorization",
+      `Bearer ${token}`
+    );
   }
 
-  const response = await fetch(`${API_URL}${path}`, {
-    ...options,
-    headers,
-  });
+  const response = await fetch(
+    `${API_URL}${path}`,
+    {
+      ...options,
+      headers,
+    }
+  );
 
   if (response.status === 401) {
     logout();
-    window.location.href = "/login";
+    return response;
   }
 
   return response;
 }
 
 export function isLoggedIn() {
-  return Boolean(localStorage.getItem("token"));
+  return Boolean(
+    localStorage.getItem("token")
+  );
 }
 
 export function getUser() {
