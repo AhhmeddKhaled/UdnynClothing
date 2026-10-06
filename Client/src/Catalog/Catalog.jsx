@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import "./Catalog.css";
 
 // ======================================================
-// رابط السيرفر على Back4App
+// رابط السيرفر
 // ======================================================
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -32,7 +32,9 @@ export default function Products() {
       setLoading(true);
       setError("");
 
-      const response = await fetch(`${API_URL}/api/availableStock`);
+      const response = await fetch(
+        `${API_URL}/api/availableStock`
+      );
 
       if (!response.ok) {
         throw new Error("فشل تحميل المنتجات");
@@ -40,15 +42,34 @@ export default function Products() {
 
       const data = await response.json();
 
-      if (!Array.isArray(data)) {
-        throw new Error("السيرفر أرسل بيانات غير صحيحة");
+      // السيرفر يرجع:
+      // {
+      //   success: true,
+      //   products: [...]
+      // }
+
+      const productList = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.products)
+          ? data.products
+          : null;
+
+      if (!productList) {
+        throw new Error(
+          "السيرفر أرسل بيانات غير صحيحة"
+        );
       }
 
-      setProducts(data);
+      setProducts(productList);
     } catch (err) {
-      console.error("Load products error:", err);
+      console.error(
+        "Load products error:",
+        err
+      );
 
-      setError("تعذر تحميل المنتجات حاليًا");
+      setError(
+        "تعذر تحميل المنتجات حاليًا"
+      );
     } finally {
       setLoading(false);
     }
@@ -70,11 +91,19 @@ export default function Products() {
     return [
       ...new Set(
         products
-          .filter((product) => Number(product.qty) > 0 && product.manufacturer)
-          .map((product) => String(product.manufacturer).trim())
-          .filter(Boolean),
+          .filter(
+            (product) =>
+              Number(product.qty) > 0 &&
+              product.manufacturer
+          )
+          .map((product) =>
+            String(product.manufacturer).trim()
+          )
+          .filter(Boolean)
       ),
-    ].sort((a, b) => a.localeCompare(b, "ar"));
+    ].sort((a, b) =>
+      a.localeCompare(b, "ar")
+    );
   }, [products]);
 
   // ==========================================
@@ -85,11 +114,19 @@ export default function Products() {
     return [
       ...new Set(
         products
-          .filter((product) => Number(product.qty) > 0 && product.category)
-          .map((product) => String(product.category).trim())
-          .filter(Boolean),
+          .filter(
+            (product) =>
+              Number(product.qty) > 0 &&
+              product.category
+          )
+          .map((product) =>
+            String(product.category).trim()
+          )
+          .filter(Boolean)
       ),
-    ].sort((a, b) => a.localeCompare(b, "ar"));
+    ].sort((a, b) =>
+      a.localeCompare(b, "ar")
+    );
   }, [products]);
 
   // ==========================================
@@ -108,7 +145,9 @@ export default function Products() {
       // فلتر المصنع
       if (
         selectedManufacturer &&
-        String(product.manufacturer || "").trim() !== selectedManufacturer
+        String(
+          product.manufacturer || ""
+        ).trim() !== selectedManufacturer
       ) {
         return false;
       }
@@ -116,7 +155,9 @@ export default function Products() {
       // فلتر التصنيف
       if (
         selectedCategory &&
-        String(product.category || "").trim() !== selectedCategory
+        String(
+          product.category || ""
+        ).trim() !== selectedCategory
       ) {
         return false;
       }
@@ -126,15 +167,25 @@ export default function Products() {
         return true;
       }
 
-      const name = String(product.name || "").toLowerCase();
+      const name = String(
+        product.name || ""
+      ).toLowerCase();
 
-      const itemId = String(product.itemId || "").toLowerCase();
+      const itemId = String(
+        product.itemId || ""
+      ).toLowerCase();
 
-      const barcode = String(product.barcode || "").toLowerCase();
+      const barcode = String(
+        product.barcode || ""
+      ).toLowerCase();
 
-      const manufacturer = String(product.manufacturer || "").toLowerCase();
+      const manufacturer = String(
+        product.manufacturer || ""
+      ).toLowerCase();
 
-      const category = String(product.category || "").toLowerCase();
+      const category = String(
+        product.category || ""
+      ).toLowerCase();
 
       return (
         name.includes(value) ||
@@ -144,13 +195,22 @@ export default function Products() {
         category.includes(value)
       );
     });
-  }, [products, search, selectedManufacturer, selectedCategory]);
+  }, [
+    products,
+    search,
+    selectedManufacturer,
+    selectedCategory,
+  ]);
 
   // ==========================================
   // المنتجات الظاهرة
   // ==========================================
 
-  const visibleProducts = filteredProducts.slice(0, visibleCount);
+  const visibleProducts =
+    filteredProducts.slice(
+      0,
+      visibleCount
+    );
 
   // ==========================================
   // عند تغيير الفلاتر نرجع لأول المنتجات
@@ -158,7 +218,11 @@ export default function Products() {
 
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
-  }, [search, selectedManufacturer, selectedCategory]);
+  }, [
+    search,
+    selectedManufacturer,
+    selectedCategory,
+  ]);
 
   // ==========================================
   // مسح كل الفلاتر
@@ -175,7 +239,11 @@ export default function Products() {
   // ==========================================
 
   if (loading) {
-    return <div className="products-loading">جاري تحميل المنتجات...</div>;
+    return (
+      <div className="products-loading">
+        جاري تحميل المنتجات...
+      </div>
+    );
   }
 
   // ==========================================
@@ -187,7 +255,10 @@ export default function Products() {
       <div className="products-error">
         <p>{error}</p>
 
-        <button onClick={loadProducts} className="retry-btn">
+        <button
+          onClick={loadProducts}
+          className="retry-btn"
+        >
           إعادة المحاولة
         </button>
       </div>
@@ -213,117 +284,29 @@ export default function Products() {
           type="search"
           placeholder="ابحث باسم الصنف أو رقم الصنف أو الباركود..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) =>
+            setSearch(e.target.value)
+          }
         />
 
         {/* المصنع */}
 
         <select
           value={selectedManufacturer}
-          onChange={(e) => setSelectedManufacturer(e.target.value)}
+          onChange={(e) =>
+            setSelectedManufacturer(
+              e.target.value
+            )
+          }
         >
-          <option value="">كل المصانع</option>
+          <option value="">
+            كل المصانع
+          </option>
 
-          {manufacturers.map((manufacturer) => (
-            <option key={manufacturer} value={manufacturer}>
-              {manufacturer}
-            </option>
-          ))}
-        </select>
-
-        {/* التصنيف */}
-
-        <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value)}
-        >
-          <option value="">كل التصنيفات</option>
-
-          {categories.map((category) => (
-            <option key={category} value={category}>
-              {category}
-            </option>
-          ))}
-        </select>
-
-        {/* تحديث */}
-
-        <button onClick={loadProducts}>تحديث</button>
-
-        {/* مسح الفلاتر */}
-
-        {(search || selectedManufacturer || selectedCategory) && (
-          <button className="clear-btn" onClick={clearFilters}>
-            مسح الفلاتر
-          </button>
-        )}
-      </div>
-
-      {/* ================================
-          العدد
-      ================================= */}
-
-      <div className="count">
-        عدد المنتجات المتاحة: <strong>{filteredProducts.length}</strong>
-      </div>
-
-      {/* ================================
-          Grid
-      ================================= */}
-
-      <div className="grid">
-        {visibleProducts.map((product) => (
-          <div className="card" key={product.itemId}>
-            {/* الصورة */}
-
-            <div className="pic">
-              {product.imagePath ? (
-                <img
-                  src={`${API_URL}${product.imagePath}`}
-                  alt={product.name}
-                  loading="lazy"
-                />
-              ) : (
-                <div className="no-image">لا توجد صورة</div>
-              )}
-
-              <span className="chip">#{product.itemId}</span>
-            </div>
-
-            {/* البيانات */}
-
-            <div className="info">
-              <div className="name">{product.name}</div>
-
-              <div className="qty">
-                <span>العدد المتاح</span>
-
-                <b>{product.qty}</b>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* لا توجد نتائج */}
-
-      {visibleProducts.length === 0 && (
-        <div className="no-results">
-          {search || selectedManufacturer || selectedCategory
-            ? "لا توجد منتجات مطابقة للفلاتر."
-            : "لا توجد منتجات متاحة حاليًا."}
-        </div>
-      )}
-
-      {/* عرض المزيد */}
-
-      {visibleCount < filteredProducts.length && (
-        <div className="morewrap">
-          <button onClick={() => setVisibleCount((prev) => prev + PAGE_SIZE)}>
-            عرض المزيد
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
+          {manufacturers.map(
+            (manufacturer) => (
+              <option
+                key={manufacturer}
+                value={manufacturer}
+              >
+                {manufa
