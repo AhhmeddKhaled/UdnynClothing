@@ -1,3 +1,5 @@
+import './Catalog.css'
+
 import React, { useEffect, useMemo, useState } from "react";
 
 const API_URL =
