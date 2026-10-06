@@ -35,6 +35,19 @@ const uploadDir = path.join(__dirname, "uploads");
 app.use("/uploads", express.static(uploadDir));
 
 // ======================================================
+// Test route
+// ======================================================
+
+app.get("/test", (req, res) => {
+  console.log("🔥 TEST ROUTE HIT");
+
+  res.status(200).json({
+    success: true,
+    message: "Server is working",
+  });
+});
+
+// ======================================================
 // Routes
 // ======================================================
 

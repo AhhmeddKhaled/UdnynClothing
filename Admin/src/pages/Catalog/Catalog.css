@@ -1,9 +1,10 @@
-/* ======================================================
-   Catalog Page
-   ====================================================== */
-
-.catalog-page {
+.catalog {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
   padding: var(--space-8);
+  box-sizing: border-box;
+
   color: var(--color-ink);
   font-family: var(--font-body);
 }
@@ -14,124 +15,251 @@
 
 .catalog-header {
   display: flex;
+  align-items: flex-end;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-6);
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
 }
 
-.catalog-title {
+.catalog-header-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.catalog-eyebrow,
+.catalog-section-label {
+  display: block;
+
+  color: var(--color-gold-deep);
+
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.catalog-header h1 {
   margin: 0;
-  font-family: var(--font-display);
-  font-size: var(--text-2xl);
+
   color: var(--color-plum);
+
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.catalog-header p {
+  margin: 0;
+
+  color: var(--color-plum-soft);
+
+  font-size: var(--text-sm);
+  line-height: 1.6;
 }
 
 /* ======================================================
-   Buttons
+   Add Product Button
    ====================================================== */
 
-.catalog-add-btn,
-.catalog-save-btn {
-  border: none;
-  border-radius: var(--radius-md);
+.catalog-add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
 
-  padding: var(--space-3) var(--space-5);
+  min-height: 42px;
+  padding: 0 var(--space-5);
+
+  border: 1px solid var(--color-plum);
+  border-radius: var(--radius-md);
 
   background: var(--color-plum);
   color: var(--color-paper);
 
   font-family: var(--font-body);
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: 700;
 
   cursor: pointer;
 
   transition:
-    opacity 0.2s ease,
-    background 0.2s ease;
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease,
+    opacity 0.18s ease;
 }
 
-.catalog-add-btn:hover,
-.catalog-save-btn:hover {
-  opacity: 0.88;
+.catalog-add-button:hover:not(:disabled) {
+  background: var(--color-plum-deep);
+  border-color: var(--color-plum-deep);
+
+  transform: translateY(-1px);
 }
 
-.catalog-save-btn:disabled {
-  opacity: 0.5;
+.catalog-add-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.catalog-add-button:disabled {
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
-/* ======================================================
-   Error
-   ====================================================== */
+.catalog-add-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
-.catalog-error {
-  margin-bottom: var(--space-5);
+  width: 20px;
+  height: 20px;
 
-  padding: var(--space-3) var(--space-4);
-
-  border: 1px solid var(--color-clay);
-  border-radius: var(--radius-sm);
-
-  background: var(--color-clay-bg);
-  color: var(--color-clay);
-
-  font-size: var(--text-sm);
+  font-size: var(--text-lg);
+  line-height: 1;
 }
 
 /* ======================================================
-   Add Product Form
+   Messages
    ====================================================== */
 
-.catalog-form {
-  margin-bottom: var(--space-8);
+.catalog-message {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 
-  padding: var(--space-6);
+  width: 100%;
+  margin-bottom: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+
+  box-sizing: border-box;
 
   border: 1px solid var(--color-line);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
+
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+.catalog-message-error {
+  border-color: var(--color-clay);
+  background: var(--color-clay-bg);
+  color: var(--color-clay);
+}
+
+.catalog-message-success {
+  border-color: var(--color-sage);
+  background: var(--color-sage-bg);
+  color: var(--color-sage);
+}
+
+.catalog-message-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 auto;
+
+  width: 22px;
+  height: 22px;
+
+  border-radius: var(--radius-full);
+
+  font-size: var(--text-xs);
+  font-weight: 700;
+}
+
+/* ======================================================
+   Cards
+   ====================================================== */
+
+.catalog-card {
+  width: 100%;
+  margin-bottom: var(--space-6);
+  padding: var(--space-6);
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
 
   background: var(--color-paper);
+
   box-shadow: var(--shadow-card);
 }
 
-.catalog-form-title {
-  margin: 0 0 var(--space-6);
+.catalog-form-card {
+  border-top: 2px solid var(--color-gold);
+}
 
-  font-family: var(--font-display);
-  font-size: var(--text-xl);
+.catalog-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-5);
+
+  margin-bottom: var(--space-6);
+}
+
+.catalog-card-header h2 {
+  margin: var(--space-1) 0 0;
 
   color: var(--color-plum);
+
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 400;
+  line-height: 1.25;
 }
 
-/* ======================================================
-   Form Fields
-   ====================================================== */
+.catalog-card-header p {
+  margin: var(--space-2) 0 0;
 
-.catalog-form-group {
-  display: flex;
-  flex-direction: column;
-
-  gap: var(--space-2);
-  margin-bottom: var(--space-4);
-}
-
-.catalog-form-group label {
   color: var(--color-plum-soft);
 
   font-size: var(--text-sm);
-  font-weight: 600;
+  line-height: 1.5;
 }
 
-.catalog-form-group input,
-.catalog-form-group textarea {
+/* ======================================================
+   Form
+   ====================================================== */
+
+.catalog-form {
   width: 100%;
+}
+
+.catalog-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: var(--space-5);
+
+  margin-bottom: var(--space-5);
+}
+
+.catalog-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.catalog-field > label {
+  color: var(--color-ink);
+
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.catalog-field input,
+.catalog-field textarea {
+  width: 100%;
+
   box-sizing: border-box;
 
-  padding: var(--space-3);
-
   border: 1px solid var(--color-line);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
 
   background: var(--color-paper);
   color: var(--color-ink);
@@ -141,85 +269,478 @@
 
   outline: none;
 
-  transition: border-color 0.2s ease;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.18s ease;
 }
 
-.catalog-form-group input:focus,
-.catalog-form-group textarea:focus {
-  border-color: var(--color-gold);
+.catalog-field input {
+  height: 44px;
+  padding: 0 var(--space-3);
 }
 
-.catalog-form-group textarea {
-  min-height: 100px;
+.catalog-field textarea {
+  min-height: 110px;
+  padding: var(--space-3);
 
   resize: vertical;
+
+  line-height: 1.6;
+}
+
+.catalog-field input::placeholder,
+.catalog-field textarea::placeholder {
+  color: var(--color-plum-tint);
+}
+
+.catalog-field input:hover,
+.catalog-field textarea:hover {
+  border-color: var(--color-plum-tint);
+}
+
+.catalog-field input:focus,
+.catalog-field textarea:focus {
+  border-color: var(--color-gold);
+
+  box-shadow:
+    0 0 0 3px rgba(176, 137, 104, 0.12);
+}
+
+.catalog-description-field {
+  margin-bottom: var(--space-5);
 }
 
 /* ======================================================
-   Featured Checkbox
+   Checkbox
    ====================================================== */
 
-.catalog-checkbox {
+.catalog-field-checkbox {
+  justify-content: flex-end;
+}
+
+.catalog-field-checkbox > label {
+  min-height: 44px;
+
   display: flex;
   align-items: center;
+  gap: var(--space-2);
+
+  cursor: pointer;
+  user-select: none;
+}
+
+.catalog-field-checkbox input {
+  width: 17px;
+  height: 17px;
+
+  margin: 0;
+
+  cursor: pointer;
+
+  accent-color: var(--color-plum);
+}
+
+.catalog-field-checkbox span {
+  color: var(--color-ink);
+
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+/* ======================================================
+   Image Upload
+   ====================================================== */
+
+.catalog-image-upload {
+  width: 100%;
+}
+
+.catalog-image-picker {
+  width: 100%;
+  min-height: 160px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
   gap: var(--space-2);
-  margin-bottom: var(--space-5);
+
+  padding: var(--space-6);
+
+  box-sizing: border-box;
+
+  border: 1px dashed var(--color-plum-tint);
+  border-radius: var(--radius-lg);
+
+  background: var(--color-sand);
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.catalog-image-picker:hover {
+  border-color: var(--color-gold);
+  background: var(--color-sand-deep);
+}
+
+.catalog-upload-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 38px;
+
+  margin-bottom: var(--space-1);
+
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-full);
+
+  background: var(--color-paper);
+  color: var(--color-gold);
+
+  font-size: var(--text-xl);
+}
+
+.catalog-upload-title {
+  color: var(--color-plum);
+
+  font-size: var(--text-base);
+  font-weight: 700;
+}
+
+.catalog-image-picker small {
+  color: var(--color-plum-soft);
+
+  font-size: var(--text-xs);
+}
+
+/* ======================================================
+   Image Preview
+   ====================================================== */
+
+.catalog-image-preview {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+
+  padding: var(--space-3);
+
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+
+  background: var(--color-sand);
+}
+
+.catalog-image-preview img {
+  width: 110px;
+  height: 110px;
+
+  display: block;
+
+  object-fit: cover;
+
+  border-radius: var(--radius-md);
+
+  border: 1px solid var(--color-line);
+}
+
+.catalog-image-preview-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  gap: var(--space-1);
+}
+
+.catalog-image-preview-info > span {
+  color: var(--color-ink);
+
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.catalog-image-preview-info small {
+  max-width: 320px;
+
+  overflow: hidden;
+
+  color: var(--color-plum-soft);
+
+  font-size: var(--text-xs);
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.catalog-image-remove {
+  height: 34px;
+
+  margin-top: var(--space-2);
+  padding: 0 var(--space-3);
+
+  border: 1px solid var(--color-clay);
+  border-radius: var(--radius-md);
+
+  background: transparent;
+  color: var(--color-clay);
+
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.catalog-image-remove:hover {
+  background: var(--color-clay-bg);
+}
+
+/* ======================================================
+   Form Actions
+   ====================================================== */
+
+.catalog-form-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+
+  border-top: 1px solid var(--color-line);
+}
+
+.catalog-primary-button,
+.catalog-secondary-button {
+  min-width: 120px;
+  min-height: 42px;
+
+  padding: 0 var(--space-5);
+
+  border-radius: var(--radius-md);
+
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.catalog-primary-button {
+  border: 1px solid var(--color-plum);
+
+  background: var(--color-plum);
+  color: var(--color-paper);
+}
+
+.catalog-primary-button:hover:not(:disabled) {
+  background: var(--color-plum-deep);
+  border-color: var(--color-plum-deep);
+}
+
+.catalog-secondary-button {
+  border: 1px solid var(--color-line);
+
+  background: transparent;
+  color: var(--color-ink);
+}
+
+.catalog-secondary-button:hover:not(:disabled) {
+  background: var(--color-sand);
+  border-color: var(--color-plum-tint);
+}
+
+.catalog-primary-button:disabled,
+.catalog-secondary-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ======================================================
+   Products Header
+   ====================================================== */
+
+.catalog-products-header {
+  align-items: center;
+}
+
+.catalog-product-count {
+  min-width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0 var(--space-3);
+
+  box-sizing: border-box;
+
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-full);
+
+  background: var(--color-sand);
+
+  color: var(--color-plum);
+
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+/* ======================================================
+   Loading
+   ====================================================== */
+
+.catalog-state {
+  min-height: 300px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--color-plum-soft);
+
+  font-size: var(--text-base);
+}
+
+/* ======================================================
+   Empty State
+   ====================================================== */
+
+.catalog-empty {
+  min-height: 240px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: var(--space-8);
+
+  box-sizing: border-box;
+
+  border: 1px dashed var(--color-line);
+  border-radius: var(--radius-lg);
+
+  background: var(--color-sand);
+
+  text-align: center;
+}
+
+.catalog-empty-icon {
+  width: 46px;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: var(--space-3);
+
+  border-radius: var(--radius-full);
+
+  background: var(--color-paper);
+  color: var(--color-gold);
+
+  font-size: var(--text-xl);
+
+  box-shadow: var(--shadow-card);
+}
+
+.catalog-empty h3 {
+  margin: 0;
+
+  color: var(--color-plum);
+
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 400;
+}
+
+.catalog-empty p {
+  max-width: 420px;
+
+  margin: var(--space-2) 0 var(--space-5);
 
   color: var(--color-plum-soft);
 
   font-size: var(--text-sm);
+  line-height: 1.6;
 }
 
-.catalog-checkbox input {
-  width: auto;
+.catalog-empty-button {
+  min-height: 38px;
+
+  padding: 0 var(--space-4);
+
+  border: 1px solid var(--color-gold);
+  border-radius: var(--radius-md);
+
+  background: transparent;
+  color: var(--color-gold-deep);
+
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.catalog-empty-button:hover {
+  background: var(--color-sand-deep);
 }
 
 /* ======================================================
-   Catalog Table
+   Table
    ====================================================== */
 
-.catalog-table-wrapper {
+.catalog-table-wrap {
   width: 100%;
+
   overflow-x: auto;
+
   border: 1px solid var(--color-line);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-lg);
 }
 
 .catalog-table {
   width: 100%;
+  min-width: 900px;
 
   border-collapse: collapse;
 
-  color: var(--color-ink);
-
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
+  text-align: left;
 }
 
-/* ======================================================
-   Table Header
-   ====================================================== */
-
 .catalog-table th {
-  padding: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+
+  background: var(--color-sand);
 
   border-bottom: 1px solid var(--color-line);
 
   color: var(--color-plum-soft);
 
   font-size: var(--text-xs);
-  font-weight: 600;
+  font-weight: 700;
 
-  text-align: left;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 
   white-space: nowrap;
 }
-
-/* ======================================================
-   Table Body
-   ====================================================== */
 
 .catalog-table td {
   padding: var(--space-4);
@@ -227,6 +748,8 @@
   border-bottom: 1px solid var(--color-line);
 
   color: var(--color-ink);
+
+  font-size: var(--text-sm);
 
   vertical-align: middle;
 }
@@ -236,154 +759,243 @@
 }
 
 .catalog-table tbody tr {
-  transition: background 0.2s ease;
+  transition: background-color 0.15s ease;
 }
-
-/* No colored hover */
 
 .catalog-table tbody tr:hover {
-  background: transparent;
+  background: var(--color-sand);
 }
 
 /* ======================================================
-   Product Column
+   Product Cell
    ====================================================== */
 
-.catalog-table-product {
-  min-width: 220px;
+.catalog-product-cell {
+  display: flex;
+  align-items: center;
+
+  gap: var(--space-3);
+
+  min-width: 250px;
 }
 
-.catalog-table-product-name {
-  display: block;
+.catalog-product-image {
+  width: 58px;
+  height: 58px;
 
-  color: var(--color-plum);
+  flex: 0 0 auto;
 
-  font-size: var(--text-base);
-  font-weight: 600;
-}
-
-.catalog-table-product-description {
-  display: block;
-
-  max-width: 300px;
-
-  margin-top: var(--space-1);
-
-  color: var(--color-plum-soft);
-
-  font-size: var(--text-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* ======================================================
-   Price
-   ====================================================== */
-
-.catalog-table-price {
-  color: var(--color-gold-deep);
-
-  font-weight: 600;
-
-  white-space: nowrap;
-}
-
-/* ======================================================
-   Featured Badge
-   ====================================================== */
-
-.catalog-featured {
-  display: inline-block;
-
-  padding: var(--space-1) var(--space-2);
-
-  border-radius: var(--radius-md);
-
-  background: var(--color-sage-bg);
-  color: var(--color-sage);
-
-  font-size: var(--text-xs);
-  font-weight: 600;
-
-  white-space: nowrap;
-}
-
-/* ======================================================
-   Standard Status
-   ====================================================== */
-
-.catalog-status {
-  display: inline-block;
-
-  padding: var(--space-1) var(--space-2);
 
   border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
 
-  background: transparent;
+  background: var(--color-sand);
+}
+
+.catalog-product-image img {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: cover;
+}
+
+.catalog-product-image span {
+  color: var(--color-plum-tint);
+
+  font-size: var(--text-sm);
+}
+
+.catalog-product-info {
+  min-width: 0;
+}
+
+.catalog-product-name {
+  overflow: hidden;
+
+  color: var(--color-plum);
+
+  font-size: var(--text-base);
+  font-weight: 700;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.catalog-product-description {
+  max-width: 320px;
+
+  margin-top: var(--space-1);
+
+  overflow: hidden;
+
   color: var(--color-plum-soft);
 
   font-size: var(--text-xs);
-  font-weight: 600;
+  line-height: 1.5;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.catalog-table-text {
+  color: var(--color-plum-soft);
+}
+
+.catalog-price {
+  color: var(--color-ink);
+
+  font-size: var(--text-base);
+  font-weight: 700;
+}
+
+/* ======================================================
+   Badge
+   ====================================================== */
+
+.catalog-badge {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 26px;
+
+  padding: 0 var(--space-3);
+
+  border-radius: var(--radius-full);
+
+  font-size: var(--text-xs);
+  font-weight: 700;
 
   white-space: nowrap;
 }
 
-/* ======================================================
-   Empty State
-   ====================================================== */
+.catalog-badge-featured {
+  background: var(--color-sage-bg);
+  color: var(--color-sage);
+}
 
-.catalog-empty {
-  padding: var(--space-8);
+.catalog-muted {
+  color: var(--color-plum-tint);
 
-  border: 1px dashed var(--color-line);
-  border-radius: var(--radius-sm);
-
-  background: var(--color-paper);
-  color: var(--color-plum-soft);
-
-  text-align: center;
-
-  font-size: var(--text-base);
+  font-size: var(--text-xs);
 }
 
 /* ======================================================
-   Loading State
+   Delete Button
    ====================================================== */
 
-.catalog-loading {
-  padding: var(--space-8);
+.catalog-delete-button {
+  min-height: 34px;
 
-  text-align: center;
+  padding: 0 var(--space-3);
+
+  border: 1px solid var(--color-clay);
+  border-radius: var(--radius-md);
+
+  background: transparent;
+  color: var(--color-clay);
+
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease;
 }
 
-.catalog-loading-text {
-  margin: var(--space-3) 0 0;
-
-  color: var(--color-plum-soft);
-
-  font-size: var(--text-sm);
+.catalog-delete-button:hover {
+  background: var(--color-clay-bg);
 }
 
 /* ======================================================
    Responsive
    ====================================================== */
 
-@media (max-width: 768px) {
-  .catalog-page {
+@media (max-width: 900px) {
+  .catalog {
+    padding: var(--space-6);
+  }
+
+  .catalog-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .catalog-card {
     padding: var(--space-5);
+  }
+}
+
+@media (max-width: 600px) {
+  .catalog {
+    padding: var(--space-4);
   }
 
   .catalog-header {
-    align-items: flex-start;
     flex-direction: column;
-
-    gap: var(--space-4);
+    align-items: stretch;
   }
 
-  .catalog-table {
-    min-width: 800px;
+  .catalog-header h1 {
+    font-size: var(--text-2xl);
+  }
+
+  .catalog-add-button {
+    width: 100%;
+  }
+
+  .catalog-card {
+    padding: var(--space-4);
+
+    border-radius: var(--radius-md);
+  }
+
+  .catalog-form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .catalog-primary-button,
+  .catalog-secondary-button {
+    width: 100%;
+  }
+
+  .catalog-image-preview {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .catalog-image-preview img {
+    width: 100%;
+    height: 180px;
+  }
+
+  .catalog-image-preview-info {
+    align-items: stretch;
+  }
+
+  .catalog-image-preview-info small {
+    max-width: 100%;
+  }
+
+  .catalog-image-remove {
+    width: 100%;
+  }
+
+  .catalog-products-header {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .catalog-product-count {
+    flex: 0 0 auto;
   }
 }

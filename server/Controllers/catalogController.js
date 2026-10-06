@@ -1,188 +1,63 @@
 const mongoose = require("mongoose");
 
-const CatalogProduct = require("../models/CatalogProduct");
+const catalogProductSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
-// ======================================================
-// Get All Catalog Products
-// ======================================================
+    description: {
+      type: String,
+      default: "",
+      trim: true,
+    },
 
-async function getCatalogProducts(req, res, next) {
-  try {
-    if (mongoose.connection.readyState !== 1) {
-      return res.status(503).json({
-        success: false,
-        message: "قاعدة البيانات غير متصلة حاليًا",
-      });
-    }
+    price: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
 
-    const products = await CatalogProduct.find({
-      isActive: true,
-    }).sort({
-      sortOrder: 1,
-      createdAt: -1,
-    });
+    category: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
-    res.json({
-      success: true,
-      products,
-    });
-  } catch (error) {
-    console.error("Get catalog products error:", error);
-    next(error);
+    manufacturer: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    imagePath: {
+      type: String,
+      default: null,
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
+
+    sortOrder: {
+      type: Number,
+      default: 0,
+    },
+  },
+  {
+    timestamps: true,
   }
-}
+);
 
-// ======================================================
-// Get One Catalog Product
-// ======================================================
-
-async function getCatalogProduct(req, res, next) {
-  try {
-    if (mongoose.connection.readyState !== 1) {
-      return res.status(503).json({
-        success: false,
-        message: "قاعدة البيانات غير متصلة حاليًا",
-      });
-    }
-
-    const product = await CatalogProduct.findOne({
-      _id: req.params.id,
-      isActive: true,
-    });
-
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: "المنتج غير موجود",
-      });
-    }
-
-    res.json({
-      success: true,
-      product,
-    });
-  } catch (error) {
-    console.error("Get catalog product error:", error);
-    next(error);
-  }
-}
-
-// ======================================================
-// Create Catalog Product
-// ======================================================
-
-async function createCatalogProduct(req, res, next) {
-  try {
-    const {
-      name,
-      description,
-      price,
-      category,
-      manufacturer,
-      imagePath,
-      isFeatured,
-      sortOrder,
-    } = req.body;
-
-    if (!name || price === undefined || !category) {
-      return res.status(400).json({
-        success: false,
-        message: "الاسم والسعر والتصنيف مطلوبين",
-      });
-    }
-
-    const product = await CatalogProduct.create({
-      name,
-      description,
-      price,
-      category,
-      manufacturer,
-      imagePath,
-      isFeatured,
-      sortOrder,
-    });
-
-    res.status(201).json({
-      success: true,
-      message: "تم إنشاء المنتج بنجاح",
-      product,
-    });
-  } catch (error) {
-    console.error("Create catalog product error:", error);
-    next(error);
-  }
-}
-
-// ======================================================
-// Update Catalog Product
-// ======================================================
-
-async function updateCatalogProduct(req, res, next) {
-  try {
-    const product = await CatalogProduct.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: "المنتج غير موجود",
-      });
-    }
-
-    res.json({
-      success: true,
-      message: "تم تحديث المنتج بنجاح",
-      product,
-    });
-  } catch (error) {
-    console.error("Update catalog product error:", error);
-    next(error);
-  }
-}
-
-// ======================================================
-// Delete Catalog Product
-// ======================================================
-
-async function deleteCatalogProduct(req, res, next) {
-  try {
-    const product = await CatalogProduct.findByIdAndUpdate(
-      req.params.id,
-      {
-        isActive: false,
-      },
-      {
-        new: true,
-      }
-    );
-
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: "المنتج غير موجود",
-      });
-    }
-
-    res.json({
-      success: true,
-      message: "تم حذف المنتج من الكتالوج",
-    });
-  } catch (error) {
-    console.error("Delete catalog product error:", error);
-    next(error);
-  }
-}
-
-module.exports = {
-  getCatalogProducts,
-  getCatalogProduct,
-  createCatalogProduct,
-  updateCatalogProduct,
-  deleteCatalogProduct,
-};
+module.exports = mongoose.model(
+  "CatalogProduct",
+  catalogProductSchema
+);

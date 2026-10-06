@@ -1,57 +1,18 @@
 const express = require("express");
 
-const {
-  getCatalogProducts,
-  getCatalogProduct,
-  createCatalogProduct,
-  updateCatalogProduct,
-  deleteCatalogProduct,
-} = require("../controllers/catalogController");
-
-const authenticate = require("../middleware/auth");
-const authorize = require("../middleware/authorize");
-
 const router = express.Router();
 
 // ======================================================
-// Public Catalog
-// العميل يقدر يشوف المنتجات بدون Login
+// GET Catalog
 // ======================================================
 
-router.get(
-  "/",
-  getCatalogProducts
-);
+router.get("/", (req, res) => {
+  console.log("🔥 GET /api/catalog HIT");
 
-router.get(
-  "/:id",
-  getCatalogProduct
-);
-
-// ======================================================
-// Admin Catalog Management
-// لازم Login + Permission
-// ======================================================
-
-router.post(
-  "/",
-  authenticate,
-  authorize("products.create"),
-  createCatalogProduct
-);
-
-router.put(
-  "/:id",
-  authenticate,
-  authorize("products.update"),
-  updateCatalogProduct
-);
-
-router.delete(
-  "/:id",
-  authenticate,
-  authorize("products.delete"),
-  deleteCatalogProduct
-);
+  res.status(200).json({
+    success: true,
+    products: [],
+  });
+});
 
 module.exports = router;
