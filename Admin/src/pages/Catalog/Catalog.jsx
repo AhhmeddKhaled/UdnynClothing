@@ -54,7 +54,7 @@ export default function Catalog() {
 
       console.log("Catalog: fetching...");
 
-      const response = await fetch("http://localhost:5000/api/catalog");
+      const response = await fetch(`${API_URL}/api/catalog`);
 
       console.log(
         "Catalog response:",
@@ -243,8 +243,6 @@ export default function Catalog() {
 
       setSuccess("تم إضافة المنتج بنجاح");
 
-      // Add the new product directly
-      // to the current table.
       if (data.product) {
         setProducts((current) => [data.product, ...current]);
       } else {
