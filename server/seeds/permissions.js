@@ -1,4 +1,4 @@
-const Permission = require("../models/Permission");
+const Permission = require("../Models/Permission");
 
 const permissions = [
   {
@@ -50,6 +50,10 @@ const permissions = [
   {
     name: "orders.delete",
     description: "Delete orders",
+  },
+  {
+    name: "availableStock.read",
+    description: "View available stock",
   },
 ];
 

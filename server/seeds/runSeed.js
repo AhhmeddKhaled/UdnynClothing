@@ -1,9 +1,9 @@
 require("dotenv").config();
-
-const connectMongoDB = require("../config/database");
 const seedPermissions = require("./permissions");
-const seedRoles = require("./roles");
 
+
+const seedRoles = require("./roles");
+const connectMongoDB = require("../config/database");
 async function runSeed() {
   try {
     await connectMongoDB();

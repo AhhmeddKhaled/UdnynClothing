@@ -4,9 +4,10 @@ const path = require("path");
 const fs = require("fs");
 const XLSX = require("xlsx");
 
-const AvailableStock = require(
-  "../models/AvailableStock"
-);
+const authenticate = require("../middleware/auth");
+const authorize = require("../middleware/authorize");
+
+const AvailableStock = require("../models/AvailableStock");
 
 const router = express.Router();
 
@@ -219,45 +220,66 @@ function normalizeNumber(value) {
 |--------------------------------------------------------------------------
 | GET Available Stock
 |--------------------------------------------------------------------------
+|
+| Authentication:
+|   authenticate
+|
+| Permission:
+|   availableStock.read
+|
 */
 
-router.get("/", async (req, res) => {
-  try {
-    const products =
-      await AvailableStock.find({
-        active: true,
-      })
-        .sort({
-          itemId: 1,
+router.get(
+  "/",
+  authenticate,
+  authorize("availableStock.read"),
+  async (req, res) => {
+    try {
+      const products =
+        await AvailableStock.find({
+          active: true,
         })
-        .lean();
+          .sort({
+            itemId: 1,
+          })
+          .lean();
 
-    return res.status(200).json({
-      success: true,
-      products,
-    });
-  } catch (error) {
-    console.error(
-      "Available stock GET error:",
-      error
-    );
+      return res.status(200).json({
+        success: true,
+        products,
+      });
+    } catch (error) {
+      console.error(
+        "Available stock GET error:",
+        error
+      );
 
-    return res.status(500).json({
-      success: false,
-      message:
-        "Failed to load available stock",
-    });
+      return res.status(500).json({
+        success: false,
+        message:
+          "Failed to load available stock",
+      });
+    }
   }
-});
+);
 
 /*
 |--------------------------------------------------------------------------
 | IMPORT EXCEL
 |--------------------------------------------------------------------------
+|
+| Authentication:
+|   authenticate
+|
+| Permission:
+|   availableStock.read
+|
 */
 
 router.post(
   "/import",
+  authenticate,
+  authorize("availableStock.read"),
   upload.single("file"),
   async (req, res) => {
     try {

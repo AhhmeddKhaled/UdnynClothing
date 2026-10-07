@@ -20,6 +20,7 @@ const roles = {
     "users.update",
     "orders.read",
     "orders.update",
+    "availableStock.read",
   ],
 
   admin: [
@@ -37,6 +38,8 @@ const roles = {
     "orders.create",
     "orders.update",
     "orders.delete",
+
+    "availableStock.read",
   ],
 
   owner: [
@@ -54,6 +57,8 @@ const roles = {
     "orders.create",
     "orders.update",
     "orders.delete",
+
+    "availableStock.read",
   ],
 };
 
