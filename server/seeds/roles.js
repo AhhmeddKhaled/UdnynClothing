@@ -1,5 +1,5 @@
-const Role = require("../models/Role");
-const Permission = require("../models/Permission");
+const Role = require("../Models/Role");
+const Permission = require("../Models/Permission");
 
 const roles = {
   customer: [

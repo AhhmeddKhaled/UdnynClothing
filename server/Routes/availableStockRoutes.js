@@ -7,7 +7,7 @@ const XLSX = require("xlsx");
 const authenticate = require("../middleware/auth");
 const authorize = require("../middleware/authorize");
 
-const AvailableStock = require("../models/AvailableStock");
+const AvailableStock = require("../Mdels/AvailableStock");
 
 const router = express.Router();
 

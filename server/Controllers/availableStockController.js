@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const XLSX = require("xlsx");
 
-const AvailableStock = require("../models/AvailableStock");
+const AvailableStock = require("../Models/AvailableStock")
 const parseSheet = require("../utils/excelParser");
 
 // ======================================================
