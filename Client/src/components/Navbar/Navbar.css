@@ -1,0 +1,146 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  background: var(--color-paper);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.navbar-inner {
+  width: min(1400px, 100%);
+  min-height: 68px;
+
+  margin: 0 auto;
+  padding: 0 var(--space-6);
+
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.navbar-logo {
+  flex-shrink: 0;
+
+  border: 0;
+  background: none;
+
+  color: var(--color-plum);
+
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+
+  flex: 1;
+}
+
+.navbar-links button {
+  padding: 0;
+
+  border: 0;
+  background: none;
+
+  color: var(--color-plum-soft);
+
+  font: inherit;
+  font-size: var(--text-sm);
+
+  cursor: pointer;
+
+  transition: color 0.15s;
+}
+
+.navbar-links button:hover {
+  color: var(--color-gold-deep);
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.navbar-icon,
+.navbar-language,
+.navbar-logout {
+  min-height: 38px;
+
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+
+  background: var(--color-paper);
+  color: var(--color-plum);
+
+  font: inherit;
+  font-size: var(--text-sm);
+
+  cursor: pointer;
+}
+
+.navbar-icon {
+  width: 38px;
+  font-size: 21px;
+}
+
+.navbar-language {
+  padding: 0 12px;
+  font-weight: 600;
+}
+
+.navbar-logout {
+  padding: 0 12px;
+}
+
+.navbar-icon:hover,
+.navbar-language:hover,
+.navbar-logout:hover {
+  border-color: var(--color-gold);
+  color: var(--color-gold-deep);
+}
+
+@media (max-width: 900px) {
+  .navbar-inner {
+    flex-wrap: wrap;
+    padding-top: var(--space-3);
+    padding-bottom: var(--space-3);
+    gap: var(--space-3);
+  }
+
+  .navbar-links {
+    order: 3;
+
+    width: 100%;
+
+    overflow-x: auto;
+
+    padding-bottom: var(--space-1);
+
+    gap: var(--space-4);
+  }
+
+  .navbar-actions {
+    margin-inline-start: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .navbar-inner {
+    padding-inline: var(--space-4);
+  }
+
+  .navbar-logo {
+    font-size: 24px;
+  }
+
+  .navbar-logout {
+    display: none;
+  }
+}

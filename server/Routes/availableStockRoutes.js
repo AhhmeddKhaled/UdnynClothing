@@ -13,32 +13,51 @@ const router = express.Router();
 
 /*
 |--------------------------------------------------------------------------
-| Upload Directory
+| Upload Directories
 |--------------------------------------------------------------------------
 */
 
-const uploadDir = path.join(
+/*
+ * Excel uploads
+ */
+const excelUploadDir = path.join(
   __dirname,
   "..",
   "uploads",
   "excel"
 );
 
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, {
+if (!fs.existsSync(excelUploadDir)) {
+  fs.mkdirSync(excelUploadDir, {
+    recursive: true,
+  });
+}
+
+/*
+ * Available Stock images
+ */
+const imageUploadDir = path.join(
+  __dirname,
+  "..",
+  "uploads",
+  "available-stock"
+);
+
+if (!fs.existsSync(imageUploadDir)) {
+  fs.mkdirSync(imageUploadDir, {
     recursive: true,
   });
 }
 
 /*
 |--------------------------------------------------------------------------
-| Multer Configuration
+| Excel Multer Configuration
 |--------------------------------------------------------------------------
 */
 
-const storage = multer.diskStorage({
+const excelStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadDir);
+    cb(null, excelUploadDir);
   },
 
   filename: (req, file, cb) => {
@@ -52,8 +71,8 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({
-  storage,
+const excelUpload = multer({
+  storage: excelStorage,
 
   limits: {
     fileSize: 20 * 1024 * 1024,
@@ -78,6 +97,65 @@ const upload = multer({
       return cb(
         new Error(
           "Only XLSX and XLS files are allowed"
+        )
+      );
+    }
+
+    cb(null, true);
+  },
+});
+
+/*
+|--------------------------------------------------------------------------
+| Image Multer Configuration
+|--------------------------------------------------------------------------
+*/
+
+const imageStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, imageUploadDir);
+  },
+
+  filename: (req, file, cb) => {
+    const itemId =
+      String(req.params.itemId || "product")
+        .replace(/[^a-zA-Z0-9_-]/g, "");
+
+    const extension =
+      path.extname(
+        file.originalname
+      ).toLowerCase();
+
+    const filename =
+      `${itemId}-${Date.now()}${extension}`;
+
+    cb(null, filename);
+  },
+});
+
+const imageUpload = multer({
+  storage: imageStorage,
+
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+
+  fileFilter: (req, file, cb) => {
+    const allowedMimeTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/webp",
+    ];
+
+    if (
+      !allowedMimeTypes.includes(
+        file.mimetype
+      )
+    ) {
+      return cb(
+        new Error(
+          "Only JPG, JPEG, PNG and WEBP images are allowed"
         )
       );
     }
@@ -221,11 +299,16 @@ function normalizeNumber(value) {
 | GET Available Stock
 |--------------------------------------------------------------------------
 |
+| IMPORTANT:
+| هذا الـ endpoint خاص بالـ Admin فقط.
+|
 | Authentication:
 |   authenticate
 |
 | Permission:
 |   availableStock.read
+|
+| الـ Customer / Client ممنوع من الوصول إليه.
 |
 */
 
@@ -265,6 +348,237 @@ router.get(
 
 /*
 |--------------------------------------------------------------------------
+| UPLOAD PRODUCT IMAGE
+|--------------------------------------------------------------------------
+|
+| Endpoint:
+|   POST /api/availableStock/:itemId/image
+|
+| Authentication:
+|   authenticate
+|
+| Permission:
+|   availableStock.import
+|
+| FormData field:
+|   image
+|
+*/
+
+router.post(
+  "/:itemId/image",
+  authenticate,
+  authorize("availableStock.import"),
+  imageUpload.single("image"),
+  async (req, res) => {
+    try {
+      console.log(
+        "🔥 POST /api/availableStock/:itemId/image HIT"
+      );
+
+      const itemId =
+        normalizeNumber(
+          req.params.itemId
+        );
+
+      if (!itemId) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid product itemId",
+        });
+      }
+
+      /*
+       * تأكد إن المنتج موجود
+       */
+
+      const product =
+        await AvailableStock.findOne({
+          itemId,
+        });
+
+      if (!product) {
+        /*
+         * لو Multer رفع الملف قبل ما نعرف
+         * إن المنتج موجود، نحذف الملف.
+         */
+
+        if (req.file?.path) {
+          try {
+            fs.unlinkSync(
+              req.file.path
+            );
+          } catch (deleteError) {
+            console.error(
+              "Failed to delete orphan image:",
+              deleteError
+            );
+          }
+        }
+
+        return res.status(404).json({
+          success: false,
+          message:
+            "Product not found",
+        });
+      }
+
+      /*
+       * تأكد إن الصورة وصلت
+       */
+
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "No image was uploaded",
+        });
+      }
+
+      console.log(
+        "Image file:",
+        req.file.originalname
+      );
+
+      console.log(
+        "Saved as:",
+        req.file.filename
+      );
+
+      /*
+       * الصورة القديمة
+       */
+
+      const oldImagePath =
+        product.imagePath;
+
+      /*
+       * المسار الذي سيتم حفظه في MongoDB
+       */
+
+      const imagePath =
+        `/uploads/available-stock/${req.file.filename}`;
+
+      /*
+       * تحديث المنتج
+       */
+
+      product.imagePath =
+        imagePath;
+
+      await product.save();
+
+      /*
+       * حذف الصورة القديمة بعد نجاح
+       * حفظ الصورة الجديدة.
+       *
+       * نحذف فقط الملفات المحلية
+       * الخاصة بمجلد available-stock.
+       */
+
+      if (
+        oldImagePath &&
+        oldImagePath.startsWith(
+          "/uploads/available-stock/"
+        )
+      ) {
+        const oldFilename =
+          path.basename(
+            oldImagePath
+          );
+
+        const oldFilePath =
+          path.join(
+            imageUploadDir,
+            oldFilename
+          );
+
+        /*
+         * تأكد إن الملف القديم داخل
+         * مجلد الصور قبل حذفه.
+         */
+
+        if (
+          fs.existsSync(oldFilePath)
+        ) {
+          try {
+            fs.unlinkSync(
+              oldFilePath
+            );
+
+            console.log(
+              "Old image deleted:",
+              oldFilename
+            );
+          } catch (deleteError) {
+            console.error(
+              "Failed to delete old image:",
+              deleteError
+            );
+          }
+        }
+      }
+
+      return res.status(200).json({
+        success: true,
+
+        message:
+          "Product image uploaded successfully",
+
+        imagePath,
+
+        product: {
+          itemId:
+            product.itemId,
+
+          imagePath:
+            product.imagePath,
+        },
+      });
+    } catch (error) {
+      console.error(
+        "Product image upload error:",
+        error
+      );
+
+      /*
+       * لو حصل خطأ بعد رفع الملف،
+       * نحذف الملف الجديد حتى لا يفضل
+       * ملف غير مرتبط بأي Product.
+       */
+
+      if (req.file?.path) {
+        try {
+          if (
+            fs.existsSync(
+              req.file.path
+            )
+          ) {
+            fs.unlinkSync(
+              req.file.path
+            );
+          }
+        } catch (deleteError) {
+          console.error(
+            "Failed to cleanup uploaded image:",
+            deleteError
+          );
+        }
+      }
+
+      return res.status(500).json({
+        success: false,
+        message:
+          error.message ||
+          "Failed to upload product image",
+      });
+    }
+  }
+);
+
+/*
+|--------------------------------------------------------------------------
 | IMPORT EXCEL
 |--------------------------------------------------------------------------
 |
@@ -272,15 +586,15 @@ router.get(
 |   authenticate
 |
 | Permission:
-|   availableStock.read
+|   availableStock.import
 |
 */
 
 router.post(
   "/import",
   authenticate,
-  authorize("availableStock.read"),
-  upload.single("file"),
+  authorize("availableStock.import"),
+  excelUpload.single("file"),
   async (req, res) => {
     try {
       console.log(

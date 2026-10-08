@@ -5,13 +5,11 @@ const cors = require("cors");
 const path = require("path");
 
 const connectMongoDB = require("./config/database");
-
 const healthRoutes = require("./routes/healthRoutes");
 const userRoutes = require("./routes/userRoutes");
 const availableStockRoutes = require("./routes/availableStockRoutes");
 const authRoutes = require("./routes/authRoutes");
 const catalogRoutes = require("./routes/catalogRoutes");
-
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();

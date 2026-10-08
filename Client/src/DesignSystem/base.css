@@ -1,0 +1,182 @@
+@import "./tokens.css";
+
+/* ======================================================
+   Reset أساسي
+   ====================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--color-sand);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.6;
+}
+
+h1, h2, h3 { margin: 0; }
+
+.num { font-variant-numeric: tabular-nums; }
+
+/* ======================================================
+   العناوين
+   ====================================================== */
+
+.ds-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--text-display);
+  color: var(--color-plum);
+}
+
+.ds-page-title {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--color-plum);
+  margin: 0 0 var(--space-1);
+}
+
+.ds-page-sub {
+  font-size: var(--text-sm);
+  color: var(--color-plum-soft);
+  margin: 0 0 var(--space-6);
+}
+
+/* ======================================================
+   أزرار
+   ====================================================== */
+
+.btn {
+  font: inherit;
+  font-size: var(--text-sm);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  min-height: 40px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  transition: background .15s, border-color .15s, color .15s;
+}
+.btn:disabled { opacity: .5; cursor: default; }
+.btn:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 2px; }
+
+.btn-primary {
+  background: var(--color-plum);
+  color: var(--color-paper);
+}
+.btn-primary:hover:not(:disabled) { background: var(--color-plum-deep); }
+
+.btn-secondary {
+  background: var(--color-paper);
+  color: var(--color-plum);
+  border-color: var(--color-line);
+}
+.btn-secondary:hover:not(:disabled) { border-color: var(--color-plum); }
+
+.btn-danger {
+  background: var(--color-paper);
+  color: var(--color-clay);
+  border-color: var(--color-clay-bg);
+}
+.btn-danger:hover:not(:disabled) { background: var(--color-clay-bg); }
+
+.btn-text {
+  background: none;
+  border: 0;
+  color: var(--color-gold-deep);
+  text-decoration: underline;
+  padding: 0;
+  min-height: auto;
+}
+
+/* ======================================================
+   حقول الإدخال
+   ====================================================== */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  color: var(--color-plum-soft);
+}
+
+.field input,
+.field select,
+.field textarea {
+  font: inherit;
+  font-size: var(--text-base);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  min-height: 42px;
+}
+
+.field input:focus-visible,
+.field select:focus-visible,
+.field textarea:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 1px;
+}
+
+/* ======================================================
+   كروت
+   ====================================================== */
+
+.card {
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  padding: var(--space-5);
+}
+
+/* ======================================================
+   بادجات (حالة، دور، تنبيه)
+   ====================================================== */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--text-xs);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+}
+.badge-neutral { background: var(--color-sand-deep); color: var(--color-plum-soft); }
+.badge-gold    { background: #F1E4D8; color: var(--color-gold-deep); }
+.badge-success { background: var(--color-sage-bg); color: var(--color-sage); }
+.badge-danger  { background: var(--color-clay-bg); color: var(--color-clay); }
+
+/* ======================================================
+   جداول
+   ====================================================== */
+
+.table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+.table th {
+  text-align: right;
+  color: var(--color-plum-soft);
+  font-weight: 500;
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--color-line);
+}
+.table td {
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--color-line);
+}
+
+/* ======================================================
+   رسائل حالة (فاضي / تحميل / خطأ)
+   ====================================================== */
+
+.state {
+  padding: var(--space-10) var(--space-5);
+  text-align: center;
+  color: var(--color-plum-soft);
+}
+.state b { display: block; color: var(--color-clay); font-size: var(--text-lg); margin-bottom: var(--space-2); }

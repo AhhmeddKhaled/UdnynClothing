@@ -1,0 +1,57 @@
+.login-page {
+  min-height: 100vh;
+
+  display: grid;
+  place-items: center;
+
+  padding: var(--space-6);
+
+  background: var(--color-sand);
+}
+
+.login-card {
+  width: min(100%, 420px);
+
+  padding: var(--space-8);
+
+  box-shadow: var(--shadow-card);
+}
+
+.login-header {
+  text-align: center;
+
+  margin-bottom: var(--space-6);
+}
+
+.login-header .ds-display {
+  margin-bottom: var(--space-2);
+}
+
+.login-header .ds-page-sub {
+  margin-bottom: 0;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+
+  gap: var(--space-4);
+}
+
+.login-error {
+  padding: var(--space-3) var(--space-4);
+
+  background: var(--color-clay-bg);
+  color: var(--color-clay);
+
+  border: 1px solid var(--color-clay);
+  border-radius: var(--radius-sm);
+
+  font-size: var(--text-sm);
+}
+
+.login-submit {
+  width: 100%;
+
+  margin-top: var(--space-2);
+}

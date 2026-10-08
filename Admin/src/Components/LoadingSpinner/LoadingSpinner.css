@@ -1,0 +1,54 @@
+.admin-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: color-mix(
+    in srgb,
+    var(--color-paper) 82%,
+    transparent
+  );
+
+  backdrop-filter: blur(3px);
+}
+
+.admin-loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: var(--space-3);
+
+  padding: var(--space-6);
+}
+
+.admin-loading-ring {
+  width: 46px;
+  height: 46px;
+
+  border: 3px solid var(--color-line);
+  border-top-color: var(--color-gold);
+
+  border-radius: var(--radius-full);
+
+  animation: admin-loading-spin 0.8s linear infinite;
+}
+
+.admin-loading-brand {
+  color: var(--color-plum);
+
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+@keyframes admin-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

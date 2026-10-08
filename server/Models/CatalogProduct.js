@@ -1,27 +1,66 @@
-const express = require("express");
+const mongoose = require("mongoose");
 
-const router = express.Router();
+const catalogProductSchema =
+  new mongoose.Schema(
+    {
+      name: {
+        type: String,
+        required: true,
+        trim: true,
+      },
 
-// ======================================================
-// GET Catalog
-// ======================================================
+      description: {
+        type: String,
+        default: "",
+        trim: true,
+      },
 
-router.get("/", async (req, res) => {
-  try {
-    console.log("GET /api/catalog HIT");
+      price: {
+        type: Number,
+        required: true,
+        min: 0,
+      },
 
-    res.status(200).json({
-      success: true,
-      products: [],
-    });
-  } catch (error) {
-    console.error("Catalog route error:", error);
+      category: {
+        type: String,
+        required: true,
+        trim: true,
+      },
 
-    res.status(500).json({
-      success: false,
-      message: "Failed to load catalog",
-    });
-  }
-});
+      manufacturer: {
+        type: String,
+        default: "",
+        trim: true,
+      },
 
-module.exports = router;
+      imagePath: {
+        type: String,
+        default: null,
+      },
+
+      isActive: {
+        type: Boolean,
+        default: true,
+      },
+
+      isFeatured: {
+        type: Boolean,
+        default: false,
+      },
+
+      sortOrder: {
+        type: Number,
+        default: 0,
+      },
+    },
+    {
+      timestamps: true,
+    }
+  );
+
+module.exports =
+  mongoose.models.CatalogProduct ||
+  mongoose.model(
+    "CatalogProduct",
+    catalogProductSchema
+  );

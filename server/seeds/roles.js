@@ -20,6 +20,7 @@ const roles = {
     "users.update",
     "orders.read",
     "orders.update",
+
     "availableStock.read",
   ],
 
@@ -40,6 +41,7 @@ const roles = {
     "orders.delete",
 
     "availableStock.read",
+    "availableStock.import",
   ],
 
   owner: [
@@ -59,6 +61,7 @@ const roles = {
     "orders.delete",
 
     "availableStock.read",
+    "availableStock.import",
   ],
 };
 

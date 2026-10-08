@@ -1,45 +1,61 @@
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5000";
 
-export async function login(email, password) {
-  const response = await fetch(`${API_URL}/api/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email,
-      password,
-    }),
-  });
+export async function login(
+  email,
+  password
+) {
+  const response = await fetch(
+    `${API_URL}/api/auth/login`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    }
+  );
 
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || "Login failed");
+    throw new Error(
+      data.message || "Login failed"
+    );
   }
 
   if (data.token) {
-    localStorage.setItem("token", data.token);
+    localStorage.setItem(
+      "token",
+      data.token
+    );
   }
 
   if (data.user) {
-    localStorage.setItem("user", JSON.stringify(data.user));
+    localStorage.setItem(
+      "user",
+      JSON.stringify(data.user)
+    );
   }
 
   return data;
 }
 
-export async function authFetch(path, options = {}) {
-  const token = localStorage.getItem("token");
+export async function authFetch(
+  path,
+  options = {}
+) {
+  const token =
+    localStorage.getItem("token");
 
-  const headers = new Headers(options.headers || {});
+  const headers = new Headers(
+    options.headers || {}
+  );
 
-  /*
-   * FormData:
-   * لا نضع Content-Type يدويًا.
-   * المتصفح هو الذي يضيف multipart/form-data
-   * مع الـ boundary الصحيح.
-   */
   const isFormData =
     typeof FormData !== "undefined" &&
     options.body instanceof FormData;
@@ -50,7 +66,10 @@ export async function authFetch(path, options = {}) {
     !headers.has("Content-Type") &&
     options.body
   ) {
-    headers.set("Content-Type", "application/json");
+    headers.set(
+      "Content-Type",
+      "application/json"
+    );
   }
 
   if (token) {
@@ -83,7 +102,8 @@ export function isLoggedIn() {
 }
 
 export function getUser() {
-  const user = localStorage.getItem("user");
+  const user =
+    localStorage.getItem("user");
 
   if (!user) {
     return null;

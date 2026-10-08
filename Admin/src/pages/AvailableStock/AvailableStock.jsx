@@ -1,219 +1,303 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+
 import "./AvailableStock.css";
+
 import { authFetch } from "../Login/auth.js";
 
-const AvailableStock = () => {
+import { useLoading } from "../../context/LoadingContext/LoadingContext.jsx";
+
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:5000";
+
+export default function AvailableStock() {
+  const {
+    startLoading,
+    stopLoading,
+  } = useLoading();
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-
-  const [showImportForm, setShowImportForm] = useState(false);
-  const [file, setFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
-
-  // =========================================
-  // Filters
-  // =========================================
-
-  const [productSearch, setProductSearch] = useState("");
-  const [selectedManufacturer, setSelectedManufacturer] =
+  const [search, setSearch] = useState("");
+  const [categoryFilter, setCategoryFilter] =
     useState("");
-  const [selectedCategory, setSelectedCategory] =
+  const [manufacturerFilter, setManufacturerFilter] =
     useState("");
 
-  // =========================================
-  // Fetch Products
-  // =========================================
+  const [importing, setImporting] =
+    useState(false);
 
-  const fetchProducts = async () => {
+  const [imageUploadingFor, setImageUploadingFor] =
+    useState(null);
+
+  const fileInputRefs = useRef({});
+
+  const currentUser = JSON.parse(
+    localStorage.getItem("user") || "null"
+  );
+
+  const canManageImages = [
+    "admin",
+    "owner",
+  ].includes(currentUser?.role);
+
+  const canImport = [
+    "admin",
+    "owner",
+  ].includes(currentUser?.role);
+
+  async function fetchProducts() {
+    setLoading(true);
+    startLoading();
+
     try {
-      setLoading(true);
-      setError("");
-
       const response = await authFetch(
         "/api/availableStock"
       );
 
-      const text = await response.text();
+      const data = await response.json();
 
-      let data;
-
-      try {
-        data = JSON.parse(text);
-      } catch {
-        throw new Error(
-          "Invalid response from server"
-        );
-      }
-
-      if (!response.ok || !data.success) {
+      if (!response.ok) {
         throw new Error(
           data.message ||
-            "Failed to load products"
+            "فشل تحميل البضاعة المتاحة"
         );
       }
 
-      setProducts(data.products || []);
-    } catch (err) {
+      setProducts(
+        Array.isArray(data)
+          ? data
+          : data.products || []
+      );
+    } catch (error) {
       console.error(
-        "Fetch products error:",
-        err
+        "Available Stock fetch error:",
+        error
       );
 
-      setError(
-        err.message ||
-          "An error occurred while loading products"
+      setProducts([]);
+
+      alert(
+        error.message ||
+          "فشل تحميل البضاعة المتاحة"
       );
     } finally {
       setLoading(false);
+      stopLoading();
     }
-  };
+  }
 
   useEffect(() => {
     fetchProducts();
   }, []);
 
-  // =========================================
-  // Unique Manufacturers
-  // =========================================
+  const categories = useMemo(() => {
+    return [
+      ...new Set(
+        products
+          .map((product) => product.category)
+          .filter(Boolean)
+      ),
+    ].sort((a, b) =>
+      String(a).localeCompare(
+        String(b),
+        "ar"
+      )
+    );
+  }, [products]);
 
   const manufacturers = useMemo(() => {
-    const values = products
-      .map((product) => product.manufacturer)
-      .filter(
-        (value) =>
-          value !== null &&
-          value !== undefined
+    return [
+      ...new Set(
+        products
+          .map(
+            (product) =>
+              product.manufacturer
+          )
+          .filter(Boolean)
+      ),
+    ].sort((a, b) =>
+      String(a).localeCompare(
+        String(b),
+        "ar"
       )
-      .map((value) => String(value).trim())
-      .filter(Boolean);
-
-    return [...new Set(values)].sort((a, b) =>
-      a.localeCompare(b, "ar")
     );
   }, [products]);
-
-  // =========================================
-  // Unique Categories
-  // =========================================
-
-  const categories = useMemo(() => {
-    const values = products
-      .map((product) => product.category)
-      .filter(
-        (value) =>
-          value !== null &&
-          value !== undefined
-      )
-      .map((value) => String(value).trim())
-      .filter(Boolean);
-
-    return [...new Set(values)].sort((a, b) =>
-      a.localeCompare(b, "ar")
-    );
-  }, [products]);
-
-  // =========================================
-  // Filter Products
-  // =========================================
 
   const filteredProducts = useMemo(() => {
-    const search = productSearch
-      .trim()
-      .toLowerCase();
+    const normalizedSearch =
+      search.trim().toLowerCase();
 
     return products.filter((product) => {
-      const productName = String(
-        product.name || ""
-      ).toLowerCase();
-
-      const manufacturer = String(
-        product.manufacturer || ""
-      ).trim();
-
-      const category = String(
-        product.category || ""
-      ).trim();
-
-      const matchesName =
-        !search ||
-        productName.includes(search);
-
-      const matchesManufacturer =
-        !selectedManufacturer ||
-        manufacturer === selectedManufacturer;
+      const matchesSearch =
+        !normalizedSearch ||
+        String(product.itemId || "")
+          .toLowerCase()
+          .includes(normalizedSearch) ||
+        String(product.name || "")
+          .toLowerCase()
+          .includes(normalizedSearch) ||
+        String(product.manufacturer || "")
+          .toLowerCase()
+          .includes(normalizedSearch);
 
       const matchesCategory =
-        !selectedCategory ||
-        category === selectedCategory;
+        !categoryFilter ||
+        product.category === categoryFilter;
+
+      const matchesManufacturer =
+        !manufacturerFilter ||
+        product.manufacturer ===
+          manufacturerFilter;
 
       return (
-        matchesName &&
-        matchesManufacturer &&
-        matchesCategory
+        matchesSearch &&
+        matchesCategory &&
+        matchesManufacturer
       );
     });
   }, [
     products,
-    productSearch,
-    selectedManufacturer,
-    selectedCategory,
+    search,
+    categoryFilter,
+    manufacturerFilter,
   ]);
 
-  // =========================================
-  // Clear Filters
-  // =========================================
+  function getImageUrl(imagePath) {
+    if (!imagePath) {
+      return null;
+    }
 
-  const clearFilters = () => {
-    setProductSearch("");
-    setSelectedManufacturer("");
-    setSelectedCategory("");
-  };
+    if (
+      imagePath.startsWith("http://") ||
+      imagePath.startsWith("https://")
+    ) {
+      return imagePath;
+    }
 
-  const hasFilters =
-    productSearch.trim() ||
-    selectedManufacturer ||
-    selectedCategory;
+    return `${API_URL}${imagePath}`;
+  }
 
-  // =========================================
-  // File Select
-  // =========================================
+  function openImagePicker(itemId) {
+    const input =
+      fileInputRefs.current[itemId];
 
-  const handleFileChange = (event) => {
-    const selectedFile =
-      event.target.files?.[0];
+    if (input) {
+      input.click();
+    }
+  }
 
-    if (!selectedFile) {
-      setFile(null);
+  async function handleImageUpload(
+    event,
+    product
+  ) {
+    const file = event.target.files?.[0];
+
+    event.target.value = "";
+
+    if (!file) {
       return;
     }
 
-    setFile(selectedFile);
-    setError("");
-    setSuccess("");
-  };
-
-  // =========================================
-  // Upload Excel
-  // =========================================
-
-  const handleUpload = async (event) => {
-    event.preventDefault();
-
-    if (!file) {
-      setError(
-        "Please select an Excel file first"
+    if (
+      ![
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp",
+      ].includes(file.type)
+    ) {
+      alert(
+        "من فضلك اختر صورة بصيغة JPG أو PNG أو WEBP"
       );
       return;
     }
 
-    try {
-      setUploading(true);
-      setError("");
-      setSuccess("");
+    if (file.size > 5 * 1024 * 1024) {
+      alert(
+        "حجم الصورة يجب ألا يتجاوز 5 ميجابايت"
+      );
+      return;
+    }
 
+    setImageUploadingFor(product.itemId);
+    startLoading();
+
+    try {
+      const formData = new FormData();
+
+      formData.append("image", file);
+
+      const response = await authFetch(
+        `/api/availableStock/${product.itemId}/image`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "فشل رفع الصورة"
+        );
+      }
+
+      const newImagePath =
+        data.imagePath ||
+        data.product?.imagePath;
+
+      setProducts((currentProducts) =>
+        currentProducts.map((item) =>
+          item.itemId === product.itemId
+            ? {
+                ...item,
+                imagePath:
+                  newImagePath ||
+                  item.imagePath,
+              }
+            : item
+        )
+      );
+
+      alert("تم حفظ صورة المنتج بنجاح");
+    } catch (error) {
+      console.error(
+        "Image upload error:",
+        error
+      );
+
+      alert(
+        error.message ||
+          "حدث خطأ أثناء رفع الصورة"
+      );
+    } finally {
+      setImageUploadingFor(null);
+      stopLoading();
+    }
+  }
+
+  async function handleImport(event) {
+    const file = event.target.files?.[0];
+
+    event.target.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    setImporting(true);
+    startLoading();
+
+    try {
       const formData = new FormData();
 
       formData.append("file", file);
@@ -226,491 +310,347 @@ const AvailableStock = () => {
         }
       );
 
-      const text = await response.text();
+      const data = await response.json();
 
-      let data;
-
-      try {
-        data = JSON.parse(text);
-      } catch {
-        throw new Error(
-          "Invalid response from server"
-        );
-      }
-
-      if (!response.ok || !data.success) {
+      if (!response.ok) {
         throw new Error(
           data.message ||
-            "Failed to update products"
+            "فشل استيراد ملف المنتجات"
         );
-      }
-
-      const total = data.total || 0;
-      const inserted = data.inserted || 0;
-      const updated = data.updated || 0;
-
-      setSuccess(
-        `Products updated successfully — Total ${total} — New ${inserted} — Updated ${updated}`
-      );
-
-      setFile(null);
-
-      const fileInput =
-        document.getElementById(
-          "available-stock-file"
-        );
-
-      if (fileInput) {
-        fileInput.value = "";
       }
 
       await fetchProducts();
 
-      setShowImportForm(false);
-    } catch (err) {
+      alert(
+        data.message ||
+          "تم استيراد المنتجات بنجاح"
+      );
+    } catch (error) {
       console.error(
-        "Upload error:",
-        err
+        "Excel import error:",
+        error
       );
 
-      setError(
-        err.message ||
-          "An error occurred while uploading the file"
+      alert(
+        error.message ||
+          "حدث خطأ أثناء استيراد الملف"
       );
     } finally {
-      setUploading(false);
+      setImporting(false);
+      stopLoading();
     }
-  };
-
-  // =========================================
-  // Price Formatter
-  // =========================================
-
-  const formatPrice = (value) => {
-    return Number(value || 0).toLocaleString(
-      "en-US",
-      {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }
-    );
-  };
-
-  // =========================================
-  // Render
-  // =========================================
+  }
 
   return (
-    <div className="available-stock">
+    <main
+      className="page available-stock-page"
+      dir="rtl"
+    >
+      <section className="ds-page-head">
+        <div>
+          <h1 className="ds-page-title">
+            البضاعة المتاحة
+          </h1>
 
-      {/* =====================================
-          Header
-      ====================================== */}
-
-      <div className="available-stock-header">
-        <div className="available-stock-title">
-          <h1>Available Stock</h1>
-
-          <p>
-            View and manage products,
-            quantities and prices
+          <p className="ds-page-sub">
+            إدارة المنتجات والكميات المتاحة
           </p>
         </div>
+      </section>
 
-        <button
-          type="button"
-          className="available-stock-import-button"
-          onClick={() => {
-            setShowImportForm(
-              (prev) => !prev
-            );
-
-            setError("");
-            setSuccess("");
-          }}
-        >
-          {showImportForm
-            ? "Close"
-            : "Update Products"}
-        </button>
-      </div>
-
-      {/* =====================================
-          Messages
-      ====================================== */}
-
-      {success && (
-        <div className="available-stock-success">
-          {success}
-        </div>
-      )}
-
-      {error && (
-        <div className="available-stock-error">
-          {error}
-        </div>
-      )}
-
-      {/* =====================================
-          Import Panel
-      ====================================== */}
-
-      {showImportForm && (
-        <div className="available-stock-import-panel">
-
-          <div className="available-stock-import-header">
-            <div>
-              <h2>Update Products</h2>
-
-              <p>
-                Upload an Excel file to update
-                inventory data
-              </p>
-            </div>
-
-            <button
-              type="button"
-              className="available-stock-close-button"
-              onClick={() => {
-                setShowImportForm(false);
-                setFile(null);
-                setError("");
-              }}
-            >
-              Close
-            </button>
-          </div>
-
-          <form
-            className="available-stock-import-form"
-            onSubmit={handleUpload}
-          >
-            <label
-              htmlFor="available-stock-file"
-              className="available-stock-file-label"
-            >
-              Choose Excel File
+      <section className="card available-stock-toolbar">
+        <div className="available-stock-filters">
+          <div className="field-group">
+            <label className="field-label">
+              البحث
             </label>
 
             <input
-              id="available-stock-file"
-              type="file"
-              accept=".xlsx,.xls"
-              className="available-stock-file-input"
-              onChange={handleFileChange}
+              className="field"
+              type="text"
+              value={search}
+              onChange={(event) =>
+                setSearch(event.target.value)
+              }
+              placeholder="رقم المنتج أو الاسم..."
             />
+          </div>
 
-            {file && (
-              <div className="available-stock-selected-file">
-                Selected file:
-                <strong>
-                  {file.name}
-                </strong>
-              </div>
-            )}
+          <div className="field-group">
+            <label className="field-label">
+              التصنيف
+            </label>
 
-            <button
-              type="submit"
-              className="available-stock-upload-button"
-              disabled={
-                !file || uploading
+            <select
+              className="field"
+              value={categoryFilter}
+              onChange={(event) =>
+                setCategoryFilter(
+                  event.target.value
+                )
               }
             >
-              {uploading
-                ? "Updating..."
-                : "Upload & Update"}
-            </button>
-          </form>
-        </div>
-      )}
+              <option value="">
+                كل التصنيفات
+              </option>
 
-      {/* =====================================
-          Filters
-      ====================================== */}
-
-      <div className="available-stock-filters">
-
-        {/* Product Name */}
-
-        <div className="available-stock-filter-field available-stock-search-field">
-          <label htmlFor="available-stock-search">
-            Product Name
-          </label>
-
-          <input
-            id="available-stock-search"
-            type="text"
-            value={productSearch}
-            onChange={(event) =>
-              setProductSearch(
-                event.target.value
-              )
-            }
-            placeholder="Search product name..."
-          />
-        </div>
-
-        {/* Manufacturer */}
-
-        <div className="available-stock-filter-field">
-          <label htmlFor="available-stock-manufacturer">
-            Manufacturer
-          </label>
-
-          <select
-            id="available-stock-manufacturer"
-            value={selectedManufacturer}
-            onChange={(event) =>
-              setSelectedManufacturer(
-                event.target.value
-              )
-            }
-          >
-            <option value="">
-              All Manufacturers
-            </option>
-
-            {manufacturers.map(
-              (manufacturer) => (
-                <option
-                  key={manufacturer}
-                  value={manufacturer}
-                >
-                  {manufacturer}
-                </option>
-              )
-            )}
-          </select>
-        </div>
-
-        {/* Category */}
-
-        <div className="available-stock-filter-field">
-          <label htmlFor="available-stock-category">
-            Category
-          </label>
-
-          <select
-            id="available-stock-category"
-            value={selectedCategory}
-            onChange={(event) =>
-              setSelectedCategory(
-                event.target.value
-              )
-            }
-          >
-            <option value="">
-              All Categories
-            </option>
-
-            {categories.map(
-              (category) => (
+              {categories.map((category) => (
                 <option
                   key={category}
                   value={category}
                 >
                   {category}
                 </option>
-              )
-            )}
-          </select>
-        </div>
-
-        {/* Filter Actions */}
-
-        <div className="available-stock-filter-actions">
-
-          <div className="available-stock-results-count">
-            Showing{" "}
-            <strong>
-              {filteredProducts.length}
-            </strong>{" "}
-            of{" "}
-            <strong>
-              {products.length}
-            </strong>
+              ))}
+            </select>
           </div>
 
-          <button
-            type="button"
-            className="available-stock-clear-filters"
-            onClick={clearFilters}
-            disabled={!hasFilters}
-          >
-            Clear Filters
-          </button>
+          <div className="field-group">
+            <label className="field-label">
+              المصنع
+            </label>
 
+            <select
+              className="field"
+              value={manufacturerFilter}
+              onChange={(event) =>
+                setManufacturerFilter(
+                  event.target.value
+                )
+              }
+            >
+              <option value="">
+                كل المصانع
+              </option>
+
+              {manufacturers.map(
+                (manufacturer) => (
+                  <option
+                    key={manufacturer}
+                    value={manufacturer}
+                  >
+                    {manufacturer}
+                  </option>
+                )
+              )}
+            </select>
+          </div>
+
+          {canImport && (
+            <div className="field-group">
+              <label className="field-label">
+                استيراد المنتجات
+              </label>
+
+              <label
+                className="btn btn-primary"
+                style={{
+                  cursor: importing
+                    ? "not-allowed"
+                    : "pointer",
+                  opacity: importing
+                    ? 0.6
+                    : 1,
+                }}
+              >
+                {importing
+                  ? "جاري الاستيراد..."
+                  : "استيراد Excel"}
+
+                <input
+                  type="file"
+                  accept=".xlsx,.xls"
+                  onChange={handleImport}
+                  disabled={importing}
+                  hidden
+                />
+              </label>
+            </div>
+          )}
         </div>
-      </div>
+      </section>
 
-      {/* =====================================
-          Table
-      ====================================== */}
-
-      {loading ? (
-        <div className="available-stock-state">
-          Loading products...
-        </div>
-      ) : filteredProducts.length === 0 ? (
-        <div className="available-stock-state">
-          {products.length === 0
-            ? "No products available"
-            : "No products match the current filters"}
-        </div>
-      ) : (
-        <div className="available-stock-table-wrap">
-
-          <table className="available-stock-table">
-
+      <section className="card">
+        <div className="table-wrapper">
+          <table className="table">
             <thead>
               <tr>
-                <th>Item ID</th>
-                <th>Product</th>
-                <th>Quantity</th>
-                <th>Purchase Price</th>
-                <th>Wholesale Price</th>
-                <th>Retail Price</th>
-                <th>Offer Price</th>
-                <th>Category</th>
-                <th>Manufacturer</th>
-                <th>Status</th>
+                <th>الصورة</th>
+
+                <th>رقم المنتج</th>
+
+                <th>المنتج</th>
+
+                <th>الكمية</th>
+
+                <th>سعر الشراء</th>
+
+                <th>سعر الجملة</th>
+
+                <th>سعر التجزئة</th>
+
+                <th>سعر العرض</th>
+
+                <th>التصنيف</th>
+
+                <th>الشركة المصنعة</th>
+
+                {canManageImages && (
+                  <th>إدارة الصورة</th>
+                )}
               </tr>
             </thead>
 
             <tbody>
-              {filteredProducts.map(
-                (product) => (
-                  <tr
-                    key={product.itemId}
+              {loading ? null : filteredProducts.length ===
+                0 ? (
+                <tr>
+                  <td
+                    colSpan={
+                      canManageImages
+                        ? 11
+                        : 10
+                    }
                   >
+                    <div className="state">
+                      لا توجد منتجات
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                filteredProducts.map(
+                  (product) => {
+                    const imageUrl =
+                      getImageUrl(
+                        product.imagePath
+                      );
 
-                    {/* Item ID */}
+                    const isUploading =
+                      imageUploadingFor ===
+                      product.itemId;
 
-                    <td>
-                      <span className="available-stock-item-id">
-                        {product.itemId}
-                      </span>
-                    </td>
-
-                    {/* Product */}
-
-                    <td>
-                      <div className="available-stock-product">
-
-                        <div className="available-stock-image">
-                          {product.imagePath ? (
-                            <img
-                              src={
-                                product.imagePath
-                              }
-                              alt={
-                                product.name
-                              }
-                            />
-                          ) : (
-                            "No Image"
-                          )}
-                        </div>
-
-                        <span className="available-stock-product-name">
-                          {product.name}
-                        </span>
-
-                      </div>
-                    </td>
-
-                    {/* Quantity */}
-
-                    <td>
-                      <span
-                        className={
-                          Number(
-                            product.qty || 0
-                          ) > 0
-                            ? "available-stock-qty"
-                            : "available-stock-qty available-stock-qty-empty"
+                    return (
+                      <tr
+                        key={
+                          product.itemId
                         }
                       >
-                        {Number(
-                          product.qty || 0
-                        ).toLocaleString(
-                          "en-US"
+                        <td>
+                          <div className="available-stock-image">
+                            {imageUrl ? (
+                              <img
+                                src={imageUrl}
+                                alt={
+                                  product.name ||
+                                  `Product ${product.itemId}`
+                                }
+                              />
+                            ) : (
+                              <span>
+                                لا توجد صورة
+                              </span>
+                            )}
+                          </div>
+                        </td>
+
+                        <td>
+                          <strong>
+                            {
+                              product.itemId
+                            }
+                          </strong>
+                        </td>
+
+                        <td>
+                          {product.name ||
+                            "-"}
+                        </td>
+
+                        <td>
+                          {product.qty ?? 0}
+                        </td>
+
+                        <td>
+                          {product.purchasePrice ??
+                            0}
+                        </td>
+
+                        <td>
+                          {product.wholesalePrice ??
+                            0}
+                        </td>
+
+                        <td>
+                          {product.retailPrice ??
+                            0}
+                        </td>
+
+                        <td>
+                          {product.offerPrice ??
+                            0}
+                        </td>
+
+                        <td>
+                          {product.category ||
+                            "-"}
+                        </td>
+
+                        <td>
+                          {product.manufacturer ||
+                            "-"}
+                        </td>
+
+                        {canManageImages && (
+                          <td>
+                            <input
+                              ref={(element) => {
+                                fileInputRefs.current[
+                                  product.itemId
+                                ] =
+                                  element;
+                              }}
+                              type="file"
+                              accept="image/jpeg,image/png,image/webp"
+                              hidden
+                              onChange={(
+                                event
+                              ) =>
+                                handleImageUpload(
+                                  event,
+                                  product
+                                )
+                              }
+                            />
+
+                            <button
+                              type="button"
+                              className="btn btn-secondary"
+                              disabled={
+                                isUploading
+                              }
+                              onClick={() =>
+                                openImagePicker(
+                                  product.itemId
+                                )
+                              }
+                            >
+                              {isUploading
+                                ? "جاري الرفع..."
+                                : product.imagePath
+                                ? "تغيير الصورة"
+                                : "إضافة صورة"}
+                            </button>
+                          </td>
                         )}
-                      </span>
-                    </td>
-
-                    {/* Purchase Price */}
-
-                    <td>
-                      <span className="available-stock-price">
-                        {formatPrice(
-                          product.purchasePrice
-                        )}
-                      </span>
-                    </td>
-
-                    {/* Wholesale Price */}
-
-                    <td>
-                      <span className="available-stock-price">
-                        {formatPrice(
-                          product.wholesalePrice
-                        )}
-                      </span>
-                    </td>
-
-                    {/* Retail Price */}
-
-                    <td>
-                      <span className="available-stock-price">
-                        {formatPrice(
-                          product.retailPrice
-                        )}
-                      </span>
-                    </td>
-
-                    {/* Offer Price */}
-
-                    <td>
-                      <span className="available-stock-price">
-                        {formatPrice(
-                          product.offerPrice
-                        )}
-                      </span>
-                    </td>
-
-                    {/* Category */}
-
-                    <td>
-                      {product.category ||
-                        "—"}
-                    </td>
-
-                    {/* Manufacturer */}
-
-                    <td>
-                      {product.manufacturer ||
-                        "—"}
-                    </td>
-
-                    {/* Status */}
-
-                    <td>
-                      <span className="available-stock-status">
-                        Active
-                      </span>
-                    </td>
-
-                  </tr>
+                      </tr>
+                    );
+                  }
                 )
               )}
             </tbody>
-
           </table>
         </div>
-      )}
-    </div>
+      </section>
+    </main>
   );
-};
-
-export default AvailableStock;
+}
