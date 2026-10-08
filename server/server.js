@@ -4,12 +4,12 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 
-const connectMongoDB = require("./config/database");
-const healthRoutes = require("./routes/healthRoutes");
-const userRoutes = require("./routes/userRoutes");
-const availableStockRoutes = require("./routes/availableStockRoutes");
-const authRoutes = require("./routes/authRoutes");
-const catalogRoutes = require("./routes/catalogRoutes");
+const connectMongoDB = require("./Config/database");
+const healthRoutes = require("./Routes/healthRoutes");
+const userRoutes = require("./Routes/userRoutes");
+const availableStockRoutes = require("./Routes/availableStockRoutes");
+const authRoutes = require("./Routes/authRoutes");
+const catalogRoutes = require("./Routes/catalogRoutes");
 const errorHandler = require("./middleware/errorHandler");
 
 const app = express();
@@ -51,7 +51,10 @@ app.get("/test", (req, res) => {
 
 app.use("/", healthRoutes);
 
-app.use("/api/availableStock", availableStockRoutes);
+app.use(
+  "/api/availableStock",
+  availableStockRoutes
+);
 
 app.use("/api/catalog", catalogRoutes);
 
@@ -69,13 +72,19 @@ app.use(errorHandler);
 // Start server
 // ======================================================
 
-const server = app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
+const server = app.listen(
+  PORT,
+  "0.0.0.0",
+  () => {
+    console.log(
+      `Server running on port ${PORT}`
+    );
 
-  console.log(
-    `MongoDB configured: ${!!process.env.MONGO_URI}`
-  );
-});
+    console.log(
+      `MongoDB configured: ${!!process.env.MONGO_URI}`
+    );
+  }
+);
 
 // ======================================================
 // MongoDB
@@ -108,6 +117,10 @@ async function shutdown(signal) {
   });
 }
 
-process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGTERM", () =>
+  shutdown("SIGTERM")
+);
 
-process.on("SIGINT", () => shutdown("SIGINT"));
+process.on("SIGINT", () =>
+  shutdown("SIGINT")
+);
