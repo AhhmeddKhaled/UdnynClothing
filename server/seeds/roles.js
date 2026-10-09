@@ -39,6 +39,7 @@ const roles = {
     "orders.create",
     "orders.update",
     "orders.delete",
+    "orders.updateStatus",
 
     "availableStock.read",
     "availableStock.import",
@@ -59,6 +60,8 @@ const roles = {
     "orders.create",
     "orders.update",
     "orders.delete",
+    "orders.updateStatus",
+
 
     "availableStock.read",
     "availableStock.import",

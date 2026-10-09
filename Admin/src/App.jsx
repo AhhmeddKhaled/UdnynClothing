@@ -9,10 +9,9 @@ import AvailableStock from "./pages/AvailableStock/AvailableStock.jsx";
 import Products from "./pages/Products/Products";
 import Users from "./pages/Users/Users.jsx";
 import Catalog from "./pages/Catalog/Catalog.jsx";
+import Orders from "./pages/Orders/Orders.jsx";
 
-import {
-  LoadingProvider,
-} from "./context/LoadingContext/LoadingContext.jsx";
+import { LoadingProvider } from "./context/LoadingContext/LoadingContext.jsx";
 
 function App() {
   return (
@@ -21,13 +20,7 @@ function App() {
         <Route
           path="/login"
           element={
-            <Login
-              onSuccess={() =>
-                window.location.replace(
-                  "/dashboard"
-                )
-              }
-            />
+            <Login onSuccess={() => window.location.replace("/dashboard")} />
           }
         />
 
@@ -39,51 +32,22 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route
-            index
-            element={
-              <Navigate
-                to="/dashboard"
-                replace
-              />
-            }
-          />
+          <Route index element={<Navigate to="/dashboard" replace />} />
 
-          <Route
-            path="dashboard"
-            element={<Dashboard />}
-          />
+          <Route path="dashboard" element={<Dashboard />} />
 
-          <Route
-            path="availableStock"
-            element={<AvailableStock />}
-          />
+          <Route path="availableStock" element={<AvailableStock />} />
 
-          <Route
-            path="products"
-            element={<Products />}
-          />
+          <Route path="products" element={<Products />} />
 
-          <Route
-            path="catalog"
-            element={<Catalog />}
-          />
+          <Route path="catalog" element={<Catalog />} />
 
-          <Route
-            path="users"
-            element={<Users />}
-          />
+          <Route path="orders" element={<Orders />} />
+
+          <Route path="users" element={<Users />} />
         </Route>
 
-        <Route
-          path="*"
-          element={
-            <Navigate
-              to="/"
-              replace
-            />
-          }
-        />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </LoadingProvider>
   );

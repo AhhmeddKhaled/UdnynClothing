@@ -3,10 +3,36 @@
    Uses Global Design System Tokens
    ====================================================== */
 
+/* ======================================================
+   Shared Typography
+   ====================================================== */
+
 .sb-aside,
 .sb-topbar {
   font-family: var(--font-body);
   color: var(--color-ink);
+}
+
+/* ======================================================
+   Dashboard Layout
+   عدّل أسماء الكلاسات دي لو مختلفة في JSX
+   ====================================================== */
+
+.dashboard-layout {
+  display: flex;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.dashboard-content {
+  flex: 1;
+  min-width: 0;
+  height: 100dvh;
+  margin-right: 240px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  overscroll-behavior-y: contain;
 }
 
 /* ======================================================
@@ -94,24 +120,31 @@
 
 .sb-aside {
   width: 240px;
-  flex-shrink: 0;
+  flex: 0 0 240px;
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100dvh;
+
   box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
 
   padding: var(--space-5) 0;
-
   padding-top: calc(
     var(--space-5) + env(safe-area-inset-top, 0px)
   );
-
   padding-bottom: calc(
     var(--space-5) + env(safe-area-inset-bottom, 0px)
   );
 
   background: var(--color-sand);
   border-left: 1px solid var(--color-line);
+  z-index: 20;
 }
 
 /* ======================================================
@@ -122,16 +155,13 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-
   padding: 0 var(--space-4) var(--space-5);
   margin-bottom: var(--space-4);
-
   border-bottom: 1px solid var(--color-line);
 }
 
 .sb-brand h1 {
   margin: 0;
-
   color: var(--color-plum);
   font-family: var(--font-display);
   font-size: var(--text-lg);
@@ -152,36 +182,34 @@
   flex-direction: column;
   flex: 1;
   gap: var(--space-1);
-
   padding: 0 var(--space-3);
 }
 
 .sb-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-
+  gap: var(--space-2);
+  /* justify-content: space-between; */
   padding: var(--space-2) var(--space-3);
-
   background: transparent;
   border: 0;
   border-right: 2px solid transparent;
   border-radius: var(--radius-md);
-
   color: var(--color-plum-soft);
   font: inherit;
   font-size: var(--text-sm);
   font-weight: 500;
-
   text-align: right;
-  text-decoration: none;
-
+  /* text-decoration: none; */
   cursor: pointer;
-
   transition:
     background 0.15s ease,
     color 0.15s ease,
     border-color 0.15s ease;
+
+  span.icon {
+    display: inline-flex;
+  }
 }
 
 .sb-item:hover:not(.sb-soon) {
@@ -207,12 +235,9 @@
 
 .sb-item.sb-soon em {
   padding: var(--space-1) var(--space-2);
-
   border: 1px solid var(--color-line);
   border-radius: var(--radius-full);
-
   color: var(--color-plum-soft);
-
   font-style: normal;
   font-size: var(--text-xs);
   font-weight: 600;
@@ -226,10 +251,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-
   padding: var(--space-4) var(--space-3) 0;
   margin-top: var(--space-4);
-
   border-top: 1px solid var(--color-line);
 }
 
@@ -241,7 +264,6 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-
   padding: var(--space-2) var(--space-1);
   margin-bottom: var(--space-2);
 }
@@ -250,16 +272,12 @@
   width: 34px;
   height: 34px;
   flex-shrink: 0;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   border-radius: var(--radius-full);
-
   background: var(--color-plum);
   color: var(--color-paper);
-
   font-size: var(--text-sm);
   font-weight: 700;
 }
@@ -275,32 +293,24 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-
   min-width: 0;
 }
 
 .sb-user-main b {
   overflow: hidden;
-
   color: var(--color-ink);
-
   font-size: var(--text-sm);
   font-weight: 600;
-
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .sb-user-role {
   flex-shrink: 0;
-
   padding: var(--space-1) var(--space-2);
-
   border-radius: var(--radius-full);
-
   background: var(--color-sand-deep);
   color: var(--color-plum-soft);
-
   font-size: var(--text-xs);
   font-weight: 600;
 }
@@ -316,27 +326,19 @@
 
 .sb-bottom-item {
   width: 100%;
-
   display: flex;
   align-items: center;
   gap: var(--space-3);
-
   padding: var(--space-2) var(--space-3);
-
   background: transparent;
   border: 1px solid transparent;
   border-radius: var(--radius-md);
-
   color: var(--color-plum-soft);
-
   font: inherit;
   font-size: var(--text-sm);
   font-weight: 500;
-
   text-align: right;
-
   cursor: pointer;
-
   transition:
     background 0.15s ease,
     color 0.15s ease,
@@ -383,15 +385,16 @@
     position: fixed;
     inset-block: 0;
     right: 0;
+    width: 240px;
+    height: 100dvh;
+    flex: 0 0 240px;
 
     transform: translateX(100%);
     transition: transform 0.25s ease;
-
     z-index: 50;
 
     background: var(--color-sand);
     border-left: 1px solid var(--color-line);
-
     box-shadow: var(--shadow-card);
   }
 
@@ -401,12 +404,25 @@
 
   .sb-overlay {
     display: block;
-
     position: fixed;
     inset: 0;
-
     background: var(--color-line);
-
     z-index: 40;
+  }
+
+  .dashboard-layout {
+    display: block;
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .dashboard-content {
+    width: 100%;
+    height: auto;
+    min-height: 100dvh;
+    margin-right: 0;
+    padding-top: 70px;
+    overflow: visible;
   }
 }

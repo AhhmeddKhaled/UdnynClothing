@@ -1,0 +1,233 @@
+
+[
+  {
+    "_id": "671a10000000000000000001",
+    "orderNumber": "UDN-20261001-A1B2C3",
+    "customer": {
+      "_id": "671a20000000000000000001",
+      "name": "أحمد محمد",
+      "email": "ahmed@example.com"
+    },
+    "items": [
+      {
+        "itemId": 11,
+        "name": "ع كم خليجي جملي - حجاب حياة",
+        "unitPrice": 765,
+        "quantity": 2,
+        "lineTotal": 1530
+      }
+    ],
+    "totalAmount": 1530,
+    "status": "pending",
+    "shippingAddress": "مدينة نصر، القاهرة",
+    "customerNote": "الاتصال قبل التوصيل",
+    "statusUpdatedBy": null,
+    "statusUpdatedAt": null,
+    "stockRestored": false,
+    "createdAt": "2026-10-10T09:30:00.000Z",
+    "updatedAt": "2026-10-10T09:30:00.000Z"
+  },
+  {
+    "_id": "671a10000000000000000002",
+    "orderNumber": "UDN-20261002-D4E5F6",
+    "customer": {
+      "_id": "671a20000000000000000002",
+      "name": "سارة علي",
+      "email": "sara@example.com"
+    },
+    "items": [
+      {
+        "itemId": 12,
+        "name": "حجاب شيفون أسود",
+        "unitPrice": 250,
+        "quantity": 3,
+        "lineTotal": 750
+      },
+      {
+        "itemId": 13,
+        "name": "طرحة قطن بيج",
+        "unitPrice": 180,
+        "quantity": 2,
+        "lineTotal": 360
+      }
+    ],
+    "totalAmount": 1110,
+    "status": "confirmed",
+    "shippingAddress": "المعادي، القاهرة",
+    "customerNote": "",
+    "statusUpdatedBy": "671a20000000000000000009",
+    "statusUpdatedAt": "2026-10-10T10:00:00.000Z",
+    "stockRestored": false,
+    "createdAt": "2026-10-10T08:15:00.000Z",
+    "updatedAt": "2026-10-10T10:00:00.000Z"
+  },
+  {
+    "_id": "671a10000000000000000003",
+    "orderNumber": "UDN-20261003-G7H8J9",
+    "customer": {
+      "_id": "671a20000000000000000003",
+      "name": "مريم حسن",
+      "email": "mariam@example.com"
+    },
+    "items": [
+      {
+        "itemId": 14,
+        "name": "إيشارب ساتان نبيتي",
+        "unitPrice": 320,
+        "quantity": 1,
+        "lineTotal": 320
+      }
+    ],
+    "totalAmount": 320,
+    "status": "processing",
+    "shippingAddress": "التجمع الخامس، القاهرة",
+    "customerNote": "تغليف كهدية",
+    "statusUpdatedBy": "671a20000000000000000009",
+    "statusUpdatedAt": "2026-10-10T11:20:00.000Z",
+    "stockRestored": false,
+    "createdAt": "2026-10-09T16:45:00.000Z",
+    "updatedAt": "2026-10-10T11:20:00.000Z"
+  },
+  {
+    "_id": "671a10000000000000000004",
+    "orderNumber": "UDN-20261004-K1L2M3",
+    "customer": {
+      "_id": "671a20000000000000000004",
+      "name": "عمر إبراهيم",
+      "email": "omar@example.com"
+    },
+    "items": [
+      {
+        "itemId": 15,
+        "name": "حجاب كريب زيتي",
+        "unitPrice": 290,
+        "quantity": 2,
+        "lineTotal": 580
+      }
+    ],
+    "totalAmount": 580,
+    "status": "shipped",
+    "shippingAddress": "الشيخ زايد، الجيزة",
+    "customerNote": "",
+    "statusUpdatedBy": "671a20000000000000000009",
+    "statusUpdatedAt": "2026-10-10T12:30:00.000Z",
+    "stockRestored": false,
+    "createdAt": "2026-10-08T13:00:00.000Z",
+    "updatedAt": "2026-10-10T12:30:00.000Z"
+  },
+  {
+    "_id": "671a10000000000000000005",
+    "orderNumber": "UDN-20261005-N4P5Q6",
+    "customer": {
+      "_id": "671a20000000000000000005",
+      "name": "نور خالد",
+      "email": "nour@example.com"
+    },
+    "items": [
+      {
+        "itemId": 16,
+        "name": "طرحة لينن أوف وايت",
+        "unitPrice": 210,
+        "quantity": 4,
+        "lineTotal": 840
+      }
+    ],
+    "totalAmount": 840,
+    "status": "delivered",
+    "shippingAddress": "الدقي، الجيزة",
+    "customerNote": "التوصيل مساءً",
+    "statusUpdatedBy": "671a20000000000000000009",
+    "statusUpdatedAt": "2026-10-09T18:00:00.000Z",
+    "stockRestored": false,
+    "createdAt": "2026-10-07T11:10:00.000Z",
+    "updatedAt": "2026-10-09T18:00:00.000Z"
+  },
+  {
+    "_id": "671a10000000000000000006",
+    "orderNumber": "UDN-20261006-R7S8T9",
+    "customer": {
+      "_id": "671a20000000000000000006",
+      "name": "يوسف محمود",
+      "email": "youssef@example.com"
+    },
+    "items": [
+      {
+        "itemId": 17,
+        "name": "حجاب جيرسي رمادي",
+        "unitPrice": 275,
+        "quantity": 2,
+        "lineTotal": 550
+      }
+    ],
+    "totalAmount": 550,
+    "status": "cancelled",
+    "shippingAddress": "حلوان، القاهرة",
+    "customerNote": "العميل طلب الإلغاء",
+    "statusUpdatedBy": "671a20000000000000000009",
+    "statusUpdatedAt": "2026-10-10T14:00:00.000Z",
+    "stockRestored": true,
+    "createdAt": "2026-10-06T15:30:00.000Z",
+    "updatedAt": "2026-10-10T14:00:00.000Z"
+  },
+  {
+    "_id": "671a10000000000000000007",
+    "orderNumber": "UDN-20261007-U1V2W3",
+    "customer": {
+      "_id": "671a20000000000000000007",
+      "name": "دينا سمير",
+      "email": "dina@example.com"
+    },
+    "items": [
+      {
+        "itemId": 18,
+        "name": "طرحة شيفون موف",
+        "unitPrice": 240,
+        "quantity": 2,
+        "lineTotal": 480
+      },
+      {
+        "itemId": 19,
+        "name": "حجاب قطن أبيض",
+        "unitPrice": 190,
+        "quantity": 1,
+        "lineTotal": 190
+      }
+    ],
+    "totalAmount": 670,
+    "status": "pending",
+    "shippingAddress": "مدينة الشروق، القاهرة",
+    "customerNote": "",
+    "statusUpdatedBy": null,
+    "statusUpdatedAt": null,
+    "stockRestored": false,
+    "createdAt": "2026-10-10T13:15:00.000Z",
+    "updatedAt": "2026-10-10T13:15:00.000Z"
+  },
+  {
+    "_id": "671a10000000000000000008",
+    "orderNumber": "UDN-20261008-X4Y5Z6",
+    "customer": {
+      "_id": "671a20000000000000000008",
+      "name": "ملك مصطفى",
+      "email": "malak@example.com"
+    },
+    "items": [
+      {
+        "itemId": 20,
+        "name": "إيشارب ساتان كحلي",
+        "unitPrice": 350,
+        "quantity": 1,
+        "lineTotal": 350
+      }
+    ],
+    "totalAmount": 350,
+    "status": "confirmed",
+    "shippingAddress": "مصر الجديدة، القاهرة",
+    "customerNote": "يرجى التأكد من اللون",
+    "statusUpdatedBy": "671a20000000000000000009",
+    "statusUpdatedAt": "2026-10-10T14:30:00.000Z",
+    "stockRestored": false,
+    "createdAt": "2026-10-10T07:45:00.000Z",
+    "updatedAt": "2026-10-10T14:30:00.000Z"
+  }
+]

@@ -1,48 +1,45 @@
-import { useEffect, useState } from "react";
-
-import { NavLink, useNavigate } from "react-router-dom";
-
+import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
 
 import { useTheme } from "../../context/ThemeContext.jsx";
+import { useSidebarLogic } from "../../UI_Logic/SidebarLogic.jsx";
+
+import { RxDashboard } from "react-icons/rx";
+import { PiStorefrontThin } from "react-icons/pi";
+import { LiaProductHunt } from "react-icons/lia";
+import { GrCatalog } from "react-icons/gr";
+import { GoGoal } from "react-icons/go";
+import { HiOutlineUsers } from "react-icons/hi2";
+
+import { MdDarkMode } from "react-icons/md";
+import { CiLight, CiSettings } from "react-icons/ci";
+import { RiLogoutBoxRLine } from "react-icons/ri";
 
 const NAV_ITEMS = [
-  { path: "/dashboard", label: "Dashboard" },
-  { path: "/availableStock", label: "Available Stock" },
-  { path: "/products", label: "Products" },
-  { path: "/catalog", label: "Catalog" },
-  { path: "/orders", label: "Orders" },
-  { path: "/users", label: "Users" },
+  { path: "/dashboard", label: "Dashboard", icon: <RxDashboard size={20}/> },
+  {
+    path: "/availableStock",
+    label: "Available Stock",
+    icon: <PiStorefrontThin size={20}/>,
+  },
+  { path: "/products", label: "Products", icon: <LiaProductHunt size={20}/> },
+  { path: "/catalog", label: "Catalog", icon: <GrCatalog size={20}/> },
+  { path: "/orders", label: "Orders", icon: <GoGoal size={20}/> },
+  { path: "/users", label: "Users", icon: <HiOutlineUsers size={20}/> },
 ];
 
 export default function Sidebar({ user, onLogout }) {
   const { theme, toggleTheme } = useTheme();
 
-  const [open, setOpen] = useState(false);
-  const [sessionTime, setSessionTime] = useState("");
-
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const now = new Date();
-
-    setSessionTime(
-      now.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    );
-  }, []);
-
-  function handleLogout() {
-    onLogout?.();
-    navigate("/login");
-  }
-
-  function handleSettings() {
-    setOpen(false);
-    navigate("/settings");
-  }
+  const {
+    open,
+    sessionTime,
+    handleNavigation,
+    handleLogout,
+    handleSettings,
+    handleOpenMenu,
+    handleCloseMenu,
+  } = useSidebarLogic(onLogout);
 
   return (
     <>
@@ -51,29 +48,27 @@ export default function Sidebar({ user, onLogout }) {
         <button
           type="button"
           className="sb-burger"
-          onClick={() => setOpen(true)}
+          onClick={handleOpenMenu}
           aria-label="Open menu"
+          aria-expanded={open}
+          aria-controls="admin-sidebar"
         >
           <span />
           <span />
           <span />
         </button>
 
-        <span className="sb-topbar-title">
-          Udnyn
-        </span>
+        <span className="sb-topbar-title">Udnyn</span>
 
         <button
           type="button"
           className="sb-theme-btn"
           onClick={toggleTheme}
           aria-label={
-            theme === "dark"
-              ? "Switch to light mode"
-              : "Switch to dark mode"
+            theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
           }
         >
-          {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+          {theme === "dark" ? <CiLight /> : <MdDarkMode />}
         </button>
       </div>
 
@@ -81,13 +76,16 @@ export default function Sidebar({ user, onLogout }) {
       {open && (
         <div
           className="sb-overlay"
-          onClick={() => setOpen(false)}
+          onClick={handleCloseMenu}
+          aria-hidden="true"
         />
       )}
 
       {/* Sidebar */}
       <aside
+        id="admin-sidebar"
         className={`sb-aside ${open ? "sb-open" : ""}`}
+        aria-label="Main navigation"
       >
         {/* Brand */}
         <div className="sb-brand">
@@ -101,12 +99,10 @@ export default function Sidebar({ user, onLogout }) {
             className="sb-theme-btn"
             onClick={toggleTheme}
             aria-label={
-              theme === "dark"
-                ? "Switch to light mode"
-                : "Switch to dark mode"
+              theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
             }
           >
-            {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+            {theme === "dark" ? <CiLight /> : <MdDarkMode />}
           </button>
         </div>
 
@@ -114,10 +110,7 @@ export default function Sidebar({ user, onLogout }) {
         <nav className="sb-nav">
           {NAV_ITEMS.map((item) =>
             item.soon ? (
-              <span
-                key={item.path}
-                className="sb-item sb-soon"
-              >
+              <span key={item.path} className="sb-item sb-soon">
                 <span>{item.label}</span>
                 <em>Soon</em>
               </span>
@@ -125,16 +118,16 @@ export default function Sidebar({ user, onLogout }) {
               <NavLink
                 key={item.path}
                 to={item.path}
+                end={item.path === "/dashboard"}
                 className={({ isActive }) =>
-                  `sb-item ${
-                    isActive ? "sb-active" : ""
-                  }`
+                  `sb-item ${isActive ? "sb-active" : ""}`
                 }
-                onClick={() => setOpen(false)}
+                onClick={handleNavigation}
               >
-                <span>{item.label}</span>
+                <span className="icon">{item.icon}</span>
+                <span className="label">{item.label}</span>
               </NavLink>
-            )
+            ),
           )}
         </nav>
 
@@ -149,9 +142,8 @@ export default function Sidebar({ user, onLogout }) {
             <div className="sb-user-info">
               <div className="sb-user-main">
                 <b>{user?.name || "User"}</b>
-
                 <span className="sb-user-role">
-                  {roleLabel(user?.role)}
+                  {user?.role || "Admin"}
                 </span>
               </div>
 
@@ -167,7 +159,7 @@ export default function Sidebar({ user, onLogout }) {
             className="sb-bottom-item"
             onClick={handleSettings}
           >
-            <SettingsIcon />
+            <CiSettings />
             <span>Settings</span>
           </button>
 
@@ -177,91 +169,11 @@ export default function Sidebar({ user, onLogout }) {
             className="sb-bottom-item sb-logout"
             onClick={handleLogout}
           >
-            <LogoutIcon />
+            <RiLogoutBoxRLine />
             <span>Log out</span>
           </button>
         </div>
       </aside>
     </>
-  );
-}
-
-function roleLabel(role) {
-  const map = {
-    owner: "Owner",
-    admin: "Admin",
-    moderator: "Moderator",
-    editor: "Editor",
-    customer: "Customer",
-  };
-
-  return map[role] || role || "";
-}
-
-function SunIcon() {
-  return (
-    <svg
-      width="15"
-      height="15"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <circle cx="12" cy="12" r="4" />
-      <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
-    </svg>
-  );
-}
-
-function MoonIcon() {
-  return (
-    <svg
-      width="15"
-      height="15"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z" />
-    </svg>
-  );
-}
-
-function SettingsIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" />
-      <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-1.8 1.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5v.1h-2.5v-.1a1.7 1.7 0 0 0-1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1-1.8-1.8.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H6.5v-2.5h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1 1.8-1.8.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.5v-.1H15v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1 1.8 1.8-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.5 1h.1V14h-.1a1.7 1.7 0 0 0-1.5 1Z" />
-    </svg>
-  );
-}
-
-function LogoutIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M10 17l5-5-5-5" />
-      <path d="M15 12H3" />
-      <path d="M21 19V5a2 2 0 0 0-2-2h-6" />
-    </svg>
   );
 }

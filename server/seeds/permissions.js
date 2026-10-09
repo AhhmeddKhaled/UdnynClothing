@@ -1,3 +1,4 @@
+
 const Permission = require("../Models/Permission");
 
 const permissions = [
@@ -51,6 +52,10 @@ const permissions = [
     name: "orders.delete",
     description: "Delete orders",
   },
+  {
+    name: "orders.updateStatus",
+    description: "Update order status",
+  },
 
   {
     name: "availableStock.read",
@@ -75,6 +80,7 @@ async function seedPermissions() {
     console.log("Permissions seeded successfully");
   } catch (error) {
     console.error("Permission seed error:", error.message);
+    throw error;
   }
 }
 

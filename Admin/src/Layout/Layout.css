@@ -4,12 +4,10 @@
    ====================================================== */
 
 .lo-shell {
-  display: flex;
-
   min-height: 100dvh;
-
   background: var(--color-sand);
   color: var(--color-ink);
+  justify-content: space-between;
 }
 
 /* ======================================================
@@ -17,20 +15,38 @@
    ====================================================== */
 
 .lo-content {
-  flex: 1;
-
-  min-width: 0;
-
   background: var(--color-paper);
   color: var(--color-ink);
-
   padding: var(--space-6);
 
-  padding-top: calc(
-    var(--space-6) + env(safe-area-inset-top, 0px)
-  );
+  padding-top: calc(var(--space-6) + env(safe-area-inset-top, 0px));
 
   font-family: var(--font-body);
+  width: calc(100% - 240px);
+  min-height: inherit;
+  margin: 0 0 0 auto;
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+
+/* ======================================================
+   Footer
+   ====================================================== */
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-line);
+  color: var(--color-plum-soft);
+  font-size: var(--text-xs);
+}
+
+.footer-checks {
+  font-variant-numeric: tabular-nums;
 }
 
 /* ======================================================
@@ -39,8 +55,15 @@
 
 @media (max-width: 860px) {
   .lo-content {
-    padding-top: calc(
-      70px + env(safe-area-inset-top, 0px)
-    );
+    padding-top: calc(70px + env(safe-area-inset-top, 0px));
+  }
+
+    .footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .footer .dash-btn {
+    width: 100%;
   }
 }
