@@ -6,9 +6,14 @@ import Footer from "./components/Footer/Footer";
 import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
 
 import Home from "./pages/Home/Home";
+
 import Catalog from "./pages/Catalog/Catalog";
 import ProductDetails from "./pages/Catalog/ProductDetails/ProductDetails";
+
 import AvailableStock from "./pages/AvailableStock/AvailableStock";
+import Offers from "./pages/Offers/Offers";
+
+import Register from "./pages/Register/Register";
 import Login from "./pages/Login/Login";
 
 import { getCurrentUser, logoutUser } from "./services/api";
@@ -25,7 +30,9 @@ import { LoadingProvider, useLoading } from "./context/LoadingContext";
 function AppContent() {
   const [user, setUser] = useState(() => getCurrentUser());
   const [language, setLanguage] = useState(() => getSavedLanguage());
-  const [page, setPage] = useState("home");
+  const [page, setPage] = useState(() => {
+  return sessionStorage.getItem("udnyn_current_page") || "home";
+});
   const [selectedProductId, setSelectedProductId] = useState(null);
 
   const { isLoading } = useLoading();
@@ -39,6 +46,10 @@ function AppContent() {
     setUser(loggedInUser);
     setPage("home");
   }
+
+  useEffect(() => {
+  sessionStorage.setItem("udnyn_current_page", page);
+}, [page]);
 
   function handleLogout() {
     logoutUser();
@@ -64,7 +75,13 @@ function AppContent() {
   }
 
   function handleNavigate(nextPage) {
-    setPage(nextPage);
+    // تسجيل الدخول وإنشاء الحساب صفحتان اختياريتان.
+    // أما العروض فتتطلب تسجيل الدخول أو إنشاء حساب.
+    if (nextPage === "offers" && !user) {
+      setPage("register");
+    } else {
+      setPage(nextPage);
+    }
 
     if (nextPage === "catalog") {
       setSelectedProductId(null);
@@ -75,6 +92,25 @@ function AppContent() {
 
   function renderPage() {
     switch (page) {
+      case "login":
+        return (
+          <Login
+            onLogin={handleLogin}
+            onNavigate={handleNavigate}
+            language={language}
+            t={t}
+          />
+        );
+      case "register":
+        return (
+          <Register
+            onRegister={handleLogin}
+            onNavigate={handleNavigate}
+            language={language}
+            t={t}
+          />
+        );
+
       case "catalog":
         return (
           <Catalog
@@ -89,6 +125,7 @@ function AppContent() {
           <ProductDetails
             productId={selectedProductId}
             onNavigate={handleNavigate}
+            t={t}
           />
         ) : (
           <Home t={t} onNavigate={handleNavigate} />
@@ -102,27 +139,14 @@ function AppContent() {
         return <AvailableStock user={user} />;
 
       case "offers":
+        return <Offers user={user} onNavigate={handleNavigate} />;
+
       case "categories":
       case "favorites":
       case "home":
       default:
         return <Home t={t} onNavigate={handleNavigate} />;
     }
-  }
-
-  if (!user) {
-    return (
-      <>
-        {isLoading && <LoadingSpinner />}
-
-        <Login onLogin={handleLogin} />
-
-        <FloatingSocial
-          whatsappNumber="201XXXXXXXXX"
-          telegramUrl="https://t.me/YOUR_CHANNEL"
-        />
-      </>
-    );
   }
 
   return (

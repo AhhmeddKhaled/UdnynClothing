@@ -106,6 +106,46 @@
   color: var(--color-gold-deep);
 }
 
+.navbar-login,
+.navbar-register {
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 1px solid var(--color-plum, #68445c);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.navbar-login {
+  background: transparent;
+  color: var(--color-plum, #68445c);
+}
+
+.navbar-register {
+  background: var(--color-plum, #68445c);
+  color: #fff;
+}
+
+.navbar-login:hover {
+  background: var(--color-plum, #68445c);
+  color: #fff;
+}
+
+.navbar-register:hover {
+  opacity: 0.85;
+}
+
+@media (max-width: 600px) {
+  .navbar-login,
+  .navbar-register {
+    padding: 7px 9px;
+    font-size: 12px;
+  }
+}
+
 @media (max-width: 900px) {
   .navbar-inner {
     flex-wrap: wrap;

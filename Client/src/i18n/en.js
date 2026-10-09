@@ -61,14 +61,11 @@ const en = {
     description: "Product Description",
     addToCart: "Add to Cart",
     premiumQuality: "Premium Quality",
-    premiumQualityText:
-      "Carefully selected materials and attention to detail.",
+    premiumQualityText: "Carefully selected materials and attention to detail.",
     exchange: "14-Day Exchange",
-    exchangeText:
-      "Review our exchange policy before placing your order.",
+    exchangeText: "Review our exchange policy before placing your order.",
     easyShopping: "Easy Shopping",
-    easyShoppingText:
-      "Browse our products and find what suits you.",
+    easyShoppingText: "Browse our products and find what suits you.",
     notFound: "Product not found.",
     loading: "Loading product details...",
     error: "Unable to load product details.",
@@ -97,6 +94,35 @@ const en = {
     },
     copyright: "© {year} Udnyn. All rights reserved.",
     backToTop: "Back to top",
+  },
+
+  auth: {
+    loginTitle: "Log in",
+    loginSubtitle: "Welcome back to UDNYN",
+    email: "Email address",
+    password: "Password",
+    emailPlaceholder: "example@email.com",
+    passwordPlaceholder: "Enter your password",
+    loginButton: "Log in",
+    loading: "Logging in...",
+    required: "Please enter your email and password",
+    genericError: "An error occurred while logging in",
+    noAccount: "Don't have an account?",
+    register: "Create an account",
+
+    registerTitle: "Create an Account",
+    registerSubtitle: "Join UDNYN and enjoy a great shopping experience.",
+    name: "Full Name",
+    namePlaceholder: "Enter your name",
+    confirmPassword: "Confirm Password",
+    confirmPasswordPlaceholder: "Re-enter your password",
+    registerButton: "Create Account",
+    passwordLength: "Password must be at least 8 characters",
+    passwordMismatch: "Passwords do not match",
+    incompleteResponse:
+      "The server returned an incomplete registration response",
+    haveAccount: "Already have an account?",
+    login: "Login",
   },
 };
 

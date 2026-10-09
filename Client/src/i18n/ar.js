@@ -95,6 +95,35 @@ const ar = {
     copyright: "© {year} أدنين. جميع الحقوق محفوظة.",
     backToTop: "العودة للأعلى",
   },
+
+auth: {
+  loginTitle: "تسجيل الدخول",
+  loginSubtitle: "أهلاً بيك تاني في UDNYN",
+  email: "البريد الإلكتروني",
+  password: "كلمة المرور",
+  emailPlaceholder: "example@email.com",
+  passwordPlaceholder: "أدخل كلمة المرور",
+  loginButton: "تسجيل الدخول",
+  loading: "جاري تسجيل الدخول...",
+  required: "من فضلك أدخل البريد الإلكتروني وكلمة المرور",
+  genericError: "حدث خطأ أثناء تسجيل الدخول",
+  noAccount: "ليس لديك حساب؟",
+  register: "أنشئ حسابًا",
+  
+  
+  registerTitle: "إنشاء حساب جديد",
+  registerSubtitle: "انضم إلى UDNYN واستمتع بتجربة تسوق مميزة.",
+  name: "الاسم بالكامل",
+  namePlaceholder: "اكتب اسمك",
+  confirmPassword: "تأكيد كلمة المرور",
+  confirmPasswordPlaceholder: "أعد كتابة كلمة المرور",
+  registerButton: "إنشاء حساب",
+  passwordLength: "كلمة المرور يجب ألا تقل عن 8 أحرف",
+  passwordMismatch: "كلمتا المرور غير متطابقتين",
+  incompleteResponse: "استجابة التسجيل غير مكتملة من السيرفر",
+  haveAccount: "عندك حساب بالفعل؟",
+  login: "تسجيل الدخول",
+},
 };
 
 export default ar;

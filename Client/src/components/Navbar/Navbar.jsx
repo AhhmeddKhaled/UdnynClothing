@@ -1,3 +1,4 @@
+
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
 import "./Navbar.css";
 
@@ -9,32 +10,45 @@ export default function Navbar({
   onLanguageChange,
   onLogout,
 }) {
-  const canViewAvailableStock = ["moderator", "admin", "owner"].includes(
-    user?.role,
-  );
+  const canViewAvailableStock = [
+    "moderator",
+    "admin",
+    "owner",
+  ].includes(user?.role);
 
   return (
     <header className="navbar">
       <div className="navbar-inner">
-      <button
-  className="navbar-logo"
-  onClick={() => onNavigate("home")}
->
-  {language === "ar" ? "يدنين" : "UDNYN"}
-</button>
+        <button
+          type="button"
+          className="navbar-logo"
+          onClick={() => onNavigate("home")}
+        >
+          {language === "ar" ? "يدنين" : "UDNYN"}
+        </button>
+
         <nav className="navbar-links">
-          <button onClick={() => onNavigate("home")}>{t.nav.home}</button>
+          <button type="button" onClick={() => onNavigate("home")}>
+            {t.nav.home}
+          </button>
 
-          <button onClick={() => onNavigate("catalog")}>{t.nav.catalog}</button>
+          <button type="button" onClick={() => onNavigate("catalog")}>
+            {t.nav.catalog}
+          </button>
 
-          <button onClick={() => onNavigate("offers")}>{t.nav.offers}</button>
+          <button type="button" onClick={() => onNavigate("offers")}>
+            {t.nav.offers}
+          </button>
 
-          <button onClick={() => onNavigate("categories")}>
+          <button type="button" onClick={() => onNavigate("categories")}>
             {t.nav.categories}
           </button>
 
           {canViewAvailableStock && (
-            <button onClick={() => onNavigate("availableStock")}>
+            <button
+              type="button"
+              onClick={() => onNavigate("availableStock")}
+            >
               {t.nav.availableStock}
             </button>
           )}
@@ -54,15 +68,39 @@ export default function Navbar({
           <button
             className="navbar-language"
             type="button"
-            onClick={() => onLanguageChange(language === "ar" ? "en" : "ar")}
+            onClick={() =>
+              onLanguageChange(language === "ar" ? "en" : "ar")
+            }
           >
             {language === "ar" ? "EN" : "AR"}
           </button>
 
           <ThemeToggle />
 
-          {user && (
-            <button className="navbar-logout" type="button" onClick={onLogout}>
+          {!user ? (
+            <>
+              <button
+                className="navbar-login"
+                type="button"
+                onClick={() => onNavigate("login")}
+              >
+                {t.nav.login}
+              </button>
+
+              <button
+                className="navbar-register"
+                type="button"
+                onClick={() => onNavigate("register")}
+              >
+                {language === "ar" ? "إنشاء حساب" : "Register"}
+              </button>
+            </>
+          ) : (
+            <button
+              className="navbar-logout"
+              type="button"
+              onClick={onLogout}
+            >
               {t.nav.logout}
             </button>
           )}
