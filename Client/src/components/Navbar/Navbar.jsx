@@ -20,7 +20,7 @@ export default function Navbar({
   className="navbar-logo"
   onClick={() => onNavigate("home")}
 >
-  {language === "ar" ? "يدنين" : "YEDNIN"}
+  {language === "ar" ? "يدنين" : "UDNYN"}
 </button>
         <nav className="navbar-links">
           <button onClick={() => onNavigate("home")}>{t.nav.home}</button>

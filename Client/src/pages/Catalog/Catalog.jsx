@@ -1,72 +1,61 @@
 import "./Catalog.css";
-
 import { useEffect, useMemo, useState } from "react";
-
 import { getToken } from "../../services/api";
-
 import { useLoading } from "../../context/LoadingContext";
 
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:5000";
+const API_URL = (
+  import.meta.env.VITE_API_URL || "http://localhost:5000"
+).replace(/\/+$/, "");
 
 const PAGE_SIZE = 24;
+
+export function getImageUrl(imagePath) {
+  if (!imagePath) return "";
+
+  const image = String(imagePath).trim();
+
+  if (!image) return "";
+
+  if (/^https?:\/\//i.test(image)) {
+    return image;
+  }
+
+  return `${API_URL}/${image.replace(/^\/+/, "")}`;
+}
 
 export default function Catalog({
   user,
   onNavigate,
+  onSelectProduct,
 }) {
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
-  const [visibleCount, setVisibleCount] =
-    useState(PAGE_SIZE);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const {
-    startLoading,
-    stopLoading,
-  } = useLoading();
+  const { startLoading, stopLoading } = useLoading();
 
   async function loadProducts() {
     try {
       setLoading(true);
       setError("");
-
       startLoading();
 
       const token = getToken();
-
       const url = `${API_URL}/api/catalog`;
-
-      console.log("📦 Catalog request:", {
-        url,
-        hasToken: Boolean(token),
-      });
 
       const response = await fetch(url, {
         method: "GET",
         headers: {
           ...(token
-            ? {
-                Authorization: `Bearer ${token}`,
-              }
+            ? { Authorization: `Bearer ${token}` }
             : {}),
         },
       });
 
-      const responseText =
-        await response.text();
-
-      console.log(
-        "📦 Catalog response:",
-        {
-          status: response.status,
-          statusText: response.statusText,
-          body: responseText,
-        }
-      );
+      const responseText = await response.text();
 
       let data = null;
 
@@ -83,30 +72,24 @@ export default function Catalog({
         );
       }
 
-      const productList = Array.isArray(
-        data
-      )
+      const productList = Array.isArray(data)
         ? data
         : Array.isArray(data?.products)
           ? data.products
-          : null;
+          : Array.isArray(data?.data)
+            ? data.data
+            : null;
 
       if (!productList) {
-        throw new Error(
-          "السيرفر أرسل بيانات غير صحيحة"
-        );
+        throw new Error("السيرفر أرسل بيانات غير صحيحة");
       }
 
       setProducts(productList);
     } catch (err) {
-      console.error(
-        "Catalog load error:",
-        err
-      );
+      console.error("Catalog load error:", err);
 
       setError(
-        err.message ||
-          "تعذر تحميل المنتجات حاليًا"
+        err.message || "تعذر تحميل المنتجات حاليًا"
       );
     } finally {
       setLoading(false);
@@ -123,28 +106,20 @@ export default function Catalog({
       ...new Set(
         products
           .map((product) =>
-            String(
-              product.category || ""
-            ).trim()
+            String(product.category || "").trim()
           )
           .filter(Boolean)
       ),
-    ].sort((a, b) =>
-      a.localeCompare(b, "ar")
-    );
+    ].sort((a, b) => a.localeCompare(b, "ar"));
   }, [products]);
 
   const filteredProducts = useMemo(() => {
-    const searchValue = search
-      .trim()
-      .toLowerCase();
+    const searchValue = search.trim().toLowerCase();
 
     return products.filter((product) => {
       if (
         category &&
-        String(
-          product.category || ""
-        ).trim() !== category
+        String(product.category || "").trim() !== category
       ) {
         return false;
       }
@@ -153,14 +128,10 @@ export default function Catalog({
         return true;
       }
 
-      const name = String(
-        product.name || ""
-      ).toLowerCase();
-
+      const name = String(product.name || "").toLowerCase();
       const description = String(
         product.description || ""
       ).toLowerCase();
-
       const manufacturer = String(
         product.manufacturer || ""
       ).toLowerCase();
@@ -171,21 +142,16 @@ export default function Catalog({
         manufacturer.includes(searchValue)
       );
     });
-  }, [
-    products,
-    search,
-    category,
-  ]);
+  }, [products, search, category]);
 
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
   }, [search, category]);
 
-  const visibleProducts =
-    filteredProducts.slice(
-      0,
-      visibleCount
-    );
+  const visibleProducts = filteredProducts.slice(
+    0,
+    visibleCount
+  );
 
   function formatPrice(value) {
     const price = Number(value);
@@ -194,34 +160,30 @@ export default function Catalog({
       return "—";
     }
 
-    return new Intl.NumberFormat(
-      "ar-EG",
-      {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-      }
-    ).format(price);
+    return new Intl.NumberFormat("ar-EG", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(price);
   }
 
   if (loading) {
     return (
-      <main
-        className="catalog-page"
-        dir="rtl"
-      />
+      <main className="catalog-page" dir="rtl">
+        <div className="state">
+          جاري تحميل المنتجات...
+        </div>
+      </main>
     );
   }
 
   if (error) {
     return (
-      <main
-        className="catalog-page"
-        dir="rtl"
-      >
+      <main className="catalog-page" dir="rtl">
         <div className="state">
           <b>{error}</b>
 
           <button
+            type="button"
             className="btn btn-primary"
             onClick={loadProducts}
           >
@@ -233,19 +195,13 @@ export default function Catalog({
   }
 
   return (
-    <main
-      className="catalog-page"
-      dir="rtl"
-    >
+    <main className="catalog-page" dir="rtl">
       <header className="catalog-header">
         <div>
-          <h1 className="ds-page-title">
-            الكتالوج
-          </h1>
+          <h1 className="ds-page-title">الكتالوج</h1>
 
           <p className="ds-page-sub">
-            اكتشف تشكيلتنا واختار المنتجات
-            المناسبة لك
+            اكتشف تشكيلتنا واختار المنتجات المناسبة لك
           </p>
         </div>
 
@@ -274,29 +230,21 @@ export default function Catalog({
           <select
             value={category}
             onChange={(event) =>
-              setCategory(
-                event.target.value
-              )
+              setCategory(event.target.value)
             }
           >
-            <option value="">
-              كل الأقسام
-            </option>
+            <option value="">كل الأقسام</option>
 
-            {categories.map(
-              (item) => (
-                <option
-                  key={item}
-                  value={item}
-                >
-                  {item}
-                </option>
-              )
-            )}
+            {categories.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
           </select>
         </label>
 
         <button
+          type="button"
           className="btn btn-secondary"
           onClick={loadProducts}
         >
@@ -305,6 +253,7 @@ export default function Catalog({
 
         {(search || category) && (
           <button
+            type="button"
             className="btn btn-text"
             onClick={() => {
               setSearch("");
@@ -318,88 +267,82 @@ export default function Catalog({
 
       <div className="catalog-count">
         عدد المنتجات:{" "}
-        <strong>
-          {filteredProducts.length}
-        </strong>
+        <strong>{filteredProducts.length}</strong>
       </div>
 
       <section className="catalog-grid">
-        {visibleProducts.map(
-          (product) => (
-            <article
-              className="catalog-product-card"
-              key={
-                product._id ||
-                product.name
-              }
-            >
-              <div className="catalog-product-image">
-                {product.imagePath ? (
-                  <img
-                    src={`${API_URL}${product.imagePath}`}
-                    alt={product.name}
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="catalog-no-image">
-                    لا توجد صورة
-                  </div>
+        {visibleProducts.map((product) => (
+          <article
+            className="catalog-product-card"
+            key={product._id || product.name}
+          >
+            <div className="catalog-product-image">
+              {product.imagePath ? (
+                <img
+                  src={getImageUrl(product.imagePath)}
+                  alt={product.name || "صورة المنتج"}
+                  loading="lazy"
+                />
+              ) : (
+                <div className="catalog-no-image">
+                  لا توجد صورة
+                </div>
+              )}
+
+              <button
+                type="button"
+                className="catalog-favorite"
+                aria-label="إضافة للمفضلة"
+              >
+                ♡
+              </button>
+            </div>
+
+            <div className="catalog-product-info">
+              <div className="catalog-product-meta">
+                {product.category && (
+                  <span>{product.category}</span>
                 )}
 
-                <button
-                  type="button"
-                  className="catalog-favorite"
-                  aria-label="إضافة للمفضلة"
-                >
-                  ♡
-                </button>
-              </div>
-
-              <div className="catalog-product-info">
-                <div className="catalog-product-meta">
-                  {product.category && (
-                    <span>
-                      {product.category}
-                    </span>
-                  )}
-
-                  {product.manufacturer && (
-                    <span>
-                      {product.manufacturer}
-                    </span>
-                  )}
-                </div>
-
-                <h2>
-                  {product.name}
-                </h2>
-
-                {product.description && (
-                  <p className="catalog-product-description">
-                    {product.description}
-                  </p>
+                {product.manufacturer && (
+                  <span>{product.manufacturer}</span>
                 )}
-
-                <div className="catalog-product-price">
-                  <strong>
-                    {formatPrice(
-                      product.price
-                    )}
-                  </strong>
-
-                  <span>ج.م</span>
-                </div>
-
-                <button
-                  type="button"
-                  className="btn btn-primary catalog-product-button"
-                >
-                  عرض المنتج
-                </button>
               </div>
-            </article>
-          )
-        )}
+
+              <h2>{product.name}</h2>
+
+              {product.description && (
+                <p className="catalog-product-description">
+                  {product.description}
+                </p>
+              )}
+
+              <div className="catalog-product-price">
+                <strong>
+                  {formatPrice(product.price)}
+                </strong>
+
+                <span>ج.م</span>
+              </div>
+
+              <button
+                type="button"
+                className="btn btn-primary catalog-product-button"
+                onClick={() => {
+                  if (typeof onSelectProduct === "function") {
+                    onSelectProduct(product);
+                  } else {
+                    console.error(
+                      "onSelectProduct غير مربوط في App.jsx"
+                    );
+                  }
+                }}
+              >
+                عرض المنتج
+              </button>
+            </div>
+          </article>
+        ))}
       </section>
 
       {visibleProducts.length === 0 && (
@@ -412,15 +355,14 @@ export default function Catalog({
         </div>
       )}
 
-      {visibleCount <
-        filteredProducts.length && (
+      {visibleCount < filteredProducts.length && (
         <div className="catalog-more">
           <button
+            type="button"
             className="btn btn-secondary"
             onClick={() =>
               setVisibleCount(
-                (count) =>
-                  count + PAGE_SIZE
+                (count) => count + PAGE_SIZE
               )
             }
           >

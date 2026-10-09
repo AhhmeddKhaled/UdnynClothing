@@ -12,31 +12,20 @@ const en = {
 
   home: {
     brand: "Udnyn",
-
     heroTitle: "Your Style Starts Here",
     heroText:
       "Discover our curated collection of fashion and essentials designed for your style.",
     shopNow: "Browse Catalog",
-
     categoriesTitle: "Shop by Category",
-    categoriesText:
-      "Choose a category and discover our collection.",
-
+    categoriesText: "Choose a category and discover our collection.",
     offersTitle: "Featured Offers",
-    offersText:
-      "Selected products at special prices for a limited time.",
-
+    offersText: "Selected products at special prices for a limited time.",
     featuredTitle: "Featured Products",
-    featuredText:
-      "A carefully selected collection of our latest products.",
-
+    featuredText: "A carefully selected collection of our latest products.",
     reviewsTitle: "Customer Reviews",
-    reviewsText:
-      "Real experiences from our customers.",
-
+    reviewsText: "Real experiences from our customers.",
     ctaTitle: "Ready to Discover Our Collection?",
-    ctaText:
-      "Browse our products and find what fits your style.",
+    ctaText: "Browse our products and find what fits your style.",
     ctaButton: "Start Shopping",
   },
 
@@ -65,6 +54,49 @@ const en = {
       name: "Ahmed Ali",
       text: "Very easy shopping experience and the products matched the pictures perfectly.",
     },
+  },
+
+  productDetails: {
+    back: "Back to Catalog",
+    description: "Product Description",
+    addToCart: "Add to Cart",
+    premiumQuality: "Premium Quality",
+    premiumQualityText:
+      "Carefully selected materials and attention to detail.",
+    exchange: "14-Day Exchange",
+    exchangeText:
+      "Review our exchange policy before placing your order.",
+    easyShopping: "Easy Shopping",
+    easyShoppingText:
+      "Browse our products and find what suits you.",
+    notFound: "Product not found.",
+    loading: "Loading product details...",
+    error: "Unable to load product details.",
+    noImage: "No image available",
+    noDescription: "No description is available for this product.",
+    shoppingBenefits: "Shopping Benefits",
+  },
+
+  footer: {
+    brand: "Udnyn",
+    tagline: "Your style tells your story. Every detail matters.",
+    quickLinks: "Quick Links",
+    learnTitle: "Learn with Udnyn",
+    learning: {
+      styling: "Styling Tips",
+      colors: "Choosing Colors",
+      trends: "Outfit Inspiration",
+    },
+    socialTitle: "Social Media",
+    socialDescription: "Follow us and discover what's new at Udnyn.",
+    serviceTitle: "Customer Service",
+    service: {
+      contact: "Contact Us",
+      faq: "Frequently Asked Questions",
+      shipping: "Shipping & Returns",
+    },
+    copyright: "© {year} Udnyn. All rights reserved.",
+    backToTop: "Back to top",
   },
 };
 

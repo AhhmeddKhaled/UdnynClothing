@@ -1,0 +1,350 @@
+.udnyn-footer {
+  width: 100%;
+  background: var(--color-plum-deep);
+  color: var(--color-paper);
+}
+
+.udnyn-footer__container {
+  width: min(100% - var(--space-8), 1280px);
+  margin-inline: auto;
+}
+
+/* Intro */
+.udnyn-footer__intro {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding-block: var(--space-10) var(--space-8);
+  text-align: start;
+}
+
+.udnyn-footer__intro-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.udnyn-footer__brand {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-paper);
+  font-family: var(--font-display);
+  font-size: var(--text-display);
+  font-weight: 700;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: color 180ms ease;
+}
+
+.udnyn-footer__brand:hover {
+  color: var(--color-gold);
+}
+
+.udnyn-footer__tagline {
+  margin: 0;
+  color: var(--color-plum-tint);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: 1.9;
+}
+
+.udnyn-footer__catalog-button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  border: 1px solid var(--color-gold);
+  border-radius: var(--radius-md);
+  background: var(--color-gold);
+  color: var(--color-paper);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.udnyn-footer__catalog-button:hover {
+  background: var(--color-gold-deep);
+  border-color: var(--color-gold-deep);
+}
+
+.udnyn-footer__catalog-button span {
+  font-size: var(--text-lg);
+}
+
+.udnyn-footer__divider {
+  width: 100%;
+  height: 1px;
+  background: var(--color-line-dark);
+}
+
+/* Main columns */
+.udnyn-footer__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-8);
+  padding-block: var(--space-10);
+}
+
+.udnyn-footer__column {
+  min-width: 0;
+}
+
+.udnyn-footer__heading {
+  margin: 0 0 var(--space-5);
+  color: var(--color-gold);
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.udnyn-footer__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.udnyn-footer__link {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-plum-tint);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  line-height: 1.9;
+  text-align: start;
+  cursor: pointer;
+  transition: color 180ms ease;
+}
+
+.udnyn-footer__link:hover {
+  color: var(--color-paper);
+}
+
+.udnyn-footer__column-description {
+  margin: 0 0 var(--space-4);
+  color: var(--color-plum-tint);
+  font-size: var(--text-sm);
+  line-height: 1.9;
+}
+
+/* Social links */
+.udnyn-footer__social-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.udnyn-footer__social-link,
+.udnyn-footer__bottom-icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-line-dark);
+  border-radius: var(--radius-full);
+  color: var(--color-paper);
+  text-decoration: none;
+  transition:
+    color 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.udnyn-footer__social-link:hover,
+.udnyn-footer__bottom-icon:hover {
+  border-color: var(--color-gold);
+  background: var(--color-gold);
+  color: var(--color-plum-deep);
+}
+
+.udnyn-footer__social-link svg,
+.udnyn-footer__bottom-icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* Bottom bar */
+.udnyn-footer__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: 72px;
+  border-top: 1px solid var(--color-line-dark);
+}
+
+.udnyn-footer__bottom-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.udnyn-footer__bottom-socials {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.udnyn-footer__bottom-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.udnyn-footer__back-top {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-paper);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: color 180ms ease;
+}
+
+.udnyn-footer__back-top:hover {
+  color: var(--color-gold);
+}
+
+.udnyn-footer__back-top span {
+  font-size: var(--text-lg);
+}
+
+.udnyn-footer__copyright {
+  margin: 0;
+  color: var(--color-plum-tint);
+  font-size: var(--text-xs);
+  line-height: 1.8;
+}
+
+/* Dark mode */
+[data-theme="dark"] .udnyn-footer {
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+[data-theme="dark"] .udnyn-footer__brand,
+[data-theme="dark"] .udnyn-footer__back-top {
+  color: var(--color-ink);
+}
+
+[data-theme="dark"] .udnyn-footer__tagline,
+[data-theme="dark"] .udnyn-footer__link,
+[data-theme="dark"] .udnyn-footer__column-description,
+[data-theme="dark"] .udnyn-footer__copyright {
+  color: var(--color-plum-soft);
+}
+
+[data-theme="dark"] .udnyn-footer__heading {
+  color: var(--color-gold);
+}
+
+[data-theme="dark"] .udnyn-footer__link:hover,
+[data-theme="dark"] .udnyn-footer__brand:hover,
+[data-theme="dark"] .udnyn-footer__back-top:hover {
+  color: var(--color-gold);
+}
+
+[data-theme="dark"] .udnyn-footer__social-link,
+[data-theme="dark"] .udnyn-footer__bottom-icon {
+  color: var(--color-ink);
+  border-color: var(--color-line);
+}
+
+[data-theme="dark"] .udnyn-footer__social-link:hover,
+[data-theme="dark"] .udnyn-footer__bottom-icon:hover {
+  background: var(--color-gold);
+  border-color: var(--color-gold);
+  color: var(--color-paper);
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  .udnyn-footer__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-6);
+    row-gap: var(--space-8);
+  }
+}
+
+/* Mobile */
+@media (max-width: 520px) {
+  .udnyn-footer__container {
+    width: calc(100% - var(--space-8));
+  }
+
+  .udnyn-footer__intro {
+    gap: var(--space-3);
+    padding-block: var(--space-8) var(--space-6);
+  }
+
+  .udnyn-footer__intro-copy {
+    flex: 1;
+  }
+
+  .udnyn-footer__brand {
+    font-size: var(--text-2xl);
+  }
+
+  .udnyn-footer__tagline {
+    font-size: var(--text-xs);
+  }
+
+  .udnyn-footer__catalog-button {
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+  }
+
+  .udnyn-footer__grid {
+    gap: var(--space-6) var(--space-4);
+    padding-block: var(--space-8);
+  }
+
+  .udnyn-footer__heading {
+    margin-bottom: var(--space-3);
+    font-size: var(--text-base);
+  }
+
+  .udnyn-footer__bottom {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding-block: var(--space-4);
+  }
+
+  .udnyn-footer__bottom-actions {
+    gap: var(--space-3);
+  }
+
+  .udnyn-footer__bottom-socials {
+    gap: var(--space-1);
+  }
+
+  .udnyn-footer__copyright {
+    width: 100%;
+    order: 2;
+  }
+}
