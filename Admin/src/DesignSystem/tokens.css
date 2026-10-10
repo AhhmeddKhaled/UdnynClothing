@@ -24,10 +24,10 @@
   --color-clay: #b5563d;
   --color-clay-bg: #f6e4dd;
 
-  --color-sand: #f3ede4;
-  --color-sand-deep: #e9dfcf;
+  --color-sand: #fff;
+  --color-sand-deep: #ececec;
 
-  --color-paper: #fbf8f3;
+  --color-paper: #f7f7f7;
 
   --color-line: rgba(42, 31, 38, 0.12);
   --color-line-dark: rgba(255, 255, 255, 0.12);

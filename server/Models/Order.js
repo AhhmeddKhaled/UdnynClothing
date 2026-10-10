@@ -43,25 +43,62 @@ const orderSchema = new mongoose.Schema(
       unique: true,
       index: true,
     },
+
+    // Optional: used when the order belongs to a registered user.
+    // Manual orders can leave this field null.
     customer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      default: null,
       index: true,
     },
+
+    // Customer details for manually created orders.
+    customerName: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 120,
+    },
+
+    customerPhone: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 30,
+    },
+
     items: {
       type: [orderItemSchema],
       required: true,
       validate: {
-        validator: (items) => Array.isArray(items) && items.length > 0,
+        validator: (items) =>
+          Array.isArray(items) && items.length > 0,
         message: "Order must contain at least one item",
       },
     },
+
+    // Product subtotal before shipping.
+    subtotal: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
+
+    shippingCost: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 0,
+    },
+
+    // subtotal + shippingCost
     totalAmount: {
       type: Number,
       required: true,
       min: 0,
     },
+
     status: {
       type: String,
       enum: [
@@ -75,25 +112,32 @@ const orderSchema = new mongoose.Schema(
       default: "pending",
       index: true,
     },
+
     shippingAddress: {
       type: String,
+      required: true,
       trim: true,
-      default: "",
+      maxlength: 1000,
     },
+
     customerNote: {
       type: String,
       trim: true,
       default: "",
+      maxlength: 2000,
     },
+
     statusUpdatedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null,
     },
+
     statusUpdatedAt: {
       type: Date,
       default: null,
     },
+
     stockRestored: {
       type: Boolean,
       default: false,

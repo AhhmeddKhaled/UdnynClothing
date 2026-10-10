@@ -22,8 +22,8 @@ const ALLOWED_TRANSITIONS = {
 };
 
 function isAdmin(req) {
-  return req.user?.role?.name === "admin" ||
-    req.user?.role?.name === "owner";
+  const role = req.user?.role?.name;
+  return role === "admin" || role === "owner";
 }
 
 function sendError(res, status, message) {
@@ -40,17 +40,72 @@ function getOrderNumber() {
 }
 
 // POST /api/orders
+// Manual orders can only be created by admins/owners.
 async function createOrder(req, res, next) {
-  const session = await mongoose.startSession();
-  let responseOrder = null;
+  let session;
 
   try {
-    const {
-      items,
-      shippingAddress = "",
-      customerNote = "",
-    } = req.body;
+    if (!isAdmin(req)) {
+      return sendError(
+        res,
+        403,
+        "Only admins can create manual orders"
+      );
+    }
 
+    const {
+      customerName,
+      customerPhone,
+      items,
+      shippingAddress,
+      customerNote = "",
+      shippingCost = 0,
+    } = req.body || {};
+
+    // Validate customer details.
+    if (
+      typeof customerName !== "string" ||
+      !customerName.trim() ||
+      customerName.trim().length > 120
+    ) {
+      return sendError(res, 400, "Valid customer name is required");
+    }
+
+    if (
+      typeof customerPhone !== "string" ||
+      !customerPhone.trim() ||
+      customerPhone.trim().length > 30
+    ) {
+      return sendError(res, 400, "Valid customer phone is required");
+    }
+
+    if (
+      typeof shippingAddress !== "string" ||
+      !shippingAddress.trim() ||
+      shippingAddress.length > 1000
+    ) {
+      return sendError(res, 400, "Valid shipping address is required");
+    }
+
+    if (
+      typeof customerNote !== "string" ||
+      customerNote.length > 2000
+    ) {
+      return sendError(res, 400, "Invalid customer note");
+    }
+
+    // Validate shipping cost.
+    const parsedShippingCost = Number(shippingCost);
+
+    if (
+      !Number.isFinite(parsedShippingCost) ||
+      parsedShippingCost < 0 ||
+      !Number.isSafeInteger(Math.round(parsedShippingCost * 100))
+    ) {
+      return sendError(res, 400, "Invalid shipping cost");
+    }
+
+    // Validate requested items.
     if (!Array.isArray(items) || items.length === 0) {
       return sendError(res, 400, "Order must contain at least one item");
     }
@@ -59,15 +114,7 @@ async function createOrder(req, res, next) {
       return sendError(res, 400, "Order contains too many items");
     }
 
-    if (typeof shippingAddress !== "string" || shippingAddress.length > 1000) {
-      return sendError(res, 400, "Invalid shipping address");
-    }
-
-    if (typeof customerNote !== "string" || customerNote.length > 2000) {
-      return sendError(res, 400, "Invalid customer note");
-    }
-
-    // Combine duplicate item IDs and validate all quantities.
+    // Combine duplicate item IDs and validate quantities.
     const quantitiesByItemId = new Map();
 
     for (const item of items) {
@@ -79,7 +126,11 @@ async function createOrder(req, res, next) {
       }
 
       if (!Number.isSafeInteger(quantity) || quantity <= 0) {
-        return sendError(res, 400, "Each quantity must be a positive integer");
+        return sendError(
+          res,
+          400,
+          "Each quantity must be a positive integer"
+        );
       }
 
       const combinedQuantity =
@@ -92,17 +143,20 @@ async function createOrder(req, res, next) {
       quantitiesByItemId.set(itemId, combinedQuantity);
     }
 
-    const requestedItems = [...quantitiesByItemId.entries()];
+    const requestedItems = [...quantitiesByItemId.entries()].sort(
+      ([a], [b]) => a - b
+    );
+
+    session = await mongoose.startSession();
+
+    let responseOrder = null;
 
     await session.withTransaction(async () => {
       const orderItems = [];
-      let totalAmount = 0;
-
-      // Sort IDs to keep the update order consistent across requests.
-      requestedItems.sort(([a], [b]) => a - b);
+      let subtotal = 0;
 
       for (const [itemId, quantity] of requestedItems) {
-        // The stock decrement is conditional and atomic.
+        // Reserve stock atomically, only for active products.
         const stockItem = await AvailableStock.findOneAndUpdate(
           {
             itemId,
@@ -136,12 +190,10 @@ async function createOrder(req, res, next) {
           throw error;
         }
 
-        // Offer price is used when valid and greater than zero.
-        // Otherwise, use the retail price.
+        // Prices always come from the database, never from the UI.
         const offerPrice = Number(stockItem.offerPrice) || 0;
         const retailPrice = Number(stockItem.retailPrice) || 0;
-        const unitPrice =
-          offerPrice > 0 ? offerPrice : retailPrice;
+        const unitPrice = offerPrice > 0 ? offerPrice : retailPrice;
 
         if (!Number.isFinite(unitPrice) || unitPrice < 0) {
           const error = new Error(
@@ -152,7 +204,7 @@ async function createOrder(req, res, next) {
         }
 
         const lineTotal = Number((unitPrice * quantity).toFixed(2));
-        totalAmount = Number((totalAmount + lineTotal).toFixed(2));
+        subtotal = Number((subtotal + lineTotal).toFixed(2));
 
         orderItems.push({
           itemId: stockItem.itemId,
@@ -163,13 +215,25 @@ async function createOrder(req, res, next) {
         });
       }
 
+      const totalAmount = Number(
+        (subtotal + parsedShippingCost).toFixed(2)
+      );
+
       const [createdOrder] = await Order.create(
         [
           {
             orderNumber: getOrderNumber(),
-            customer: req.user._id,
+
+            // This is a manual order, not linked to a registered customer.
+            customer: null,
+            customerName: customerName.trim(),
+            customerPhone: customerPhone.trim(),
+
             items: orderItems,
+            subtotal,
+            shippingCost: parsedShippingCost,
             totalAmount,
+
             shippingAddress: shippingAddress.trim(),
             customerNote: customerNote.trim(),
             status: "pending",
@@ -199,9 +263,11 @@ async function createOrder(req, res, next) {
       );
     }
 
-    next(error);
+    return next(error);
   } finally {
-    await session.endSession();
+    if (session) {
+      await session.endSession();
+    }
   }
 }
 
@@ -236,7 +302,7 @@ async function getMyOrders(req, res, next) {
       },
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 }
 
@@ -255,6 +321,7 @@ async function getAllOrders(req, res, next) {
       if (!VALID_STATUSES.includes(req.query.status)) {
         return sendError(res, 400, "Invalid order status filter");
       }
+
       filter.status = req.query.status;
     }
 
@@ -279,7 +346,7 @@ async function getAllOrders(req, res, next) {
       },
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 }
 
@@ -304,8 +371,13 @@ async function getOrderById(req, res, next) {
       return sendError(res, 404, "Order not found");
     }
 
+    const customerId =
+      order.customer?._id?.toString() ||
+      order.customer?.toString();
+
     const ownsOrder =
-      order.customer.toString() === req.user._id.toString();
+      Boolean(customerId) &&
+      customerId === req.user._id.toString();
 
     if (!isAdmin(req) && !ownsOrder) {
       return sendError(res, 403, "You cannot access this order");
@@ -316,17 +388,25 @@ async function getOrderById(req, res, next) {
       order,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 }
 
 // PATCH /api/orders/:id/status
 async function updateOrderStatus(req, res, next) {
-  const session = await mongoose.startSession();
+  let session;
 
   try {
+    if (!isAdmin(req)) {
+      return sendError(
+        res,
+        403,
+        "Only admins can update order status"
+      );
+    }
+
     const { id } = req.params;
-    const { status } = req.body;
+    const { status } = req.body || {};
 
     if (!mongoose.isValidObjectId(id)) {
       return sendError(res, 400, "Invalid order ID");
@@ -336,8 +416,9 @@ async function updateOrderStatus(req, res, next) {
       return sendError(res, 400, "Invalid order status");
     }
 
+    session = await mongoose.startSession();
+
     let updatedOrder = null;
-    let transactionError = null;
 
     await session.withTransaction(async () => {
       const order = await Order.findById(id).session(session);
@@ -363,7 +444,7 @@ async function updateOrderStatus(req, res, next) {
         throw error;
       }
 
-      // Return reserved stock exactly once when cancelling.
+      // Restore stock exactly once when cancelling.
       if (status === "cancelled") {
         if (order.stockRestored) {
           const error = new Error("Stock has already been restored");
@@ -408,9 +489,11 @@ async function updateOrderStatus(req, res, next) {
       return sendError(res, error.statusCode, error.message);
     }
 
-    next(error);
+    return next(error);
   } finally {
-    await session.endSession();
+    if (session) {
+      await session.endSession();
+    }
   }
 }
 
