@@ -1,37 +1,61 @@
 import "./AvailableStock.css";
 
-import { useEffect, useMemo, useState } from "react";
-import { useFetchData } from "../Hooks/useFetchData";
-import { authFetch } from "../pages/Login/auth.js";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
+const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
+const API_ENDPOINT = `${API_URL}/api/availableStock`;
 const PAGE_SIZE = 40;
 
 export default function AvailableStock() {
-  const {
-    data,
-    loading,
-    error: fetchError,
-    load: loadProducts,
-  } = useFetchData(
-    `${API_URL}/api/availableStock`,
-    authFetch,
-    { initialData: [] }
-  );
-
-  // دعم استجابة API سواء كانت مصفوفة مباشرة
-  // أو object يحتوي على products.
-  const products = Array.isArray(data)
-    ? data
-    : Array.isArray(data?.products)
-      ? data.products
-      : [];
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
 
   const [search, setSearch] = useState("");
   const [manufacturer, setManufacturer] = useState("");
   const [category, setCategory] = useState("");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  const loadProducts = useCallback(async () => {
+    setLoading(true);
+    setFetchError(false);
+
+    try {
+      const response = await fetch(API_ENDPOINT, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Request failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      const result = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.products)
+          ? data.products
+          : null;
+
+      if (!result) {
+        throw new Error("Unexpected API response format");
+      }
+
+      setProducts(result);
+    } catch (error) {
+      console.error("Available Stock API error:", error);
+      setFetchError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadProducts();
+  }, [loadProducts]);
 
   const error = fetchError
     ? "تعذر تحميل المنتجات المتاحة حاليًا"
@@ -43,12 +67,9 @@ export default function AvailableStock() {
         products
           .filter(
             (product) =>
-              Number(product.qty) > 0 &&
-              product.manufacturer
+              Number(product.qty) > 0 && product.manufacturer
           )
-          .map((product) =>
-            String(product.manufacturer).trim()
-          )
+          .map((product) => String(product.manufacturer).trim())
           .filter(Boolean)
       ),
     ].sort((a, b) => a.localeCompare(b, "ar"));
@@ -60,12 +81,9 @@ export default function AvailableStock() {
         products
           .filter(
             (product) =>
-              Number(product.qty) > 0 &&
-              product.category
+              Number(product.qty) > 0 && product.category
           )
-          .map((product) =>
-            String(product.category).trim()
-          )
+          .map((product) => String(product.category).trim())
           .filter(Boolean)
       ),
     ].sort((a, b) => a.localeCompare(b, "ar"));
@@ -75,9 +93,7 @@ export default function AvailableStock() {
     const searchValue = search.trim().toLowerCase();
 
     return products.filter((product) => {
-      if (Number(product.qty) <= 0) {
-        return false;
-      }
+      if (Number(product.qty) <= 0) return false;
 
       if (
         manufacturer &&
@@ -93,18 +109,14 @@ export default function AvailableStock() {
         return false;
       }
 
-      if (!searchValue) {
-        return true;
-      }
+      if (!searchValue) return true;
 
       const name = String(product.name || "").toLowerCase();
       const itemId = String(product.itemId || "").toLowerCase();
       const barcode = String(product.barcode || "").toLowerCase();
-
       const productManufacturer = String(
         product.manufacturer || ""
       ).toLowerCase();
-
       const productCategory = String(
         product.category || ""
       ).toLowerCase();
@@ -123,18 +135,12 @@ export default function AvailableStock() {
     setVisibleCount(PAGE_SIZE);
   }, [search, manufacturer, category]);
 
-  useEffect(() => {
-    console.log("Available Stock API:", `${API_URL}/api/availableStock`);
-  }, []);
-
   const visibleProducts = filteredProducts.slice(0, visibleCount);
 
   const formatPrice = (value) => {
     const price = Number(value);
 
-    if (!Number.isFinite(price)) {
-      return "—";
-    }
+    if (!Number.isFinite(price)) return "—";
 
     return new Intl.NumberFormat("ar-EG", {
       minimumFractionDigits: 0,
@@ -143,20 +149,12 @@ export default function AvailableStock() {
   };
 
   const getImageUrl = (imagePath) => {
-    if (!imagePath) {
-      return null;
-    }
+    if (!imagePath) return null;
 
     const value = String(imagePath).trim();
+    if (!value) return null;
 
-    if (!value) {
-      return null;
-    }
-
-    if (
-      value.startsWith("http://") ||
-      value.startsWith("https://")
-    ) {
+    if (/^https?:\/\//i.test(value)) {
       return value;
     }
 
@@ -164,9 +162,7 @@ export default function AvailableStock() {
       ? value
       : `/${value}`;
 
-    const baseUrl = API_URL.replace(/\/+$/, "");
-
-    return `${baseUrl}${normalizedPath}`;
+    return `${API_URL}${normalizedPath}`;
   };
 
   if (loading) {
@@ -177,7 +173,6 @@ export default function AvailableStock() {
             className="available-stock-spinner"
             aria-hidden="true"
           />
-
           <span>جاري تحميل المنتجات...</span>
         </div>
       </main>
@@ -189,7 +184,6 @@ export default function AvailableStock() {
       <main className="available-stock-page" dir="rtl">
         <div className="state">
           <b>{error}</b>
-
           <button
             onClick={loadProducts}
             className="btn btn-primary"
@@ -206,7 +200,6 @@ export default function AvailableStock() {
       <header className="available-stock-header">
         <div>
           <h1 className="ds-page-title">البضاعة المتاحة</h1>
-
           <p className="ds-page-sub">
             عرض المنتجات والكميات والأسعار المتاحة
           </p>
@@ -216,7 +209,6 @@ export default function AvailableStock() {
       <section className="available-stock-tools card">
         <label className="field stock-search">
           <span>بحث</span>
-
           <input
             type="search"
             placeholder="اسم الصنف أو رقم الصنف أو الباركود..."
@@ -227,15 +219,11 @@ export default function AvailableStock() {
 
         <label className="field">
           <span>المصنع</span>
-
           <select
             value={manufacturer}
-            onChange={(event) =>
-              setManufacturer(event.target.value)
-            }
+            onChange={(event) => setManufacturer(event.target.value)}
           >
             <option value="">كل المصانع</option>
-
             {manufacturers.map((item) => (
               <option key={item} value={item}>
                 {item}
@@ -246,13 +234,11 @@ export default function AvailableStock() {
 
         <label className="field">
           <span>التصنيف</span>
-
           <select
             value={category}
             onChange={(event) => setCategory(event.target.value)}
           >
             <option value="">كل التصنيفات</option>
-
             {categories.map((item) => (
               <option key={item} value={item}>
                 {item}
@@ -307,17 +293,11 @@ export default function AvailableStock() {
                 {imageUrl ? (
                   <img
                     src={imageUrl}
-                    alt={
-                      product.name ||
-                      `Product ${product.itemId || ""}`
-                    }
+                    alt={product.name || `Product ${product.itemId || ""}`}
                     loading="lazy"
                     onError={(event) => {
                       console.error("IMAGE FAILED:", imageUrl);
-                      console.error(
-                        "IMAGE PATH:",
-                        product.imagePath
-                      );
+                      console.error("IMAGE PATH:", product.imagePath);
                       event.currentTarget.style.display = "none";
                     }}
                   />
@@ -335,7 +315,6 @@ export default function AvailableStock() {
               <div className="stock-product-info">
                 <div className="stock-product-title">
                   <h2>{product.name}</h2>
-
                   {product.manufacturer && (
                     <span>{product.manufacturer}</span>
                   )}
@@ -344,7 +323,6 @@ export default function AvailableStock() {
                 <div className="stock-prices">
                   <div className="stock-price">
                     <span>سعر الجملة</span>
-
                     <strong>
                       {formatPrice(product.wholesalePrice)}
                       <small> ج.م</small>
@@ -353,7 +331,6 @@ export default function AvailableStock() {
 
                   <div className="stock-price">
                     <span>سعر القطاعي</span>
-
                     <strong>
                       {formatPrice(product.retailPrice)}
                       <small> ج.م</small>
@@ -362,7 +339,6 @@ export default function AvailableStock() {
 
                   <div className="stock-price stock-offer">
                     <span>سعر العرض</span>
-
                     <strong>
                       {formatPrice(product.offerPrice)}
                       <small> ج.م</small>
@@ -372,10 +348,7 @@ export default function AvailableStock() {
 
                 <div className="stock-quantity">
                   <span>الكمية المتاحة</span>
-
-                  <strong className="num">
-                    {product.qty}
-                  </strong>
+                  <strong className="num">{product.qty}</strong>
                 </div>
               </div>
             </article>
