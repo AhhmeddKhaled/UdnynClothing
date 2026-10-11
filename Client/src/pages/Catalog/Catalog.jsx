@@ -1,7 +1,6 @@
 import "./Catalog.css";
 import { useEffect, useMemo, useState } from "react";
 import { getToken } from "../../services/api";
-import { useLoading } from "../../context/LoadingContext";
 
 const API_URL = (
   import.meta.env.VITE_API_URL || "http://localhost:5000"
@@ -35,13 +34,11 @@ export default function Catalog({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const { startLoading, stopLoading } = useLoading();
 
   async function loadProducts() {
     try {
       setLoading(true);
       setError("");
-      startLoading();
 
       const token = getToken();
       const url = `${API_URL}/api/catalog`;

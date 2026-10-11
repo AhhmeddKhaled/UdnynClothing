@@ -25,8 +25,6 @@ import {
   saveLanguage,
 } from "./i18n/i18n";
 
-import { LoadingProvider, useLoading } from "./context/LoadingContext";
-
 function AppContent() {
   const [user, setUser] = useState(() => getCurrentUser());
   const [language, setLanguage] = useState(() => getSavedLanguage());
@@ -35,7 +33,6 @@ function AppContent() {
 });
   const [selectedProductId, setSelectedProductId] = useState(null);
 
-  const { isLoading } = useLoading();
   const t = getTranslations(language);
 
   useEffect(() => {

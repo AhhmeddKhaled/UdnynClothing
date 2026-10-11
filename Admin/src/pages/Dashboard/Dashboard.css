@@ -6,7 +6,6 @@
 .dashboard {
   min-height: 100%;
   padding-bottom: var(--space-5);
-  background: var(--color-paper);
   color: var(--color-ink);
   font-family: var(--font-body);
 }
@@ -30,134 +29,7 @@
   margin-bottom: var(--space-6);
 }
 
-/* ======================================================
-   Buttons
-   ====================================================== */
 
-.dash-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  min-height: 36px;
-  padding: var(--space-2) var(--space-4);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-md);
-  background: var(--color-paper);
-  color: var(--color-ink);
-  font: inherit;
-  font-size: var(--text-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    background 0.15s ease,
-    border-color 0.15s ease,
-    opacity 0.15s ease;
-}
-
-.dash-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.dash-btn-primary {
-  background: var(--color-plum);
-  color: var(--color-paper);
-  border-color: var(--color-plum);
-}
-
-.dash-btn-primary:hover:not(:disabled) {
-  opacity: 0.88;
-}
-
-.dash-btn svg {
-  width: 16px;
-  height: 16px;
-}
-
-/* ======================================================
-   Cards
-   ====================================================== */
-
-.dash-card {
-  min-width: 0;
-  padding: var(--space-4) var(--space-5);
-  background: var(--color-paper);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-card);
-}
-
-/* ======================================================
-   Stats
-   ====================================================== */
-
-.dash-stats {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-3);
-  margin-bottom: var(--space-8);
-}
-
-.dash-stat {
-  min-width: 0;
-}
-
-.dash-stat-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  margin-bottom: var(--space-3);
-  border-radius: var(--radius-md);
-}
-
-.dash-stat-icon svg {
-  width: 19px;
-  height: 19px;
-}
-
-.dash-icon-accent {
-  background: rgba(59, 36, 54, 0.08);
-  color: var(--color-plum);
-}
-
-.dash-icon-success {
-  background: var(--color-sage-bg);
-  color: var(--color-sage);
-}
-
-.dash-icon-gold {
-  background: var(--color-sand);
-  color: var(--color-gold-deep);
-}
-
-.dash-icon-danger {
-  background: var(--color-clay-bg);
-  color: var(--color-clay);
-}
-
-.dash-label {
-  margin-bottom: var(--space-1);
-  color: var(--color-plum-soft);
-  font-size: var(--text-xs);
-}
-
-.dash-value {
-  color: var(--color-ink);
-  font-size: var(--text-2xl);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  overflow-wrap: anywhere;
-}
-
-.dash-hint {
-  margin-top: var(--space-1);
-  color: var(--color-plum-soft);
-  font-size: var(--text-xs);
-  line-height: 1.6;
-}
 
 /* ======================================================
    Section Headers

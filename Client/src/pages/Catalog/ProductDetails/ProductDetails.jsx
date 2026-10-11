@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { getToken } from "../../../services/api";
-import { useLoading } from "../../../context/LoadingContext";
 import { getImageUrl } from "../Catalog";
 import ar from "../../../i18n/ar.js";
 import en from "../../../i18n/en.js";
@@ -20,8 +19,6 @@ export default function ProductDetails({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const { startLoading, stopLoading } = useLoading();
-
   const t = language === "ar" ? ar : en;
   const isArabic = language === "ar";
   const text = t.productDetails;
@@ -32,7 +29,6 @@ export default function ProductDetails({
     async function fetchProduct() {
       setLoading(true);
       setError("");
-      startLoading();
 
       try {
         const token = getToken();
@@ -88,7 +84,7 @@ export default function ProductDetails({
       cancelled = true;
       stopLoading();
     };
-  }, [productId, startLoading, stopLoading]);
+  }, [productId, stopLoading]);
 
   const handleAddToCart = () => {
     if (!product) return;

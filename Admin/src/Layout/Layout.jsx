@@ -4,6 +4,8 @@ import Sidebar from "../Components/Sidebar/Sidebar.jsx";
 import { getUser, logout, getLoginTime , authFetch } from "../pages/Login/auth.js";
 import { useTheme } from "../context/ThemeContext.jsx";
 import { useDashboardLogic } from "../UI_Logic/DashboardLogic";
+import Button from '../Components/Button/Button';
+
 
 import "./Layout.css";
 
@@ -55,14 +57,7 @@ export default function Layout() {
       : "Login time unavailable"}
   </span>
 
-  <button
-    type="button"
-    className="dash-btn dash-btn-primary"
-    onClick={load}
-    disabled={loading}
-  >
-    {loading ? "Refreshing..." : "Refresh data"}
-  </button>
+  <Button load={load} loading={loading} />
 
   <span className="footer-checks">
     Data checks: {missingDataTotal ?? 0}

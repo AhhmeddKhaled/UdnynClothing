@@ -1,109 +1,41 @@
 import "./AvailableStock.css";
 
-import React, {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useFetchData } from "../Hooks/useFetchData";
+import { authFetch } from "../pages/Login/auth.js";
 
-const API_URL =
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const PAGE_SIZE = 40;
 
 export default function AvailableStock() {
-  const [products, setProducts] = useState([]);
+  const {
+    data,
+    loading,
+    error: fetchError,
+    load: loadProducts,
+  } = useFetchData(
+    `${API_URL}/api/availableStock`,
+    authFetch,
+    { initialData: [] }
+  );
+
+  // دعم استجابة API سواء كانت مصفوفة مباشرة
+  // أو object يحتوي على products.
+  const products = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.products)
+      ? data.products
+      : [];
+
   const [search, setSearch] = useState("");
-  const [manufacturer, setManufacturer] =
-    useState("");
-  const [category, setCategory] =
-    useState("");
-  const [visibleCount, setVisibleCount] =
-    useState(PAGE_SIZE);
-  const [loading, setLoading] =
-    useState(true);
-  const [error, setError] = useState("");
+  const [manufacturer, setManufacturer] = useState("");
+  const [category, setCategory] = useState("");
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
 
-  const loadProducts = async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      const token =
-        localStorage.getItem("token");
-
-      const headers = {};
-
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
-      const response = await fetch(
-        `${API_URL}/api/availableStock`,
-        {
-          method: "GET",
-          headers,
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          `فشل تحميل المنتجات - HTTP ${response.status}`
-        );
-      }
-
-      const data =
-        await response.json();
-
-      const productList =
-        Array.isArray(data)
-          ? data
-          : Array.isArray(
-                data?.products
-              )
-            ? data.products
-            : null;
-
-      if (!productList) {
-        throw new Error(
-          "السيرفر أرسل بيانات غير صحيحة"
-        );
-      }
-
-      setProducts(productList);
-    } catch (err) {
-      console.error(
-        "Load available stock error:",
-        err
-      );
-
-      console.error(
-        "AVAILABLE STOCK API:",
-        `${API_URL}/api/availableStock`
-      );
-
-      setError(
-        "تعذر تحميل المنتجات المتاحة حاليًا"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    console.log(
-      "Available Stock API_URL:",
-      API_URL
-    );
-
-    console.log(
-      "Available Stock API:",
-      `${API_URL}/api/availableStock`
-    );
-
-    loadProducts();
-  }, []);
+  const error = fetchError
+    ? "تعذر تحميل المنتجات المتاحة حاليًا"
+    : "";
 
   const manufacturers = useMemo(() => {
     return [
@@ -115,15 +47,11 @@ export default function AvailableStock() {
               product.manufacturer
           )
           .map((product) =>
-            String(
-              product.manufacturer
-            ).trim()
+            String(product.manufacturer).trim()
           )
           .filter(Boolean)
       ),
-    ].sort((a, b) =>
-      a.localeCompare(b, "ar")
-    );
+    ].sort((a, b) => a.localeCompare(b, "ar"));
   }, [products]);
 
   const categories = useMemo(() => {
@@ -136,104 +64,70 @@ export default function AvailableStock() {
               product.category
           )
           .map((product) =>
-            String(
-              product.category
-            ).trim()
+            String(product.category).trim()
           )
           .filter(Boolean)
       ),
-    ].sort((a, b) =>
-      a.localeCompare(b, "ar")
-    );
+    ].sort((a, b) => a.localeCompare(b, "ar"));
   }, [products]);
 
   const filteredProducts = useMemo(() => {
-    const searchValue =
-      search.trim().toLowerCase();
+    const searchValue = search.trim().toLowerCase();
 
-    return products.filter(
-      (product) => {
-        if (Number(product.qty) <= 0) {
-          return false;
-        }
-
-        if (
-          manufacturer &&
-          String(
-            product.manufacturer || ""
-          ).trim() !== manufacturer
-        ) {
-          return false;
-        }
-
-        if (
-          category &&
-          String(
-            product.category || ""
-          ).trim() !== category
-        ) {
-          return false;
-        }
-
-        if (!searchValue) {
-          return true;
-        }
-
-        const name = String(
-          product.name || ""
-        ).toLowerCase();
-
-        const itemId = String(
-          product.itemId || ""
-        ).toLowerCase();
-
-        const barcode = String(
-          product.barcode || ""
-        ).toLowerCase();
-
-        const productManufacturer =
-          String(
-            product.manufacturer || ""
-          ).toLowerCase();
-
-        const productCategory =
-          String(
-            product.category || ""
-          ).toLowerCase();
-
-        return (
-          name.includes(searchValue) ||
-          itemId.includes(searchValue) ||
-          barcode.includes(searchValue) ||
-          productManufacturer.includes(
-            searchValue
-          ) ||
-          productCategory.includes(
-            searchValue
-          )
-        );
+    return products.filter((product) => {
+      if (Number(product.qty) <= 0) {
+        return false;
       }
-    );
-  }, [
-    products,
-    search,
-    manufacturer,
-    category,
-  ]);
+
+      if (
+        manufacturer &&
+        String(product.manufacturer || "").trim() !== manufacturer
+      ) {
+        return false;
+      }
+
+      if (
+        category &&
+        String(product.category || "").trim() !== category
+      ) {
+        return false;
+      }
+
+      if (!searchValue) {
+        return true;
+      }
+
+      const name = String(product.name || "").toLowerCase();
+      const itemId = String(product.itemId || "").toLowerCase();
+      const barcode = String(product.barcode || "").toLowerCase();
+
+      const productManufacturer = String(
+        product.manufacturer || ""
+      ).toLowerCase();
+
+      const productCategory = String(
+        product.category || ""
+      ).toLowerCase();
+
+      return (
+        name.includes(searchValue) ||
+        itemId.includes(searchValue) ||
+        barcode.includes(searchValue) ||
+        productManufacturer.includes(searchValue) ||
+        productCategory.includes(searchValue)
+      );
+    });
+  }, [products, search, manufacturer, category]);
 
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
-  }, [
-    search,
-    manufacturer,
-    category,
-  ]);
+  }, [search, manufacturer, category]);
 
-  const visibleProducts =
-    filteredProducts.slice(
-      0,
-      visibleCount
-    );
+  useEffect(() => {
+    console.log("Available Stock API:", `${API_URL}/api/availableStock`);
+  }, []);
+
+  const visibleProducts = filteredProducts.slice(0, visibleCount);
 
   const formatPrice = (value) => {
     const price = Number(value);
@@ -242,13 +136,10 @@ export default function AvailableStock() {
       return "—";
     }
 
-    return new Intl.NumberFormat(
-      "ar-EG",
-      {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2,
-      }
-    ).format(price);
+    return new Intl.NumberFormat("ar-EG", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(price);
   };
 
   const getImageUrl = (imagePath) => {
@@ -256,8 +147,7 @@ export default function AvailableStock() {
       return null;
     }
 
-    const value =
-      String(imagePath).trim();
+    const value = String(imagePath).trim();
 
     if (!value) {
       return null;
@@ -270,32 +160,25 @@ export default function AvailableStock() {
       return value;
     }
 
-    const normalizedPath =
-      value.startsWith("/")
-        ? value
-        : `/${value}`;
+    const normalizedPath = value.startsWith("/")
+      ? value
+      : `/${value}`;
 
-    const baseUrl =
-      API_URL.replace(/\/+$/, "");
+    const baseUrl = API_URL.replace(/\/+$/, "");
 
     return `${baseUrl}${normalizedPath}`;
   };
 
   if (loading) {
     return (
-      <main
-        className="available-stock-page"
-        dir="rtl"
-      >
+      <main className="available-stock-page" dir="rtl">
         <div className="state available-stock-loading">
           <span
             className="available-stock-spinner"
             aria-hidden="true"
           />
 
-          <span>
-            جاري تحميل المنتجات...
-          </span>
+          <span>جاري تحميل المنتجات...</span>
         </div>
       </main>
     );
@@ -303,10 +186,7 @@ export default function AvailableStock() {
 
   if (error) {
     return (
-      <main
-        className="available-stock-page"
-        dir="rtl"
-      >
+      <main className="available-stock-page" dir="rtl">
         <div className="state">
           <b>{error}</b>
 
@@ -322,19 +202,13 @@ export default function AvailableStock() {
   }
 
   return (
-    <main
-      className="available-stock-page"
-      dir="rtl"
-    >
+    <main className="available-stock-page" dir="rtl">
       <header className="available-stock-header">
         <div>
-          <h1 className="ds-page-title">
-            البضاعة المتاحة
-          </h1>
+          <h1 className="ds-page-title">البضاعة المتاحة</h1>
 
           <p className="ds-page-sub">
-            عرض المنتجات والكميات والأسعار
-            المتاحة
+            عرض المنتجات والكميات والأسعار المتاحة
           </p>
         </div>
       </header>
@@ -347,11 +221,7 @@ export default function AvailableStock() {
             type="search"
             placeholder="اسم الصنف أو رقم الصنف أو الباركود..."
             value={search}
-            onChange={(event) =>
-              setSearch(
-                event.target.value
-              )
-            }
+            onChange={(event) => setSearch(event.target.value)}
           />
         </label>
 
@@ -361,25 +231,16 @@ export default function AvailableStock() {
           <select
             value={manufacturer}
             onChange={(event) =>
-              setManufacturer(
-                event.target.value
-              )
+              setManufacturer(event.target.value)
             }
           >
-            <option value="">
-              كل المصانع
-            </option>
+            <option value="">كل المصانع</option>
 
-            {manufacturers.map(
-              (item) => (
-                <option
-                  key={item}
-                  value={item}
-                >
-                  {item}
-                </option>
-              )
-            )}
+            {manufacturers.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
           </select>
         </label>
 
@@ -388,26 +249,15 @@ export default function AvailableStock() {
 
           <select
             value={category}
-            onChange={(event) =>
-              setCategory(
-                event.target.value
-              )
-            }
+            onChange={(event) => setCategory(event.target.value)}
           >
-            <option value="">
-              كل التصنيفات
-            </option>
+            <option value="">كل التصنيفات</option>
 
-            {categories.map(
-              (item) => (
-                <option
-                  key={item}
-                  value={item}
-                >
-                  {item}
-                </option>
-              )
-            )}
+            {categories.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
           </select>
         </label>
 
@@ -419,9 +269,7 @@ export default function AvailableStock() {
             تحديث
           </button>
 
-          {(search ||
-            manufacturer ||
-            category) && (
+          {(search || manufacturer || category) && (
             <button
               className="btn btn-text"
               onClick={() => {
@@ -438,177 +286,119 @@ export default function AvailableStock() {
 
       <div className="available-stock-count">
         عدد المنتجات المتاحة:{" "}
-        <strong>
-          {filteredProducts.length}
-        </strong>
+        <strong>{filteredProducts.length}</strong>
       </div>
 
       <section className="available-stock-grid">
-        {visibleProducts.map(
-          (product) => {
-            const imageUrl =
-              getImageUrl(
-                product.imagePath
-              );
+        {visibleProducts.map((product, index) => {
+          const imageUrl = getImageUrl(product.imagePath);
 
-            return (
-              <article
-                className="stock-product-card"
-                key={
-                  product._id ||
-                  product.itemId
-                }
-              >
-                <div className="stock-product-image">
-                  {imageUrl ? (
-                    <img
-                      src={imageUrl}
-                      alt={
-                        product.name ||
-                        `Product ${product.itemId}`
-                      }
-                      loading="lazy"
-                      onLoad={() => {
-                        console.log(
-                          "IMAGE LOADED:",
-                          imageUrl
-                        );
-                      }}
-                      onError={(event) => {
-                        console.error(
-                          "IMAGE FAILED:",
-                          imageUrl
-                        );
+          return (
+            <article
+              className="stock-product-card"
+              key={
+                product._id ||
+                product.itemId ||
+                product.barcode ||
+                index
+              }
+            >
+              <div className="stock-product-image">
+                {imageUrl ? (
+                  <img
+                    src={imageUrl}
+                    alt={
+                      product.name ||
+                      `Product ${product.itemId || ""}`
+                    }
+                    loading="lazy"
+                    onError={(event) => {
+                      console.error("IMAGE FAILED:", imageUrl);
+                      console.error(
+                        "IMAGE PATH:",
+                        product.imagePath
+                      );
+                      event.currentTarget.style.display = "none";
+                    }}
+                  />
+                ) : (
+                  <div className="stock-no-image">
+                    لا توجد صورة
+                  </div>
+                )}
 
-                        console.error(
-                          "IMAGE PATH:",
-                          product.imagePath
-                        );
+                <span className="stock-item-id badge badge-neutral">
+                  #{product.itemId}
+                </span>
+              </div>
 
-                        console.error(
-                          "IMAGE SIZE:",
-                          event.currentTarget
-                            .naturalWidth,
-                          event.currentTarget
-                            .naturalHeight
-                        );
-                      }}
-                    />
-                  ) : (
-                    <div className="stock-no-image">
-                      لا توجد صورة
-                    </div>
+              <div className="stock-product-info">
+                <div className="stock-product-title">
+                  <h2>{product.name}</h2>
+
+                  {product.manufacturer && (
+                    <span>{product.manufacturer}</span>
                   )}
-
-                  <span className="stock-item-id badge badge-neutral">
-                    #{product.itemId}
-                  </span>
                 </div>
 
-                <div className="stock-product-info">
-                  <div className="stock-product-title">
-                    <h2>
-                      {product.name}
-                    </h2>
+                <div className="stock-prices">
+                  <div className="stock-price">
+                    <span>سعر الجملة</span>
 
-                    {product.manufacturer && (
-                      <span>
-                        {
-                          product.manufacturer
-                        }
-                      </span>
-                    )}
+                    <strong>
+                      {formatPrice(product.wholesalePrice)}
+                      <small> ج.م</small>
+                    </strong>
                   </div>
 
-                  <div className="stock-prices">
-                    <div className="stock-price">
-                      <span>
-                        سعر الجملة
-                      </span>
+                  <div className="stock-price">
+                    <span>سعر القطاعي</span>
 
-                      <strong>
-                        {formatPrice(
-                          product.wholesalePrice
-                        )}
-                        <small>
-                          {" "}
-                          ج.م
-                        </small>
-                      </strong>
-                    </div>
-
-                    <div className="stock-price">
-                      <span>
-                        سعر القطاعي
-                      </span>
-
-                      <strong>
-                        {formatPrice(
-                          product.retailPrice
-                        )}
-                        <small>
-                          {" "}
-                          ج.م
-                        </small>
-                      </strong>
-                    </div>
-
-                    <div className="stock-price stock-offer">
-                      <span>
-                        سعر العرض
-                      </span>
-
-                      <strong>
-                        {formatPrice(
-                          product.offerPrice
-                        )}
-                        <small>
-                          {" "}
-                          ج.م
-                        </small>
-                      </strong>
-                    </div>
+                    <strong>
+                      {formatPrice(product.retailPrice)}
+                      <small> ج.م</small>
+                    </strong>
                   </div>
 
-                  <div className="stock-quantity">
-                    <span>
-                      الكمية المتاحة
-                    </span>
+                  <div className="stock-price stock-offer">
+                    <span>سعر العرض</span>
 
-                    <strong className="num">
-                      {product.qty}
+                    <strong>
+                      {formatPrice(product.offerPrice)}
+                      <small> ج.م</small>
                     </strong>
                   </div>
                 </div>
-              </article>
-            );
-          }
-        )}
+
+                <div className="stock-quantity">
+                  <span>الكمية المتاحة</span>
+
+                  <strong className="num">
+                    {product.qty}
+                  </strong>
+                </div>
+              </div>
+            </article>
+          );
+        })}
       </section>
 
-      {visibleProducts.length ===
-        0 && (
+      {visibleProducts.length === 0 && (
         <div className="state">
           <b>
-            {search ||
-            manufacturer ||
-            category
+            {search || manufacturer || category
               ? "لا توجد منتجات مطابقة للفلاتر."
               : "لا توجد منتجات متاحة حاليًا."}
           </b>
         </div>
       )}
 
-      {visibleCount <
-        filteredProducts.length && (
+      {visibleCount < filteredProducts.length && (
         <div className="available-stock-more">
           <button
             className="btn btn-secondary"
             onClick={() =>
-              setVisibleCount(
-                (count) =>
-                  count + PAGE_SIZE
-              )
+              setVisibleCount((count) => count + PAGE_SIZE)
             }
           >
             عرض المزيد

@@ -4,7 +4,6 @@
 ========================================= */
 
 .available-stock-page {
-  width: 100%;
   min-width: 0;
   box-sizing: border-box;
   color: var(--color-ink);
@@ -15,16 +14,11 @@
   box-sizing: border-box;
 }
 
-.available-stock-page .ds-page-head {
-  margin-bottom: var(--space-6);
-}
-
 /* =========================================
    Toolbar and Filters
 ========================================= */
 
 .available-stock-toolbar {
-  width: 100%;
   min-width: 0;
   margin-bottom: var(--space-4);
 }
@@ -32,19 +26,17 @@
 .available-stock-filters {
   display: grid;
   grid-template-columns:
-    minmax(220px, 2fr)
-    repeat(2, minmax(160px, 1fr))
-    auto;
+  minmax(220px, 2fr)
+  repeat(2, minmax(160px, 1fr))
+  auto;
   align-items: end;
   gap: var(--space-4);
   width: 100%;
   min-width: 0;
   margin: 0;
   padding: var(--space-5);
-  border: 1px solid var(--color-line);
   border-radius: var(--radius-lg);
   background: var(--color-paper);
-  box-shadow: var(--shadow-card);
 }
 
 .available-stock-filters .field-group {

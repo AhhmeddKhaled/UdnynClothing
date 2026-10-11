@@ -370,11 +370,27 @@
    ====================================================== */
 
 .sb-overlay {
-  display: none;
+  display: block;
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 15, 25, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.25s ease,
+    visibility 0.25s ease;
+  z-index: 40;
+}
+
+.sb-overlay.sb-overlay-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 /* ======================================================
-   Responsive
+   Responsive Sidebar
    ====================================================== */
 
 @media (max-width: 860px) {
@@ -384,35 +400,43 @@
 
   .sb-aside {
     position: fixed;
-    inset-block: 0;
+    top: 0;
     right: 0;
-    width: 240px;
+    left: auto;
+    bottom: 0;
+
+    width: min(280px, 85vw);
+    height: 100vh;
     height: 100dvh;
-    flex: 0 0 240px;
+    flex: none;
 
     transform: translateX(100%);
-    transition: transform 0.25s ease;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition:
+      transform 0.25s ease,
+      visibility 0.25s ease;
+
     z-index: 50;
 
     background: var(--color-sand);
     border-left: 1px solid var(--color-line);
     box-shadow: var(--shadow-card);
+
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
   }
 
   .sb-aside.sb-open {
     transform: translateX(0);
-  }
-
-  .sb-overlay {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: var(--color-line);
-    z-index: 40;
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .dashboard-layout {
     display: block;
+    width: 100%;
     height: auto;
     min-height: 100dvh;
     overflow: visible;
@@ -420,10 +444,37 @@
 
   .dashboard-content {
     width: 100%;
+    min-width: 0;
     height: auto;
     min-height: 100dvh;
+
     margin-right: 0;
     padding-top: 70px;
+
     overflow: visible;
+  }
+
+  body.sb-menu-open {
+    overflow: hidden;
+  }
+}
+
+@media (min-width: 861px) {
+  .sb-topbar {
+    display: none;
+  }
+
+  .sb-aside {
+    transform: none;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .sb-overlay {
+    display: none;
+  }
+
+  .dashboard-content {
+    margin-right: 240px;
   }
 }

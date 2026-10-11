@@ -11,11 +11,12 @@ import Users from "./pages/Users/Users.jsx";
 import Catalog from "./pages/Catalog/Catalog.jsx";
 import Orders from "./pages/Orders/Orders.jsx";
 
-import { LoadingProvider } from "./context/LoadingContext/LoadingContext.jsx";
+
 
 function App() {
+  
+  
   return (
-    <LoadingProvider>
       <Routes>
         <Route
           path="/login"
@@ -49,7 +50,6 @@ function App() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </LoadingProvider>
   );
 }
 

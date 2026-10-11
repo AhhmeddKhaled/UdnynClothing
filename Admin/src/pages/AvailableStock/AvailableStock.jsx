@@ -1,244 +1,50 @@
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React from "react";
 import "./AvailableStock.css";
-import { authFetch } from "../Login/auth.js";
-import { useLoading } from "../../context/LoadingContext/LoadingContext.jsx";
 
-const API_URL = (
-  import.meta.env.VITE_API_URL || "http://localhost:5000"
-).replace(/\/+$/, "");
-
-const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
+import { useAvailableStockLogic } from "../../UI_Logic/AvailableStockLogic.jsx";
+import ContentHeader from "../../Components/ContentHeader/ContentHeader";
 
 export default function AvailableStock() {
-  const { startLoading, stopLoading } = useLoading();
+  const {
+    filteredProducts,
+    categories,
+    manufacturers,
 
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("");
-  const [manufacturerFilter, setManufacturerFilter] = useState("");
-  const [importing, setImporting] = useState(false);
-  const [imageUploadingFor, setImageUploadingFor] = useState(null);
+    loading,
+    error,
+    importing,
+    imageUploadingFor,
 
-  const fileInputRefs = useRef({});
+    search,
+    setSearch,
+    categoryFilter,
+    setCategoryFilter,
+    manufacturerFilter,
+    setManufacturerFilter,
 
-  const currentUser = useMemo(() => {
-    try {
-      return JSON.parse(localStorage.getItem("user") || "null");
-    } catch {
-      return null;
-    }
-  }, []);
+    canManageImages,
+    canImport,
 
-  const canManageImages = ["admin", "owner"].includes(currentUser?.role);
-  const canImport = ["admin", "owner"].includes(currentUser?.role);
-
-  async function fetchProducts() {
-    setLoading(true);
-    startLoading();
-
-    try {
-      const response = await authFetch("/api/availableStock");
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "فشل تحميل البضاعة المتاحة");
-      }
-
-      setProducts(
-        Array.isArray(data)
-          ? data
-          : Array.isArray(data.products)
-            ? data.products
-            : []
-      );
-    } catch (error) {
-      console.error("Available Stock fetch error:", error);
-      setProducts([]);
-      alert(error.message || "فشل تحميل البضاعة المتاحة");
-    } finally {
-      setLoading(false);
-      stopLoading();
-    }
-  }
-
-  useEffect(() => {
-    fetchProducts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const categories = useMemo(
-    () =>
-      [
-        ...new Set(
-          products.map((product) => product.category).filter(Boolean)
-        ),
-      ].sort((a, b) => String(a).localeCompare(String(b), "ar")),
-    [products]
-  );
-
-  const manufacturers = useMemo(
-    () =>
-      [
-        ...new Set(
-          products.map((product) => product.manufacturer).filter(Boolean)
-        ),
-      ].sort((a, b) => String(a).localeCompare(String(b), "ar")),
-    [products]
-  );
-
-  const filteredProducts = useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase();
-
-    return products.filter((product) => {
-      const matchesSearch =
-        !normalizedSearch ||
-        String(product.itemId ?? "").toLowerCase().includes(normalizedSearch) ||
-        String(product.name ?? "").toLowerCase().includes(normalizedSearch) ||
-        String(product.manufacturer ?? "").toLowerCase().includes(normalizedSearch);
-
-      const matchesCategory =
-        !categoryFilter || product.category === categoryFilter;
-
-      const matchesManufacturer =
-        !manufacturerFilter || product.manufacturer === manufacturerFilter;
-
-      return matchesSearch && matchesCategory && matchesManufacturer;
-    });
-  }, [products, search, categoryFilter, manufacturerFilter]);
-
-  function getImageUrl(imagePath) {
-    if (!imagePath || typeof imagePath !== "string") return null;
-
-    const path = imagePath.trim();
-
-    if (/^https?:\/\//i.test(path)) return path;
-
-    return `${API_URL}${path.startsWith("/") ? "" : "/"}${path}`;
-  }
-
-  function openImagePicker(itemId, view) {
-    fileInputRefs.current[`${String(itemId)}-${view}`]?.click();
-  }
-
-  async function handleImageUpload(event, product) {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-
-    if (!file) return;
-
-    if (!IMAGE_TYPES.includes(file.type)) {
-      alert("من فضلك اختر صورة بصيغة JPG أو PNG أو WEBP");
-      return;
-    }
-
-    if (file.size > MAX_IMAGE_SIZE) {
-      alert("حجم الصورة يجب ألا يتجاوز 5 ميجابايت");
-      return;
-    }
-
-    if (product.itemId == null || product.itemId === "") {
-      alert("رقم المنتج غير موجود");
-      return;
-    }
-
-    const productId = String(product.itemId);
-
-    setImageUploadingFor(productId);
-    startLoading();
-
-    try {
-      const formData = new FormData();
-      formData.append("image", file);
-
-      const response = await authFetch(
-        `/api/availableStock/${encodeURIComponent(productId)}/image`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(data.message || "فشل رفع الصورة");
-      }
-
-      const newImagePath =
-        data.imagePath ??
-        data.product?.imagePath ??
-        data.product?.image ??
-        data.image;
-
-      if (!newImagePath) {
-        throw new Error(
-          "السيرفر لم يرجع مسار الصورة المحفوظة. راجع Route رفع الصور."
-        );
-      }
-
-      setProducts((currentProducts) =>
-        currentProducts.map((item) =>
-          String(item.itemId) === productId
-            ? { ...item, imagePath: newImagePath }
-            : item
-        )
-      );
-
-      alert("تم حفظ صورة المنتج بنجاح");
-    } catch (error) {
-      console.error("Image upload error:", error);
-      alert(error.message || "حدث خطأ أثناء رفع الصورة");
-    } finally {
-      setImageUploadingFor(null);
-      stopLoading();
-    }
-  }
-
-  async function handleImport(event) {
-    const file = event.target.files?.[0];
-    event.target.value = "";
-
-    if (!file) return;
-
-    setImporting(true);
-    startLoading();
-
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const response = await authFetch("/api/availableStock/import", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(data.message || "فشل استيراد ملف المنتجات");
-      }
-
-      await fetchProducts();
-      alert(data.message || "تم استيراد المنتجات بنجاح");
-    } catch (error) {
-      console.error("Excel import error:", error);
-      alert(error.message || "حدث خطأ أثناء استيراد الملف");
-    } finally {
-      setImporting(false);
-      stopLoading();
-    }
-  }
+    fileInputRefs,
+    fetchProducts,
+    getImageUrl,
+    openImagePicker,
+    handleImageUpload,
+    handleImport,
+    clearFilters,
+  } = useAvailableStockLogic();
 
   function renderImageControls(product, view) {
     const productId = String(product.itemId);
     const isUploading = imageUploadingFor === productId;
-    const hasImage = Boolean(product.imagePath ?? product.image);
+    const hasImage = Boolean(product.imagePath || product.image);
 
     return (
-      <div className={`available-stock-image-actions available-stock-image-actions--${view}`}>
+      <div
+        className={`available-stock-image-actions available-stock-image-actions--${view}`}
+      >
         <input
           ref={(element) => {
             fileInputRefs.current[`${productId}-${view}`] = element;
@@ -257,17 +63,19 @@ export default function AvailableStock() {
           onClick={() => openImagePicker(product.itemId, view)}
         >
           {isUploading
-            ? "جاري الرفع..."
+            ? "Uploading..."
             : hasImage
-              ? "تغيير الصورة"
-              : "إضافة صورة"}
+              ? "Change Image"
+              : "Add Image"}
         </button>
       </div>
     );
   }
 
   function renderProductImage(product) {
-    const imageUrl = getImageUrl(product.imagePath ?? product.image);
+    const imageUrl = getImageUrl(
+      product.imagePath || product.image
+    );
 
     return (
       <div className="available-stock-image">
@@ -281,83 +89,90 @@ export default function AvailableStock() {
             }}
           />
         ) : (
-          <span>لا توجد صورة</span>
+          <span>No Image</span>
         )}
       </div>
     );
   }
 
   function renderProductDetails(product) {
-    return (
-      <>
-        <div className="available-stock-card__field">
-          <span>الكمية</span>
-          <strong>{product.qty ?? 0}</strong>
-        </div>
-        <div className="available-stock-card__field">
-          <span>سعر الشراء</span>
-          <strong>{product.purchasePrice ?? 0}</strong>
-        </div>
-        <div className="available-stock-card__field">
-          <span>سعر الجملة</span>
-          <strong>{product.wholesalePrice ?? 0}</strong>
-        </div>
-        <div className="available-stock-card__field">
-          <span>سعر التجزئة</span>
-          <strong>{product.retailPrice ?? 0}</strong>
-        </div>
-        <div className="available-stock-card__field">
-          <span>سعر العرض</span>
-          <strong>{product.offerPrice ?? 0}</strong>
-        </div>
-        <div className="available-stock-card__field">
-          <span>التصنيف</span>
-          <strong>{product.category || "-"}</strong>
-        </div>
-        <div className="available-stock-card__field">
-          <span>الشركة المصنعة</span>
-          <strong>{product.manufacturer || "-"}</strong>
-        </div>
-      </>
-    );
+    const details = [
+      ["Quantity", product.qty ?? 0],
+      ["Purchase Price", product.purchasePrice ?? 0],
+      ["Wholesale Price", product.wholesalePrice ?? 0],
+      ["Retail Price", product.retailPrice ?? 0],
+      ["Offer Price", product.offerPrice ?? 0],
+      ["Category", product.category || "-"],
+      ["Manufacturer", product.manufacturer || "-"],
+    ];
+
+    return details.map(([label, value]) => (
+      <div className="available-stock-card__field" key={label}>
+        <span>{label}</span>
+        <strong>{value}</strong>
+      </div>
+    ));
+  }
+
+  if (loading) {
+    return <LoadingSpinner />;
   }
 
   return (
-    <main className="page available-stock-page" dir="rtl">
+    <main className="page available-stock-page" dir="ltr">
+      {/* Page Header */}
       <section className="ds-page-head">
-        <div>
-          <h1 className="ds-page-title">البضاعة المتاحة</h1>
-          <p className="ds-page-sub">إدارة المنتجات والكميات المتاحة</p>
-        </div>
+
+        <ContentHeader title="Available Stock" subTitle="Manage your products and available inventory" />
+
+       
       </section>
 
-      <section className="card available-stock-toolbar">
+      {/* Error State */}
+      {error && (
+        <section className="available-stock-error" role="alert">
+          <p>{error}</p>
+          <button
+            type="button"
+            className="btn btn-secondary"
+            onClick={fetchProducts}
+          >
+            Try Again
+          </button>
+        </section>
+      )}
+
+      {/* Search and Filters */}
+      <section className="available-stock-toolbar">
         <div className="available-stock-filters">
           <div className="field-group">
             <label className="field-label" htmlFor="stock-search">
-              البحث
+              Search
             </label>
+
             <input
               id="stock-search"
               className="field"
-              type="text"
+              type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="رقم المنتج أو الاسم..."
+              placeholder="Search by product ID, name, or manufacturer..."
             />
           </div>
 
           <div className="field-group">
             <label className="field-label" htmlFor="stock-category">
-              التصنيف
+              Category
             </label>
+
             <select
               id="stock-category"
               className="field"
               value={categoryFilter}
               onChange={(event) => setCategoryFilter(event.target.value)}
             >
-              <option value="">كل التصنيفات</option>
+              <option value="">All Categories</option>
+
               {categories.map((category) => (
                 <option key={category} value={category}>
                   {category}
@@ -368,15 +183,19 @@ export default function AvailableStock() {
 
           <div className="field-group">
             <label className="field-label" htmlFor="stock-manufacturer">
-              المصنع
+              Manufacturer
             </label>
+
             <select
               id="stock-manufacturer"
               className="field"
               value={manufacturerFilter}
-              onChange={(event) => setManufacturerFilter(event.target.value)}
+              onChange={(event) =>
+                setManufacturerFilter(event.target.value)
+              }
             >
-              <option value="">كل المصانع</option>
+              <option value="">All Manufacturers</option>
+
               {manufacturers.map((manufacturer) => (
                 <option key={manufacturer} value={manufacturer}>
                   {manufacturer}
@@ -385,18 +204,35 @@ export default function AvailableStock() {
             </select>
           </div>
 
+          <div className="available-stock-filter-actions">
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={clearFilters}
+              disabled={
+                !search && !categoryFilter && !manufacturerFilter
+              }
+            >
+              Clear Filters
+            </button>
+          </div>
+
           {canImport && (
-            <div className="field-group">
-              <label className="field-label">استيراد المنتجات</label>
+            <div className="field-group available-stock-import">
+              <label className="field-label" htmlFor="stock-import">
+                Import Products
+              </label>
+
               <label
-                className="btn btn-primary"
-                style={{
-                  cursor: importing ? "not-allowed" : "pointer",
-                  opacity: importing ? 0.6 : 1,
-                }}
+                className={`btn btn-primary ${
+                  importing ? "is-disabled" : ""
+                }`}
+                htmlFor="stock-import"
               >
-                {importing ? "جاري الاستيراد..." : "استيراد Excel"}
+                {importing ? "Importing..." : "Import Excel"}
+
                 <input
+                  id="stock-import"
                   type="file"
                   accept=".xlsx,.xls"
                   onChange={handleImport}
@@ -409,43 +245,46 @@ export default function AvailableStock() {
         </div>
       </section>
 
+      {/* Desktop Table */}
       <section className="card available-stock-table-section">
         <div className="table-wrapper">
           <table className="table">
             <thead>
               <tr>
-                <th>الصورة</th>
-                <th>رقم المنتج</th>
-                <th>المنتج</th>
-                <th>الكمية</th>
-                <th>سعر الشراء</th>
-                <th>سعر الجملة</th>
-                <th>سعر التجزئة</th>
-                <th>سعر العرض</th>
-                <th>التصنيف</th>
-                <th>الشركة المصنعة</th>
-                {canManageImages && <th>إدارة الصورة</th>}
+                <th>Image</th>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Purchase Price</th>
+                <th>Wholesale Price</th>
+                <th>Retail Price</th>
+                <th>Offer Price</th>
+                <th>Category</th>
+                <th>Manufacturer</th>
+                {canManageImages && <th>Image Actions</th>}
               </tr>
             </thead>
 
             <tbody>
-              {loading ? (
+              {filteredProducts.length === 0 ? (
                 <tr>
                   <td colSpan={canManageImages ? 11 : 10}>
-                    <div className="state">جاري تحميل المنتجات...</div>
-                  </td>
-                </tr>
-              ) : filteredProducts.length === 0 ? (
-                <tr>
-                  <td colSpan={canManageImages ? 11 : 10}>
-                    <div className="state">لا توجد منتجات</div>
+                    <div className="state">
+                      {error
+                        ? "Products could not be loaded."
+                        : "No products found."}
+                    </div>
                   </td>
                 </tr>
               ) : (
                 filteredProducts.map((product) => (
                   <tr key={product.itemId}>
                     <td>{renderProductImage(product)}</td>
-                    <td><strong>{product.itemId}</strong></td>
+
+                    <td>
+                      <strong>{product.itemId ?? "-"}</strong>
+                    </td>
+
                     <td>{product.name || "-"}</td>
                     <td>{product.qty ?? 0}</td>
                     <td>{product.purchasePrice ?? 0}</td>
@@ -454,8 +293,11 @@ export default function AvailableStock() {
                     <td>{product.offerPrice ?? 0}</td>
                     <td>{product.category || "-"}</td>
                     <td>{product.manufacturer || "-"}</td>
+
                     {canManageImages && (
-                      <td>{renderImageControls(product, "desktop")}</td>
+                      <td>
+                        {renderImageControls(product, "desktop")}
+                      </td>
                     )}
                   </tr>
                 ))
@@ -465,11 +307,17 @@ export default function AvailableStock() {
         </div>
       </section>
 
-      <section className="available-stock-cards" aria-label="المنتجات">
-        {loading ? (
-          <div className="state">جاري تحميل المنتجات...</div>
-        ) : filteredProducts.length === 0 ? (
-          <div className="state">لا توجد منتجات</div>
+      {/* Responsive Product Cards */}
+      <section
+        className="available-stock-cards"
+        aria-label="Available products"
+      >
+        {filteredProducts.length === 0 ? (
+          <div className="state">
+            {error
+              ? "Products could not be loaded."
+              : "No products found."}
+          </div>
         ) : (
           filteredProducts.map((product) => (
             <article
@@ -478,13 +326,18 @@ export default function AvailableStock() {
             >
               <div className="available-stock-card__header">
                 {renderProductImage(product)}
+
                 <div className="available-stock-card__identity">
-                  <h2>{product.name || "منتج بدون اسم"}</h2>
+                  <h2>{product.name || "Unnamed Product"}</h2>
+
                   <p>
-                    رقم المنتج: <strong>{product.itemId}</strong>
+                    Product ID:{" "}
+                    <strong>{product.itemId ?? "-"}</strong>
                   </p>
+
                   <p>
-                    الكمية: <strong>{product.qty ?? 0}</strong>
+                    Quantity:{" "}
+                    <strong>{product.qty ?? 0}</strong>
                   </p>
                 </div>
               </div>

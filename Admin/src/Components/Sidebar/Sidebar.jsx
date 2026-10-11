@@ -1,8 +1,10 @@
+
 import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
 
 import { useTheme } from "../../context/ThemeContext.jsx";
 import { useSidebarLogic } from "../../UI_Logic/SidebarLogic.jsx";
+import { getLoginTime } from "../../pages/Login/auth.js";
 
 import { RxDashboard } from "react-icons/rx";
 import { PiStorefrontThin } from "react-icons/pi";
@@ -10,22 +12,41 @@ import { LiaProductHunt } from "react-icons/lia";
 import { GrCatalog } from "react-icons/gr";
 import { GoGoal } from "react-icons/go";
 import { HiOutlineUsers } from "react-icons/hi2";
-
 import { MdDarkMode } from "react-icons/md";
 import { CiLight, CiSettings } from "react-icons/ci";
 import { RiLogoutBoxRLine } from "react-icons/ri";
 
 const NAV_ITEMS = [
-  { path: "/dashboard", label: "Dashboard", icon: <RxDashboard size={20}/> },
+  {
+    path: "/dashboard",
+    label: "Dashboard",
+    icon: <RxDashboard size={20} />,
+  },
   {
     path: "/availableStock",
     label: "Available Stock",
-    icon: <PiStorefrontThin size={20}/>,
+    icon: <PiStorefrontThin size={20} />,
   },
-  { path: "/products", label: "Products", icon: <LiaProductHunt size={20}/> },
-  { path: "/catalog", label: "Catalog", icon: <GrCatalog size={20}/> },
-  { path: "/orders", label: "Orders", icon: <GoGoal size={20}/> },
-  { path: "/users", label: "Users", icon: <HiOutlineUsers size={20}/> },
+  {
+    path: "/products",
+    label: "Products",
+    icon: <LiaProductHunt size={20} />,
+  },
+  {
+    path: "/catalog",
+    label: "Catalog",
+    icon: <GrCatalog size={20} />,
+  },
+  {
+    path: "/orders",
+    label: "Orders",
+    icon: <GoGoal size={20} />,
+  },
+  {
+    path: "/users",
+    label: "Users",
+    icon: <HiOutlineUsers size={20} />,
+  },
 ];
 
 export default function Sidebar({ user, onLogout }) {
@@ -41,15 +62,24 @@ export default function Sidebar({ user, onLogout }) {
     handleCloseMenu,
   } = useSidebarLogic(onLogout);
 
+  const loginTime = getLoginTime();
+
+  const formattedLoginTime = loginTime
+    ? loginTime.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : null;
+
   return (
     <>
       {/* Mobile Topbar */}
-      <div className="sb-topbar">
+      <header className="sb-topbar">
         <button
           type="button"
           className="sb-burger"
-          onClick={handleOpenMenu}
-          aria-label="Open menu"
+          onClick={open ? handleCloseMenu : handleOpenMenu}
+          aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           aria-controls="admin-sidebar"
         >
@@ -65,21 +95,24 @@ export default function Sidebar({ user, onLogout }) {
           className="sb-theme-btn"
           onClick={toggleTheme}
           aria-label={
-            theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+            theme === "dark"
+              ? "Switch to light mode"
+              : "Switch to dark mode"
           }
         >
           {theme === "dark" ? <CiLight /> : <MdDarkMode />}
         </button>
-      </div>
+      </header>
 
       {/* Mobile Overlay */}
-      {open && (
-        <div
-          className="sb-overlay"
-          onClick={handleCloseMenu}
-          aria-hidden="true"
-        />
-      )}
+      <button
+        type="button"
+        className={`sb-overlay ${open ? "sb-overlay-open" : ""}`}
+        onClick={handleCloseMenu}
+        aria-label="Close navigation menu"
+        tabIndex={open ? 0 : -1}
+        aria-hidden={!open}
+      />
 
       {/* Sidebar */}
       <aside
@@ -99,7 +132,9 @@ export default function Sidebar({ user, onLogout }) {
             className="sb-theme-btn"
             onClick={toggleTheme}
             aria-label={
-              theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
+              theme === "dark"
+                ? "Switch to light mode"
+                : "Switch to dark mode"
             }
           >
             {theme === "dark" ? <CiLight /> : <MdDarkMode />}
@@ -108,27 +143,20 @@ export default function Sidebar({ user, onLogout }) {
 
         {/* Navigation */}
         <nav className="sb-nav">
-          {NAV_ITEMS.map((item) =>
-            item.soon ? (
-              <span key={item.path} className="sb-item sb-soon">
-                <span>{item.label}</span>
-                <em>Soon</em>
-              </span>
-            ) : (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                end={item.path === "/dashboard"}
-                className={({ isActive }) =>
-                  `sb-item ${isActive ? "sb-active" : ""}`
-                }
-                onClick={handleNavigation}
-              >
-                <span className="icon">{item.icon}</span>
-                <span className="label">{item.label}</span>
-              </NavLink>
-            ),
-          )}
+          {NAV_ITEMS.map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              end={item.path === "/dashboard"}
+              className={({ isActive }) =>
+                `sb-item ${isActive ? "sb-active" : ""}`
+              }
+              onClick={handleNavigation}
+            >
+              <span className="icon">{item.icon}</span>
+              <span className="label">{item.label}</span>
+            </NavLink>
+          ))}
         </nav>
 
         {/* Bottom Area */}
@@ -148,7 +176,9 @@ export default function Sidebar({ user, onLogout }) {
               </div>
 
               <span className="sb-session-time">
-                Signed in at {sessionTime}
+                {formattedLoginTime
+                  ? `Logged in at ${formattedLoginTime}`
+                  : "Login time unavailable"}
               </span>
             </div>
           </div>
@@ -157,9 +187,12 @@ export default function Sidebar({ user, onLogout }) {
           <button
             type="button"
             className="sb-bottom-item"
-            onClick={handleSettings}
+            onClick={() => {
+              handleCloseMenu();
+              handleSettings();
+            }}
           >
-            <CiSettings />
+            <CiSettings size={20} />
             <span>Settings</span>
           </button>
 
@@ -169,7 +202,7 @@ export default function Sidebar({ user, onLogout }) {
             className="sb-bottom-item sb-logout"
             onClick={handleLogout}
           >
-            <RiLogoutBoxRLine />
+            <RiLogoutBoxRLine size={20} />
             <span>Log out</span>
           </button>
         </div>

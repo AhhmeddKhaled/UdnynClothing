@@ -1,40 +1,43 @@
+
 /* ======================================================
-   أدنين — Design Tokens
-   المصدر الوحيد للألوان والخطوط والمسافات في كل المشروع
-   ====================================================== */
+   Udnyn — Design Tokens
+   المصدر الموحد للألوان والخطوط والمسافات
+====================================================== */
 
 :root {
-  /* ======================================================
-     الألوان الأساسية
-     ====================================================== */
+  /* ==================== Colors ==================== */
 
+  /* Neutral colors — Light Mode */
   --color-ink: #2a1f26;
+  --color-paper: #ffffff;
+  --color-sand: #ffffff;
+  --color-sand-deep: #f3f4f6;
+  --color-card: #f8f9fb;
+  --color-card-hover: #f1f3f6;
 
+  /* Plum */
   --color-plum: #3b2436;
   --color-plum-deep: #2a1826;
   --color-plum-soft: #5a3f52;
   --color-plum-tint: #c9afc0;
 
+  /* Gold */
   --color-gold: #b08968;
   --color-gold-deep: #8c6a4f;
 
+  /* Success */
   --color-sage: #5b7b5e;
   --color-sage-bg: #e7eee4;
 
+  /* Danger */
   --color-clay: #b5563d;
   --color-clay-bg: #f6e4dd;
 
-  --color-sand: #fff;
-  --color-sand-deep: #ececec;
-
-  --color-paper: #f7f7f7;
-
-  --color-line: rgba(42, 31, 38, 0.12);
+  /* Borders */
+  --color-line: #e5e7eb;
   --color-line-dark: rgba(255, 255, 255, 0.12);
 
-  /* ======================================================
-     الخطوط
-     ====================================================== */
+  /* ==================== Typography ==================== */
 
   --font-display: "Aref Ruqaa", serif;
 
@@ -44,9 +47,7 @@
     Tahoma,
     sans-serif;
 
-  /* ======================================================
-     سلّم أحجام النص
-     ====================================================== */
+  /* ==================== Font Sizes ==================== */
 
   --text-xs: 12px;
   --text-sm: 13px;
@@ -56,9 +57,7 @@
   --text-2xl: 26px;
   --text-display: 36px;
 
-  /* ======================================================
-     المسافات — 4px Scale
-     ====================================================== */
+  /* ==================== Spacing — 4px Scale ==================== */
 
   --space-1: 4px;
   --space-2: 8px;
@@ -69,83 +68,119 @@
   --space-8: 32px;
   --space-10: 40px;
 
-  /* ======================================================
-     الزوايا
-     ====================================================== */
+  /* ==================== Radius ==================== */
 
   --radius-sm: 2px;
   --radius-md: 6px;
   --radius-lg: 12px;
   --radius-full: 999px;
 
-  /* ======================================================
-     Shadows
-     ====================================================== */
+  /* ==================== Shadows ==================== */
 
-  --shadow-card: 0 1px 3px rgba(42, 31, 38, 0.08);
+  --shadow-card: 0 1px 3px rgba(42, 31, 38, 0.06);
 }
 
 /* ======================================================
    Dark Theme
-   Navy / Plum — هادي ومريح للعين
-   ====================================================== */
+   الحفاظ على لوحة الألوان الحالية
+====================================================== */
 
 [data-theme="dark"] {
-  /* ======================================================
-     Backgrounds
-     ====================================================== */
-
+  /* Backgrounds */
   --color-paper: #17202b;
   --color-sand: #1d2936;
   --color-sand-deep: #263443;
+  --color-card: #1d2936;
+  --color-card-hover: #263443;
 
-  /* ======================================================
-     Main Text
-     ====================================================== */
-
+  /* Main Text */
   --color-ink: #eee9ec;
 
+  /* Plum */
   --color-plum-soft: #b9aeb8;
   --color-plum-tint: #8f8190;
-
-  /* ======================================================
-     Plum
-     ====================================================== */
-
   --color-plum: #d1b8c9;
   --color-plum-deep: #e3d5df;
 
-  /* ======================================================
-     Gold
-     ====================================================== */
-
+  /* Gold */
   --color-gold: #d0ad87;
   --color-gold-deep: #c39b72;
 
-  /* ======================================================
-     Sage
-     ====================================================== */
-
+  /* Success */
   --color-sage: #82b394;
   --color-sage-bg: #20352c;
 
-  /* ======================================================
-     Clay / Danger
-     ====================================================== */
-
+  /* Danger */
   --color-clay: #d8897c;
   --color-clay-bg: #382725;
 
-  /* ======================================================
-     Borders
-     ====================================================== */
-
+  /* Borders */
   --color-line: rgba(238, 233, 236, 0.11);
   --color-line-dark: rgba(255, 255, 255, 0.14);
 
-  /* ======================================================
-     Shadow
-     ====================================================== */
-
+  /* Shadows */
   --shadow-card: 0 1px 3px rgba(8, 15, 24, 0.28);
+}
+
+/* ======================================================
+   Global Theme Application
+====================================================== */
+
+html,
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+body {
+  margin: 0;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+/* Common cards */
+.card,
+.stat-card,
+.dashboard-card,
+.product-card,
+.stock-card {
+  background: var(--color-card);
+  color: var(--color-ink);
+  border: 1px solid var(--color-line);
+  box-shadow: var(--shadow-card);
+}
+
+/* Inputs */
+input,
+select,
+textarea {
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border-color: var(--color-line);
+}
+
+/* Smooth theme changes */
+body,
+.dashboard-layout,
+.dashboard-content,
+.sb-aside,
+.sb-topbar,
+.card,
+.stat-card,
+.dashboard-card,
+.product-card,
+.stock-card,
+input,
+select,
+textarea {
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }

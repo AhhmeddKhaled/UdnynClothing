@@ -4,7 +4,8 @@ import { useOutletContext } from "react-router-dom";
 import ContentHeader from "../../Components/ContentHeader/ContentHeader.jsx";
 import { authFetch } from "../Login/auth.js";
 import { useDashboardLogic } from "../../UI_Logic/DashboardLogic.jsx";
-import LoadingSpinner from '../../Components/LoadingSpinner/LoadingSpinner.jsx'
+import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner.jsx";
+import StatCard from '../../Components/StatCard/StatCard';
 
 export default function Dashboard() {
   const { user } = useOutletContext();
@@ -40,9 +41,27 @@ export default function Dashboard() {
     missingDataTotal,
   } = useDashboardLogic(authFetch);
 
-  // Loading 
-  if(loading) return <LoadingSpinner />
+  // Loading
+  if (loading) return <LoadingSpinner />;
 
+  // Error 
+  if (error) {
+    return (
+      <div className="dash-state">
+        <b>Couldn't load dashboard data</b>
+        <p>{error}</p>
+        <button
+          type="button"
+          className="dash-btn dash-btn-primary dash-retry-btn"
+          onClick={load}
+          >
+          Try again
+        </button>
+      </div>
+    );
+}
+
+  
   return (
     <div className="dashboard">
       <ContentHeader
@@ -51,20 +70,6 @@ export default function Dashboard() {
         user={user}
         sessionTime={sessionTime}
       />
-
-      {error && (
-        <div className="dash-state">
-          <b>Couldn't load dashboard data</b>
-          <p>{error}</p>
-          <button
-            type="button"
-            className="dash-btn dash-btn-primary dash-retry-btn"
-            onClick={load}
-          >
-            Try again
-          </button>
-        </div>
-      )}
 
       <section className="dash-stats">
         <StatCard
@@ -235,9 +240,7 @@ export default function Dashboard() {
                           <div
                             className="dash-table-fill"
                             style={{
-                              width: `${
-                                (count / manufacturers[0][1]) * 100
-                              }%`,
+                              width: `${(count / manufacturers[0][1]) * 100}%`,
                             }}
                           />
                         </div>
@@ -291,30 +294,12 @@ export default function Dashboard() {
           )}
         </article>
       </section>
-
     </div>
   );
+
 }
 
-function StatCard({
-  title,
-  value,
-  description,
-  icon,
-  iconStyle = "accent",
-}) {
-  return (
-    <article className="dash-card dash-stat">
-      <div className={`dash-stat-icon dash-icon-${iconStyle}`}>
-        {icon}
-      </div>
 
-      <div className="dash-label">{title}</div>
-      <div className="dash-value">{value}</div>
-      <div className="dash-hint">{description}</div>
-    </article>
-  );
-}
 
 function AlertRow({ title, description, count, variant }) {
   return (
@@ -324,9 +309,7 @@ function AlertRow({ title, description, count, variant }) {
         <p>{description}</p>
       </div>
 
-      <span className={`dash-badge dash-badge-${variant}`}>
-        {count}
-      </span>
+      <span className={`dash-badge dash-badge-${variant}`}>{count}</span>
     </div>
   );
 }
@@ -376,6 +359,3 @@ function AlertIcon() {
     </svg>
   );
 }
-
-
-
