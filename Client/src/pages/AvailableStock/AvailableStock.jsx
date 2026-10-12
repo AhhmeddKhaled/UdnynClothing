@@ -2,6 +2,8 @@ import "./AvailableStock.css";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { authFetch } from "../../services/api.js";
+
 const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
 const API_ENDPOINT = `${API_URL}/api/availableStock`;
 const PAGE_SIZE = 40;
@@ -21,7 +23,7 @@ export default function AvailableStock() {
     setFetchError(false);
 
     try {
-      const response = await fetch(API_ENDPOINT, {
+      const response = await authFetch(API_ENDPOINT, {
         method: "GET",
         headers: {
           Accept: "application/json",
@@ -57,20 +59,15 @@ export default function AvailableStock() {
     loadProducts();
   }, [loadProducts]);
 
-  const error = fetchError
-    ? "تعذر تحميل المنتجات المتاحة حاليًا"
-    : "";
+  const error = fetchError ? "تعذر تحميل المنتجات المتاحة حاليًا" : "";
 
   const manufacturers = useMemo(() => {
     return [
       ...new Set(
         products
-          .filter(
-            (product) =>
-              Number(product.qty) > 0 && product.manufacturer
-          )
+          .filter((product) => Number(product.qty) > 0 && product.manufacturer)
           .map((product) => String(product.manufacturer).trim())
-          .filter(Boolean)
+          .filter(Boolean),
       ),
     ].sort((a, b) => a.localeCompare(b, "ar"));
   }, [products]);
@@ -79,12 +76,9 @@ export default function AvailableStock() {
     return [
       ...new Set(
         products
-          .filter(
-            (product) =>
-              Number(product.qty) > 0 && product.category
-          )
+          .filter((product) => Number(product.qty) > 0 && product.category)
           .map((product) => String(product.category).trim())
-          .filter(Boolean)
+          .filter(Boolean),
       ),
     ].sort((a, b) => a.localeCompare(b, "ar"));
   }, [products]);
@@ -102,10 +96,7 @@ export default function AvailableStock() {
         return false;
       }
 
-      if (
-        category &&
-        String(product.category || "").trim() !== category
-      ) {
+      if (category && String(product.category || "").trim() !== category) {
         return false;
       }
 
@@ -115,11 +106,9 @@ export default function AvailableStock() {
       const itemId = String(product.itemId || "").toLowerCase();
       const barcode = String(product.barcode || "").toLowerCase();
       const productManufacturer = String(
-        product.manufacturer || ""
+        product.manufacturer || "",
       ).toLowerCase();
-      const productCategory = String(
-        product.category || ""
-      ).toLowerCase();
+      const productCategory = String(product.category || "").toLowerCase();
 
       return (
         name.includes(searchValue) ||
@@ -158,9 +147,7 @@ export default function AvailableStock() {
       return value;
     }
 
-    const normalizedPath = value.startsWith("/")
-      ? value
-      : `/${value}`;
+    const normalizedPath = value.startsWith("/") ? value : `/${value}`;
 
     return `${API_URL}${normalizedPath}`;
   };
@@ -169,10 +156,7 @@ export default function AvailableStock() {
     return (
       <main className="available-stock-page" dir="rtl">
         <div className="state available-stock-loading">
-          <span
-            className="available-stock-spinner"
-            aria-hidden="true"
-          />
+          <span className="available-stock-spinner" aria-hidden="true" />
           <span>جاري تحميل المنتجات...</span>
         </div>
       </main>
@@ -184,10 +168,7 @@ export default function AvailableStock() {
       <main className="available-stock-page" dir="rtl">
         <div className="state">
           <b>{error}</b>
-          <button
-            onClick={loadProducts}
-            className="btn btn-primary"
-          >
+          <button onClick={loadProducts} className="btn btn-primary">
             إعادة المحاولة
           </button>
         </div>
@@ -200,9 +181,7 @@ export default function AvailableStock() {
       <header className="available-stock-header">
         <div>
           <h1 className="ds-page-title">البضاعة المتاحة</h1>
-          <p className="ds-page-sub">
-            عرض المنتجات والكميات والأسعار المتاحة
-          </p>
+          <p className="ds-page-sub">عرض المنتجات والكميات والأسعار المتاحة</p>
         </div>
       </header>
 
@@ -248,10 +227,7 @@ export default function AvailableStock() {
         </label>
 
         <div className="stock-actions">
-          <button
-            onClick={loadProducts}
-            className="btn btn-secondary"
-          >
+          <button onClick={loadProducts} className="btn btn-secondary">
             تحديث
           </button>
 
@@ -271,8 +247,7 @@ export default function AvailableStock() {
       </section>
 
       <div className="available-stock-count">
-        عدد المنتجات المتاحة:{" "}
-        <strong>{filteredProducts.length}</strong>
+        عدد المنتجات المتاحة: <strong>{filteredProducts.length}</strong>
       </div>
 
       <section className="available-stock-grid">
@@ -282,12 +257,7 @@ export default function AvailableStock() {
           return (
             <article
               className="stock-product-card"
-              key={
-                product._id ||
-                product.itemId ||
-                product.barcode ||
-                index
-              }
+              key={product._id || product.itemId || product.barcode || index}
             >
               <div className="stock-product-image">
                 {imageUrl ? (
@@ -302,9 +272,7 @@ export default function AvailableStock() {
                     }}
                   />
                 ) : (
-                  <div className="stock-no-image">
-                    لا توجد صورة
-                  </div>
+                  <div className="stock-no-image">لا توجد صورة</div>
                 )}
 
                 <span className="stock-item-id badge badge-neutral">
@@ -315,9 +283,7 @@ export default function AvailableStock() {
               <div className="stock-product-info">
                 <div className="stock-product-title">
                   <h2>{product.name}</h2>
-                  {product.manufacturer && (
-                    <span>{product.manufacturer}</span>
-                  )}
+                  {product.manufacturer && <span>{product.manufacturer}</span>}
                 </div>
 
                 <div className="stock-prices">
@@ -370,9 +336,7 @@ export default function AvailableStock() {
         <div className="available-stock-more">
           <button
             className="btn btn-secondary"
-            onClick={() =>
-              setVisibleCount((count) => count + PAGE_SIZE)
-            }
+            onClick={() => setVisibleCount((count) => count + PAGE_SIZE)}
           >
             عرض المزيد
           </button>

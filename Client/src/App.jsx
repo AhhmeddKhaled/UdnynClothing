@@ -148,8 +148,6 @@ function AppContent() {
 
   return (
     <>
-      {isLoading && <LoadingSpinner />}
-
       <Navbar
         user={user}
         language={language}
@@ -183,8 +181,6 @@ function AppContent() {
 
 export default function App() {
   return (
-    <LoadingProvider>
       <AppContent />
-    </LoadingProvider>
   );
 }
