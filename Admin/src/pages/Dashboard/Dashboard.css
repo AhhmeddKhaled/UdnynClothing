@@ -4,12 +4,15 @@
    ====================================================== */
 
 .dashboard {
+  width: 100%;
+  min-width: 0;
   min-height: 100%;
   padding-bottom: var(--space-5);
   color: var(--color-ink);
   font-family: var(--font-body);
 }
 
+.dashboard,
 .dashboard * {
   box-sizing: border-box;
 }
@@ -29,14 +32,13 @@
   margin-bottom: var(--space-6);
 }
 
-
-
 /* ======================================================
    Section Headers
    ====================================================== */
 
 .dash-section-head {
   margin-bottom: var(--space-4);
+  min-width: 0;
 }
 
 .dash-section-head h2 {
@@ -44,6 +46,7 @@
   color: var(--color-plum);
   font-size: var(--text-base);
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .dash-section-head p {
@@ -51,6 +54,25 @@
   color: var(--color-plum-soft);
   font-size: var(--text-xs);
   line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+/* ======================================================
+   Statistics Cards
+   ====================================================== */
+
+.dash-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
+  width: 100%;
+  min-width: 0;
+  margin-bottom: var(--space-5);
+}
+
+.dash-stats > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 /* ======================================================
@@ -61,11 +83,15 @@
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
   gap: var(--space-5);
+  width: 100%;
+  min-width: 0;
   margin-bottom: var(--space-5);
 }
 
 .dash-cols > .dash-card {
+  width: 100%;
   min-width: 0;
+  max-width: 100%;
 }
 
 /* ======================================================
@@ -76,6 +102,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
+  min-width: 0;
 }
 
 .dash-swatch-row {
@@ -83,6 +110,7 @@
   grid-template-columns: minmax(90px, 120px) minmax(40px, 1fr) 36px;
   align-items: center;
   gap: var(--space-3);
+  min-width: 0;
 }
 
 .dash-swatch-name {
@@ -126,6 +154,7 @@
   justify-content: center;
   flex-wrap: wrap;
   gap: var(--space-5);
+  min-width: 0;
 }
 
 .dash-ring {
@@ -188,6 +217,7 @@
   grid-template-columns: 8px minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-2);
+  min-width: 0;
 }
 
 .dash-coverage-row b {
@@ -220,7 +250,9 @@
 
 .dash-table-wrap {
   width: 100%;
+  min-width: 0;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .dash-table {
@@ -272,6 +304,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  min-width: 0;
 }
 
 .dash-alert-row {
@@ -279,6 +312,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
+  min-width: 0;
   padding: var(--space-3);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
@@ -286,6 +320,7 @@
 }
 
 .dash-alert-content {
+  flex: 1;
   min-width: 0;
 }
 
@@ -294,6 +329,7 @@
   color: var(--color-ink);
   font-size: var(--text-sm);
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .dash-alert-content p {
@@ -301,6 +337,7 @@
   color: var(--color-plum-soft);
   font-size: var(--text-xs);
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .dash-badge {
@@ -347,6 +384,7 @@
   font-size: var(--text-sm);
   line-height: 1.7;
   text-align: center;
+  overflow-wrap: anywhere;
 }
 
 .dash-state b {
@@ -364,55 +402,229 @@
   margin-top: var(--space-2);
 }
 
-
-
 /* ======================================================
-   Responsive
+   Tablet
    ====================================================== */
 
-@media (max-width: 1000px) {
-  .dash-stats {
+@media screen and (max-width: 1000px) {
+  .dashboard .dash-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
   }
 
-  .dash-cols {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 600px) {
-  .dashboard > .header {
-    margin-bottom: var(--space-5);
-  }
-
-  .dash-stats {
-    gap: var(--space-2);
-    margin-bottom: var(--space-5);
-  }
-
-  .dash-card {
-    padding: var(--space-3);
-  }
-
-  .dash-value {
-    font-size: var(--text-xl);
-  }
-
-  .dash-hint {
-    overflow-wrap: anywhere;
-  }
-
-  .dash-swatch-row {
-    grid-template-columns: minmax(70px, 100px) minmax(35px, 1fr) 28px;
-    gap: var(--space-2);
-  }
-
-  .dash-ring-box {
+  .dashboard .dash-cols {
+    grid-template-columns: minmax(0, 1fr);
     gap: var(--space-4);
   }
 
-  .dash-ring {
-    width: 125px;
+  .dashboard .dash-card {
+    min-width: 0;
+    max-width: 100%;
   }
 
+  .dashboard .dash-ring-box {
+    justify-content: center;
+  }
+
+  .dashboard .dash-table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+  }
+}
+
+/* ======================================================
+   Mobile — One Statistics Card Per Row
+   ====================================================== */
+
+@media screen and (max-width: 600px) {
+  .dashboard {
+    width: 100%;
+    min-width: 0;
+    padding-bottom: var(--space-4);
+  }
+
+  .dashboard > .header {
+    margin-bottom: var(--space-4);
+  }
+
+  /* One StatCard per row */
+  .dashboard .dash-stats {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    width: 100%;
+    margin-bottom: var(--space-4);
+  }
+
+  .dashboard .dash-stats > * {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* Stack both dashboard sections */
+  .dashboard .dash-cols,
+  .dashboard .dash-cols.dash-cols-bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    width: 100%;
+    margin-bottom: 14px;
+  }
+
+  .dashboard .dash-cols > .dash-card {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding: 14px;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+  }
+
+  /* Headings */
+  .dashboard .dash-section-head {
+    margin-bottom: var(--space-3);
+  }
+
+  .dashboard .dash-section-head h2 {
+    font-size: var(--text-base);
+    line-height: 1.45;
+  }
+
+  .dashboard .dash-section-head p {
+    font-size: var(--text-xs);
+    line-height: 1.6;
+  }
+
+  /* Category rows */
+  .dashboard .dash-swatches {
+    width: 100%;
+    gap: 14px;
+  }
+
+  .dashboard .dash-swatch-row {
+    grid-template-columns: minmax(0, 85px) minmax(0, 1fr) 28px;
+    gap: 8px;
+  }
+
+  .dashboard .dash-swatch-name {
+    min-width: 0;
+    font-size: 11px;
+  }
+
+  .dashboard .dash-swatch-track {
+    min-width: 0;
+    height: 6px;
+  }
+
+  .dashboard .dash-swatch-count {
+    font-size: 11px;
+  }
+
+  /* Image coverage */
+  .dashboard .dash-ring-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+  }
+
+  .dashboard .dash-ring {
+    width: 125px;
+    max-width: 100%;
+  }
+
+  .dashboard .dash-ring-label {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    gap: 12px;
+  }
+
+  .dashboard .dash-coverage-row {
+    grid-template-columns: 8px minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+
+  /* Table scrolls inside its own card */
+  .dashboard .dash-table-wrap {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dashboard .dash-table {
+    width: 100%;
+    min-width: 400px;
+    font-size: 11px;
+  }
+
+  .dashboard .dash-table th,
+  .dashboard .dash-table td {
+    padding: 10px 8px;
+    white-space: nowrap;
+  }
+
+  /* Inventory alerts */
+  .dashboard .dash-alert-list {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .dashboard .dash-alert-row {
+    align-items: flex-start;
+    width: 100%;
+    min-width: 0;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .dashboard .dash-alert-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .dashboard .dash-alert-content strong {
+    font-size: var(--text-sm);
+    line-height: 1.5;
+  }
+
+  .dashboard .dash-alert-content p {
+    font-size: var(--text-xs);
+    line-height: 1.6;
+  }
+}
+
+/* ======================================================
+   Extra Small Phones
+   ====================================================== */
+
+@media screen and (max-width: 380px) {
+  .dashboard .dash-stats {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .dashboard .dash-cols > .dash-card {
+    padding: 12px;
+  }
+
+  .dashboard .dash-swatch-row {
+    grid-template-columns: minmax(0, 72px) minmax(0, 1fr) 24px;
+    gap: 6px;
+  }
+
+  .dashboard .dash-ring {
+    width: 115px;
+  }
+
+  .dashboard .dash-alert-row {
+    padding: 10px;
+  }
 }

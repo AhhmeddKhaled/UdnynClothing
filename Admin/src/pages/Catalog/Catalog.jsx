@@ -15,15 +15,11 @@ const ALLOWED_IMAGE_TYPES = [
 ];
 
 function getImageUrl(imagePath) {
-  if (!imagePath || typeof imagePath !== "string") {
-    return "";
-  }
+  if (!imagePath || typeof imagePath !== "string") return "";
 
   const path = imagePath.trim();
 
-  if (/^https?:\/\//i.test(path)) {
-    return path;
-  }
+  if (/^https?:\/\//i.test(path)) return path;
 
   return `${API_URL}${path.startsWith("/") ? "" : "/"}${path}`;
 }
@@ -31,9 +27,7 @@ function getImageUrl(imagePath) {
 async function readResponse(response) {
   const text = await response.text();
 
-  if (!text) {
-    return {};
-  }
+  if (!text) return {};
 
   try {
     return JSON.parse(text);
@@ -43,15 +37,18 @@ async function readResponse(response) {
 }
 
 function getErrorMessage(data, fallback) {
-  return (
-    data?.message ||
-    data?.error ||
-    fallback
-  );
+  return data?.message || data?.error || fallback;
 }
 
 function getProductId(product) {
   return String(product?._id ?? product?.id ?? "");
+}
+
+function formatPrice(price) {
+  return Number(price || 0).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 }
 
 export default function Catalog() {
@@ -80,14 +77,11 @@ export default function Catalog() {
   const previewUrlRef = useRef("");
 
   const loadProducts = useCallback(async (showLoader = true) => {
-    if (showLoader) {
-      setLoading(true);
-    }
+    if (showLoader) setLoading(true);
 
     setError("");
 
     try {
-      // Use the same authenticated request helper as create/delete.
       const response = await authFetch("/api/catalog", {
         method: "GET",
       });
@@ -122,9 +116,7 @@ export default function Catalog() {
       setError(err.message || "فشل تحميل منتجات الكتالوج");
       throw err;
     } finally {
-      if (showLoader) {
-        setLoading(false);
-      }
+      if (showLoader) setLoading(false);
     }
   }, []);
 
@@ -132,7 +124,6 @@ export default function Catalog() {
     loadProducts().catch(() => {});
   }, [loadProducts]);
 
-  // Revoke the previous preview URL to avoid leaking browser memory.
   function clearImagePreview() {
     if (previewUrlRef.current) {
       URL.revokeObjectURL(previewUrlRef.current);
@@ -145,9 +136,7 @@ export default function Catalog() {
   function handleImageChange(event) {
     const file = event.target.files?.[0];
 
-    if (!file) {
-      return;
-    }
+    if (!file) return;
 
     setError("");
     setSuccess("");
@@ -165,7 +154,6 @@ export default function Catalog() {
     }
 
     clearImagePreview();
-
     setImageFile(file);
 
     const previewUrl = URL.createObjectURL(file);
@@ -194,9 +182,7 @@ export default function Catalog() {
   }
 
   function closeForm() {
-    if (saving) {
-      return;
-    }
+    if (saving) return;
 
     resetForm();
     setError("");
@@ -206,9 +192,7 @@ export default function Catalog() {
   async function handleSubmit(event) {
     event.preventDefault();
 
-    if (saving) {
-      return;
-    }
+    if (saving) return;
 
     setError("");
     setSuccess("");
@@ -272,18 +256,12 @@ export default function Catalog() {
       const data = await readResponse(response);
 
       if (!response.ok) {
-        throw new Error(
-          getErrorMessage(data, "فشل إضافة المنتج")
-        );
+        throw new Error(getErrorMessage(data, "فشل إضافة المنتج"));
       }
 
-      // Reload the authoritative list from the server.
-      // This avoids depending on whether POST returns data.product.
       try {
         await loadProducts(false);
       } catch (refreshError) {
-        // The POST succeeded, so don't report creation as failed
-        // just because the follow-up list refresh failed.
         console.error(
           "Product created, but catalog refresh failed:",
           refreshError
@@ -310,17 +288,13 @@ export default function Catalog() {
       return;
     }
 
-    if (deletingId !== null) {
-      return;
-    }
+    if (deletingId !== null) return;
 
     const confirmed = window.confirm(
       `هل أنت متأكد إنك عايز تحذف المنتج "${product.name || productId}"؟`
     );
 
-    if (!confirmed) {
-      return;
-    }
+    if (!confirmed) return;
 
     setError("");
     setSuccess("");
@@ -329,24 +303,17 @@ export default function Catalog() {
     try {
       const response = await authFetch(
         `/api/catalog/${encodeURIComponent(productId)}`,
-        {
-          method: "DELETE",
-        }
+        { method: "DELETE" }
       );
 
       const data = await readResponse(response);
 
       if (!response.ok) {
-        throw new Error(
-          getErrorMessage(data, "فشل حذف المنتج")
-        );
+        throw new Error(getErrorMessage(data, "فشل حذف المنتج"));
       }
 
-      // Compare IDs as strings to avoid number/string mismatches.
       setProducts((current) =>
-        current.filter(
-          (item) => getProductId(item) !== productId
-        )
+        current.filter((item) => getProductId(item) !== productId)
       );
 
       setSuccess(data.message || "تم حذف المنتج بنجاح");
@@ -363,6 +330,53 @@ export default function Catalog() {
       <div className="catalog">
         <div className="catalog-state">Loading catalog...</div>
       </div>
+    );
+  }
+
+  function renderProductImage(product, className = "") {
+    const imagePath = product.imagePath ?? product.image ?? "";
+
+    return (
+      <div className={`catalog-product-image ${className}`}>
+        {imagePath ? (
+          <img
+            src={getImageUrl(imagePath)}
+            alt={product.name || "Product"}
+            loading="lazy"
+          />
+        ) : (
+          <span>No image</span>
+        )}
+      </div>
+    );
+  }
+
+  function renderFeatured(product) {
+    return product.isFeatured ? (
+      <span className="catalog-badge catalog-badge-featured">
+        Featured
+      </span>
+    ) : (
+      <span className="catalog-muted">No</span>
+    );
+  }
+
+  function renderDeleteButton(product, mobile = false) {
+    const productId = getProductId(product);
+
+    return (
+      <button
+        type="button"
+        className="catalog-delete-button"
+        disabled={deletingId !== null || !productId}
+        onClick={() => handleDelete(product)}
+      >
+        {deletingId === productId
+          ? "Deleting..."
+          : mobile
+            ? "Delete product"
+            : "Delete"}
+      </button>
     );
   }
 
@@ -389,13 +403,19 @@ export default function Catalog() {
       </div>
 
       {error && (
-        <div className="catalog-message catalog-message-error" role="alert">
+        <div
+          className="catalog-message catalog-message-error"
+          role="alert"
+        >
           {error}
         </div>
       )}
 
       {success && (
-        <div className="catalog-message catalog-message-success" role="status">
+        <div
+          className="catalog-message catalog-message-success"
+          role="status"
+        >
           {success}
         </div>
       )}
@@ -572,95 +592,114 @@ export default function Catalog() {
         </div>
 
         {products.length === 0 ? (
-          <div className="catalog-empty">No catalog products found.</div>
+          <div className="catalog-empty">
+            No catalog products found.
+          </div>
         ) : (
-          <div className="catalog-table-wrap">
-            <table className="catalog-table">
-              <thead>
-                <tr>
-                  <th>Image</th>
-                  <th>Product</th>
-                  <th>Category</th>
-                  <th>Manufacturer</th>
-                  <th>Price</th>
-                  <th>Featured</th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
+          <>
+            {/* Desktop table */}
+            <div className="catalog-table-wrap catalog-desktop-table">
+              <table className="catalog-table">
+                <thead>
+                  <tr>
+                    <th>Image</th>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Manufacturer</th>
+                    <th>Price</th>
+                    <th>Featured</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
 
-              <tbody>
-                {products.map((product) => {
-                  const productId = getProductId(product);
-                  const imagePath =
-                    product.imagePath ?? product.image ?? "";
+                <tbody>
+                  {products.map((product) => {
+                    const productId = getProductId(product);
 
-                  return (
-                    <tr key={productId || product.name}>
-                      <td>
-                        <div className="catalog-product-image">
-                          {imagePath ? (
-                            <img
-                              src={getImageUrl(imagePath)}
-                              alt={product.name || "Product"}
-                            />
-                          ) : (
-                            <span>No image</span>
+                    return (
+                      <tr key={productId || product.name}>
+                        <td>{renderProductImage(product)}</td>
+
+                        <td>
+                          <div className="catalog-product-name">
+                            {product.name}
+                          </div>
+
+                          {product.description && (
+                            <div className="catalog-product-description">
+                              {product.description}
+                            </div>
                           )}
-                        </div>
-                      </td>
+                        </td>
 
-                      <td>
-                        <div className="catalog-product-name">
-                          {product.name}
-                        </div>
+                        <td>{product.category || "—"}</td>
+                        <td>{product.manufacturer || "—"}</td>
+                        <td>{formatPrice(product.price)}</td>
+                        <td>{renderFeatured(product)}</td>
+                        <td>{renderDeleteButton(product)}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile product cards */}
+            <div className="catalog-mobile-products">
+              {products.map((product) => {
+                const productId = getProductId(product);
+
+                return (
+                  <article
+                    className="catalog-mobile-product"
+                    key={productId || product.name}
+                  >
+                    <div className="catalog-mobile-product-header">
+                      {renderProductImage(
+                        product,
+                        "catalog-mobile-image"
+                      )}
+
+                      <div className="catalog-mobile-product-info">
+                        <h3>{product.name || "Unnamed product"}</h3>
 
                         {product.description && (
-                          <div className="catalog-product-description">
+                          <p className="catalog-mobile-description">
                             {product.description}
-                          </div>
+                          </p>
                         )}
-                      </td>
 
-                      <td>{product.category || "—"}</td>
-                      <td>{product.manufacturer || "—"}</td>
+                        <strong className="catalog-mobile-price">
+                          {formatPrice(product.price)}
+                        </strong>
+                      </div>
+                    </div>
 
-                      <td>
-                        {Number(product.price || 0).toLocaleString("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
-                      </td>
+                    <div className="catalog-mobile-product-details">
+                      <div className="catalog-mobile-detail">
+                        <span>Category</span>
+                        <strong>{product.category || "—"}</strong>
+                      </div>
 
-                      <td>
-                        {product.isFeatured ? (
-                          <span className="catalog-badge catalog-badge-featured">
-                            Featured
-                          </span>
-                        ) : (
-                          <span className="catalog-muted">No</span>
-                        )}
-                      </td>
+                      <div className="catalog-mobile-detail">
+                        <span>Manufacturer</span>
+                        <strong>{product.manufacturer || "—"}</strong>
+                      </div>
 
-                      <td>
-                        <button
-                          type="button"
-                          className="catalog-delete-button"
-                          disabled={
-                            deletingId !== null || !productId
-                          }
-                          onClick={() => handleDelete(product)}
-                        >
-                          {deletingId === productId
-                            ? "Deleting..."
-                            : "Delete"}
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                      <div className="catalog-mobile-detail">
+                        <span>Featured</span>
+                        <div>{renderFeatured(product)}</div>
+                      </div>
+                    </div>
+
+                    <div className="catalog-mobile-product-actions">
+                      {renderDeleteButton(product, true)}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </>
         )}
       </section>
     </div>
