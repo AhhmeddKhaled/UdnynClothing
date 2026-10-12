@@ -1,13 +1,20 @@
 import "./Orders.css";
 import { useOrdersLogic } from "../../UI_Logic/OrdersLogic.jsx";
+import { useNavigate } from "react-router-dom";
+
 import {
   HiOutlineClipboardList,
   HiOutlineSearch,
   HiOutlineX,
   HiOutlineEye,
+  HiOutlineTrash,
   HiOutlinePlus,
 } from "react-icons/hi";
+
+import { GoDownload } from "react-icons/go";
+
 import ContentHeader from "../../Components/ContentHeader/ContentHeader.jsx";
+import Button from "../../Components/Button/Button";
 
 function Icon({ name, size = 18 }) {
   const icons = {
@@ -15,18 +22,26 @@ function Icon({ name, size = 18 }) {
     search: HiOutlineSearch,
     close: HiOutlineX,
     eye: HiOutlineEye,
-    plus: HiOutlinePlus,
+    trash: HiOutlineTrash,
   };
 
   const IconComponent = icons[name];
 
   if (!IconComponent) return null;
 
-  return <IconComponent aria-hidden="true" size={size} focusable="false" />;
+  return (
+    <IconComponent
+      aria-hidden="true"
+      size={size}
+      focusable="false"
+    />
+  );
 }
 
-function StatusBadge({ status, statuses }) {
-  const normalizedStatus = statuses.includes(status) ? status : "unknown";
+function StatusBadge({ status, statuses = [] }) {
+  const normalizedStatus = statuses.includes(status)
+    ? status
+    : "unknown";
 
   return (
     <span className={`orders-status orders-status-${normalizedStatus}`}>
@@ -88,7 +103,10 @@ function OrderDetailsModal({ order, logic }) {
             <div>
               <span>Order status</span>
               <strong>
-                <StatusBadge status={order.status} statuses={statuses} />
+                <StatusBadge
+                  status={order.status}
+                  statuses={statuses}
+                />
               </strong>
             </div>
 
@@ -104,23 +122,35 @@ function OrderDetailsModal({ order, logic }) {
 
             <div>
               <span>Customer phone</span>
-              <strong>{getCustomerPhone(order) || "Not available"}</strong>
+              <strong>
+                {getCustomerPhone(order) || "Not available"}
+              </strong>
             </div>
 
             <div>
               <span>Email</span>
-              <strong>{getCustomerEmail(order) || "Not available"}</strong>
+              <strong>
+                {getCustomerEmail(order) || "Not available"}
+              </strong>
+            </div>
+
+            <div>
+              <span>Governorate</span>
+              <strong>{order.governorate || "Not specified"}</strong>
             </div>
 
             <div className="orders-detail-address">
               <span>Shipping address</span>
               <strong>
-                {order.shippingAddress || "No shipping address provided"}
+                {order.shippingAddress ||
+                  "No shipping address provided"}
               </strong>
             </div>
           </div>
 
-          <h3 className="orders-detail-section-title">Order items</h3>
+          <h3 className="orders-detail-section-title">
+            Order items
+          </h3>
 
           <div className="orders-detail-items">
             {(order.items || []).map((item, index) => (
@@ -137,7 +167,9 @@ function OrderDetailsModal({ order, logic }) {
                   </span>
                 </div>
 
-                <strong>{formatMoney(getItemLineTotal(item))}</strong>
+                <strong>
+                  {formatMoney(getItemLineTotal(item))}
+                </strong>
               </div>
             ))}
           </div>
@@ -157,7 +189,10 @@ function OrderDetailsModal({ order, logic }) {
             <strong>{formatMoney(getOrderTotal(order))}</strong>
           </div>
 
-          <h3 className="orders-detail-section-title">Customer note</h3>
+          <h3 className="orders-detail-section-title">
+            Customer note
+          </h3>
+
           <p>{order.customerNote || "No customer note."}</p>
         </div>
 
@@ -175,343 +210,8 @@ function OrderDetailsModal({ order, logic }) {
   );
 }
 
-function AddOrderModal({ logic }) {
-  const {
-    products,
-    productsLoading,
-    productsError,
-    addingOrder,
-    closeAddOrder,
-    form,
-    updateFormField,
-    formError,
-    filteredProducts,
-    estimatedSubtotal,
-    validShippingCost,
-    estimatedTotal,
-    handleAddItem,
-    changeItemQuantity,
-    removeItem,
-    submitNewOrder,
-    formatMoney,
-    getProductPrice,
-    getStockForProduct,
-  } = logic;
-
-  return (
-    <div className="orders-modal-backdrop" onClick={closeAddOrder}>
-      <section
-        className="orders-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="add-order-title"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <header className="orders-modal-header">
-          <div>
-            <span className="orders-eyebrow">ORDER MANAGEMENT</span>
-            <h2 id="add-order-title">Create new order</h2>
-          </div>
-
-          <button
-            type="button"
-            className="orders-modal-close"
-            onClick={closeAddOrder}
-            disabled={addingOrder}
-            aria-label="Close add order form"
-          >
-            <Icon name="close" />
-          </button>
-        </header>
-
-        <form onSubmit={submitNewOrder}>
-          <div className="orders-modal-content">
-            <h3 className="orders-detail-section-title">Customer details</h3>
-
-            <div className="orders-form-grid">
-              <label className="orders-form-field">
-                <span>Customer name *</span>
-                <input
-                  type="text"
-                  value={form.customerName}
-                  onChange={(event) =>
-                    updateFormField("customerName", event.target.value)
-                  }
-                  placeholder="Enter customer's full name"
-                  maxLength={120}
-                  autoComplete="name"
-                  required
-                  disabled={addingOrder}
-                />
-              </label>
-
-              <label className="orders-form-field">
-                <span>Customer phone *</span>
-                <input
-                  type="tel"
-                  value={form.customerPhone}
-                  onChange={(event) =>
-                    updateFormField("customerPhone", event.target.value)
-                  }
-                  placeholder="Enter phone number"
-                  maxLength={30}
-                  autoComplete="tel"
-                  required
-                  disabled={addingOrder}
-                />
-              </label>
-            </div>
-
-            <h3 className="orders-detail-section-title">Add products</h3>
-
-            {productsLoading ? (
-              <p>Loading available products…</p>
-            ) : productsError ? (
-              <p role="alert">{productsError}</p>
-            ) : products.length === 0 ? (
-              <p>No active products were found.</p>
-            ) : (
-              <>
-                <div className="orders-form-grid">
-                  <label className="orders-form-field">
-                    <span>Search product</span>
-
-                    <div className="orders-product-search">
-                      <Icon name="search" />
-                      <input
-                        type="search"
-                        value={form.productSearch}
-                        onChange={(event) =>
-                          updateFormField("productSearch", event.target.value)
-                        }
-                        placeholder="Search by product name or ID..."
-                        aria-label="Search products"
-                        disabled={addingOrder}
-                      />
-                    </div>
-                  </label>
-
-                  <label className="orders-form-field">
-                    <span>Product</span>
-
-                    <select
-                      value={form.productId}
-                      onChange={(event) =>
-                        updateFormField("productId", event.target.value)
-                      }
-                      disabled={addingOrder}
-                    >
-                      <option value="">Choose a product</option>
-
-                      {filteredProducts.map((product) => (
-                        <option
-                          key={product.itemId}
-                          value={String(product.itemId)}
-                          disabled={getStockForProduct(product) < 1}
-                        >
-                          {product.name || `Item ${product.itemId}`} —{" "}
-                          {formatMoney(getProductPrice(product))} · Stock:{" "}
-                          {getStockForProduct(product)}
-                        </option>
-                      ))}
-                    </select>
-
-                    {filteredProducts.length === 0 && (
-                      <small className="orders-product-search-empty">
-                        No products match your search.
-                      </small>
-                    )}
-                  </label>
-
-                  <label className="orders-form-field">
-                    <span>Quantity</span>
-                    <input
-                      type="number"
-                      min="1"
-                      step="1"
-                      value={form.quantity}
-                      onChange={(event) =>
-                        updateFormField("quantity", event.target.value)
-                      }
-                      disabled={addingOrder}
-                    />
-                  </label>
-                </div>
-
-                <button
-                  type="button"
-                  className="orders-details-button"
-                  onClick={handleAddItem}
-                  disabled={addingOrder}
-                >
-                  <Icon name="plus" />
-                  Add item
-                </button>
-              </>
-            )}
-
-            {form.items.length > 0 && (
-              <>
-                <h3 className="orders-detail-section-title">
-                  Selected items ({form.items.length})
-                </h3>
-
-                <div className="orders-detail-items">
-                  {form.items.map((item) => (
-                    <div className="orders-detail-item" key={item.itemId}>
-                      <div>
-                        <strong>{item.name}</strong>
-                        <span>{formatMoney(item.unitPrice)} per unit</span>
-
-                        <label className="orders-form-field">
-                          <span>Quantity</span>
-                          <input
-                            aria-label={`Quantity for ${item.name}`}
-                            type="number"
-                            min="1"
-                            max={item.availableStock}
-                            value={item.quantity}
-                            disabled={addingOrder}
-                            onChange={(event) =>
-                              changeItemQuantity(
-                                item.itemId,
-                                event.target.value,
-                              )
-                            }
-                          />
-                        </label>
-                      </div>
-
-                      <div>
-                        <strong>
-                          {formatMoney(item.unitPrice * item.quantity)}
-                        </strong>
-
-                        <button
-                          type="button"
-                          className="orders-details-button"
-                          disabled={addingOrder}
-                          onClick={() => removeItem(item.itemId)}
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
-
-            <h3 className="orders-detail-section-title">Delivery details</h3>
-
-            <label className="orders-form-field">
-              <span>Shipping address *</span>
-              <textarea
-                rows="3"
-                maxLength={1000}
-                value={form.shippingAddress}
-                onChange={(event) =>
-                  updateFormField("shippingAddress", event.target.value)
-                }
-                placeholder="Enter the delivery address"
-                autoComplete="street-address"
-                required
-                disabled={addingOrder}
-              />
-            </label>
-
-            <div className="orders-form-grid">
-              <label className="orders-form-field">
-                <span>Shipping cost (EGP) *</span>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={form.shippingCost}
-                  onChange={(event) =>
-                    updateFormField("shippingCost", event.target.value)
-                  }
-                  required
-                  disabled={addingOrder}
-                />
-              </label>
-            </div>
-
-            <label className="orders-form-field">
-              <span>Customer note (optional)</span>
-              <textarea
-                rows="3"
-                maxLength={2000}
-                value={form.customerNote}
-                onChange={(event) =>
-                  updateFormField("customerNote", event.target.value)
-                }
-                placeholder="Additional instructions"
-                disabled={addingOrder}
-              />
-            </label>
-
-            <h3 className="orders-detail-section-title">Order summary</h3>
-
-            <div className="orders-detail-total">
-              <span>Products subtotal</span>
-              <strong>{formatMoney(estimatedSubtotal)}</strong>
-            </div>
-
-            <div className="orders-detail-total">
-              <span>Shipping cost</span>
-              <strong>{formatMoney(validShippingCost)}</strong>
-            </div>
-
-            <div className="orders-detail-total">
-              <span>Estimated total</span>
-              <strong>{formatMoney(estimatedTotal)}</strong>
-            </div>
-
-            <p>
-              Prices and stock availability are verified by the server when the
-              order is created. The final total may differ if product prices or
-              stock have changed.
-            </p>
-
-            {formError && (
-              <p role="alert" className="orders-form-error">
-                {formError}
-              </p>
-            )}
-          </div>
-
-          <footer className="orders-modal-footer">
-            <button
-              type="button"
-              className="orders-reset-button"
-              onClick={closeAddOrder}
-              disabled={addingOrder}
-            >
-              Cancel
-            </button>
-
-            <button
-              type="submit"
-              className="orders-close-button"
-              disabled={
-                addingOrder ||
-                form.items.length === 0 ||
-                productsLoading ||
-                Boolean(productsError)
-              }
-            >
-              {addingOrder ? "Creating order…" : "Create order"}
-            </button>
-          </footer>
-        </form>
-      </section>
-    </div>
-  );
-}
-
 export default function Orders() {
-
+  const navigate = useNavigate();
   const logic = useOrdersLogic();
 
   const {
@@ -530,23 +230,18 @@ export default function Orders() {
     loading,
     error,
     setError,
-    products,
-    productsLoading,
-    productsError,
-    addingOrder,
+    exportQPExpresse,
+    exportingOrders,
     successMessage,
     setSuccessMessage,
     refreshOrders,
-    showAddOrder,
-    openAddOrder,
     getCustomerName,
-    getCustomerPhone,
-    getCustomerEmail,
     getItemCount,
     formatMoney,
     formatDate,
+    deleteOrder,
+    deletingOrderId,
   } = logic;
-
 
   const statCards = [
     {
@@ -599,19 +294,32 @@ export default function Orders() {
         title="Orders"
         subTitle="Manage orders, track their status, and create new orders."
         action={
-          <button
-            type="button"
-            className="orders-close-button"
-            onClick={openAddOrder}
-          >
-            <Icon name="plus" />
-            Add Order
-          </button>
+          <div className="orders-header-actions">
+            <Button
+              onClick={exportQPExpresse}
+              loading={exportingOrders}
+              className="orders-export-btn"
+              variant="text"
+            >
+              <span className="icon">
+                <GoDownload />
+              </span>
+              Export File
+            </Button>
+
+            <Button onClick={() => navigate("/orders/new")}>
+              <HiOutlinePlus aria-hidden="true" />
+              Add Order
+            </Button>
+          </div>
         }
       />
 
       {error && (
-        <div className="orders-message orders-message-error" role="alert">
+        <div
+          className="orders-message orders-message-error"
+          role="alert"
+        >
           <span>{error}</span>
 
           <button
@@ -634,7 +342,10 @@ export default function Orders() {
       )}
 
       {successMessage && (
-        <div className="orders-message orders-message-success" role="status">
+        <div
+          className="orders-message orders-message-success"
+          role="status"
+        >
           <span>{successMessage}</span>
 
           <button
@@ -648,15 +359,24 @@ export default function Orders() {
         </div>
       )}
 
-      <section className="orders-stats" aria-label="Order statistics">
+      <section
+        className="orders-stats"
+        aria-label="Order statistics"
+      >
         {statCards.map((stat) => (
           <article
             className={`orders-stat-card ${stat.className}`}
             key={stat.label}
           >
-            <span className="orders-stat-label">{stat.label}</span>
+            <span className="orders-stat-label">
+              {stat.label}
+            </span>
+
             <strong>{stat.value}</strong>
-            <span className="orders-stat-caption">{stat.caption}</span>
+
+            <span className="orders-stat-caption">
+              {stat.caption}
+            </span>
           </article>
         ))}
       </section>
@@ -677,6 +397,7 @@ export default function Orders() {
         <div className="orders-toolbar">
           <label className="orders-search">
             <Icon name="search" />
+
             <input
               type="search"
               value={search}
@@ -695,7 +416,10 @@ export default function Orders() {
           </button>
         </div>
 
-        <div className="orders-status-tabs" aria-label="Filter by status">
+        <div
+          className="orders-status-tabs"
+          aria-label="Filter by status"
+        >
           {["all", ...statuses].map((status) => {
             const isActive = statusFilter === status;
 
@@ -715,7 +439,8 @@ export default function Orders() {
               >
                 {status === "all"
                   ? "All"
-                  : status.charAt(0).toUpperCase() + status.slice(1)}
+                  : status.charAt(0).toUpperCase() +
+                    status.slice(1)}
 
                 <span className="orders-tab-count">
                   {statusCounts[status] ?? 0}
@@ -730,6 +455,7 @@ export default function Orders() {
             <span className="orders-empty-icon">
               <Icon name="orders" />
             </span>
+
             <h3>Loading orders</h3>
             <p>Please wait while your orders are loaded.</p>
           </div>
@@ -738,8 +464,11 @@ export default function Orders() {
             <span className="orders-empty-icon">
               <Icon name="orders" />
             </span>
+
             <h3>Unable to load orders</h3>
-            <p>Check your API connection and account permissions.</p>
+            <p>
+              Check your API connection and account permissions.
+            </p>
 
             <button
               type="button"
@@ -755,7 +484,11 @@ export default function Orders() {
               <Icon name="orders" />
             </span>
 
-            <h3>{hasActiveFilters ? "No matching orders" : "No orders yet"}</h3>
+            <h3>
+              {hasActiveFilters
+                ? "No matching orders"
+                : "No orders yet"}
+            </h3>
 
             <p>
               {hasActiveFilters
@@ -789,51 +522,89 @@ export default function Orders() {
               </thead>
 
               <tbody>
-                {filteredOrders.map((order, index) => (
-                  <tr key={order._id || order.id || order.orderNumber || index}>
-                    <td>
-                      <span className="orders-number">
-                        {order._id.slice(0,6)}
-                      </span>
-                    </td>
+                {filteredOrders.map((order, index) => {
+                  const orderId = order._id || order.id;
+                  const isDeleting = deletingOrderId === orderId;
 
-                    <td>
-                      <div className="orders-customer">
-                        <span className="orders-customer-name">
-                          {getCustomerName(order)}
+                  return (
+                    <tr
+                      key={
+                        orderId || order.orderNumber || index
+                      }
+                    >
+                      <td>
+                        <span className="orders-number">
+                          {String(
+                            order._id ||
+                              order.id ||
+                              order.orderNumber ||
+                              "",
+                          ).slice(0, 6)}
                         </span>
-                      </div>
-                    </td>
+                      </td>
 
-                    <td>{formatDate(order.createdAt)}</td>
+                      <td>
+                        <div className="orders-customer">
+                          <span className="orders-customer-name">
+                            {getCustomerName(order)}
+                          </span>
+                        </div>
+                      </td>
 
-                    <td>
-                      <span className="orders-items-count">
-                        {getItemCount(order)}
-                      </span>
-                    </td>
+                      <td>{formatDate(order.createdAt)}</td>
 
-                    <td className="orders-total">
-                      {formatMoney(order.totalAmount)}
-                    </td>
+                      <td>
+                        <span className="orders-items-count">
+                          {getItemCount(order)}
+                        </span>
+                      </td>
 
-                    <td>
-                      <StatusBadge status={order.status} statuses={statuses} />
-                    </td>
+                      <td className="orders-total">
+                        {formatMoney(order.totalAmount)}
+                      </td>
 
-                    <td>
-                      <button
-                        type="button"
-                        className="orders-details-button"
-                        onClick={() => setSelectedOrder(order)}
-                        aria-label={`View order ${order.orderNumber || ""}`}
-                      >
-                        <Icon name="eye" />
-                        Details
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                      <td>
+                        <StatusBadge
+                          status={order.status}
+                          statuses={statuses}
+                        />
+                      </td>
+
+                      <td>
+                        <div className="orders-row-actions">
+                          <button
+                            type="button"
+                            className="orders-details-button"
+                            onClick={() =>
+                              setSelectedOrder(order)
+                            }
+                            aria-label={`View order ${
+                              order.orderNumber || ""
+                            }`}
+                          >
+                            <Icon name="eye" />
+                            Details
+                          </button>
+
+                          <button
+                            type="button"
+                            className="orders-delete-button"
+                            onClick={() => deleteOrder(order)}
+                            disabled={Boolean(deletingOrderId)}
+                            aria-label={`Delete order ${
+                              order.orderNumber || ""
+                            }`}
+                          >
+                            <Icon name="trash" />
+                            {isDeleting
+                              ? "Deleting..."
+                              : "Delete"}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -841,6 +612,7 @@ export default function Orders() {
 
         <footer className="orders-panel-footer">
           <span>Live data from the Orders API</span>
+
           <span>
             {loading
               ? "Loading…"
@@ -851,10 +623,11 @@ export default function Orders() {
         </footer>
       </section>
 
-      {showAddOrder && <AddOrderModal logic={logic} />}
-
       {selectedOrder && (
-        <OrderDetailsModal order={selectedOrder} logic={logic} />
+        <OrderDetailsModal
+          order={selectedOrder}
+          logic={logic}
+        />
       )}
     </section>
   );

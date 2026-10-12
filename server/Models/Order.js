@@ -1,5 +1,32 @@
-
 const mongoose = require("mongoose");
+
+const GOVERNORATES = [
+  "قاهره",
+  "جيزة",
+  "اسكندريه",
+  "قليوبية",
+  "البحيرة",
+  "مطروح",
+  "دمياط",
+  "دقهلية",
+  "كفر الشيخ",
+  "غربيه",
+  "المنوفية",
+  "شرقيه",
+  "بورسعيد",
+  "اسماعيلية",
+  "سويس",
+  "شرم الشيخ",
+  "فيوم",
+  "بني سويف",
+  "منيا",
+  "اسيوط",
+  "سوهاج",
+  "قنا",
+  "اقصر",
+  "اسوان",
+  "بحر الاحمر",
+];
 
 const orderItemSchema = new mongoose.Schema(
   {
@@ -92,7 +119,7 @@ const orderSchema = new mongoose.Schema(
       default: 0,
     },
 
-    // subtotal + shippingCost
+    // Total = subtotal + shippingCost.
     totalAmount: {
       type: Number,
       required: true,
@@ -111,6 +138,17 @@ const orderSchema = new mongoose.Schema(
       ],
       default: "pending",
       index: true,
+    },
+
+    // Customer-selected Egyptian governorate.
+    governorate: {
+      type: String,
+      required: [true, "Governorate is required"],
+      trim: true,
+      enum: {
+        values: GOVERNORATES,
+        message: "Please select a valid Egyptian governorate",
+      },
     },
 
     shippingAddress: {

@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { authFetch } from "../pages/Login/auth.js";
 
@@ -11,6 +10,34 @@ const STATUSES = [
   "cancelled",
 ];
 
+const GOVERNORATES = [
+  "قاهره",
+  "جيزة",
+  "اسكندريه",
+  "قليوبية",
+  "البحيرة",
+  "مطروح",
+  "دمياط",
+  "دقهلية",
+  "كفر الشيخ",
+  "غربيه",
+  "المنوفية",
+  "شرقيه",
+  "بورسعيد",
+  "اسماعيلية",
+  "سويس",
+  "شرم الشيخ",
+  "فيوم",
+  "بني سويف",
+  "منيا",
+  "اسيوط",
+  "سوهاج",
+  "قنا",
+  "اقصر",
+  "اسوان",
+  "بحر الاحمر",
+];
+
 const EMPTY_FORM = {
   customerName: "",
   customerPhone: "",
@@ -19,6 +46,7 @@ const EMPTY_FORM = {
   quantity: "1",
   items: [],
   shippingAddress: "",
+  governorate: "",
   shippingCost: "0",
   customerNote: "",
 };
@@ -28,7 +56,7 @@ async function readResponse(response) {
 
   if (!response.ok) {
     throw new Error(
-      data.message || data.error || `Request failed (${response.status})`
+      data.message || data.error || `Request failed (${response.status})`,
     );
   }
 
@@ -58,7 +86,7 @@ function getCustomerEmail(order) {
 function getItemCount(order) {
   return (order?.items || []).reduce(
     (total, item) => total + Number(item.quantity || 0),
-    0
+    0,
   );
 }
 
@@ -107,9 +135,9 @@ function getOrderSubtotal(order) {
       Number(
         item.lineTotal ??
           Number(item.unitPrice ?? item.price ?? 0) *
-            Number(item.quantity || 0)
+            Number(item.quantity || 0),
       ),
-    0
+    0,
   );
 }
 
@@ -119,16 +147,13 @@ function getItemUnitPrice(item) {
 
   const quantity = Number(item?.quantity || 0);
 
-  return quantity > 0
-    ? Number(item?.lineTotal || 0) / quantity
-    : 0;
+  return quantity > 0 ? Number(item?.lineTotal || 0) / quantity : 0;
 }
 
 function getItemLineTotal(item) {
   return Number(
     item?.lineTotal ??
-      Number(item?.unitPrice ?? item?.price ?? 0) *
-        Number(item?.quantity || 0)
+      Number(item?.unitPrice ?? item?.price ?? 0) * Number(item?.quantity || 0),
   );
 }
 
@@ -146,6 +171,13 @@ function validateOrderForm(form) {
   const shippingAddress = form.shippingAddress.trim();
   const shippingCost = Number(form.shippingCost);
 
+  if (!form.governorate) {
+    return "Please select the governorate.";
+  }
+
+  if (!GOVERNORATES.includes(form.governorate)) {
+    return "Please select a valid governorate.";
+  }
   if (!customerName) {
     return "Please enter the customer's name.";
   }
@@ -201,6 +233,8 @@ function validateOrderForm(form) {
 export function useOrdersLogic() {
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
+
+  const [deletingOrderId, setDeletingOrderId] = useState(null);
 
   const [loading, setLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
@@ -274,6 +308,7 @@ export function useOrdersLogic() {
       customerPhone,
       items,
       shippingAddress,
+      governorate,
       customerNote = "",
       shippingCost = 0,
     }) => {
@@ -290,10 +325,7 @@ export function useOrdersLogic() {
           throw new Error("Customer phone is required.");
         }
 
-        if (
-          typeof shippingAddress !== "string" ||
-          !shippingAddress.trim()
-        ) {
+        if (typeof shippingAddress !== "string" || !shippingAddress.trim()) {
           throw new Error("Shipping address is required.");
         }
 
@@ -303,16 +335,14 @@ export function useOrdersLogic() {
 
         const parsedShippingCost = Number(shippingCost);
 
-        if (
-          !Number.isFinite(parsedShippingCost) ||
-          parsedShippingCost < 0
-        ) {
+        if (!Number.isFinite(parsedShippingCost) || parsedShippingCost < 0) {
           throw new Error("Shipping cost must be zero or greater.");
         }
 
         const payload = {
           customerName: customerName.trim(),
           customerPhone: customerPhone.trim(),
+          governorate: governorate,
           items: items.map((item) => ({
             itemId: Number(item.itemId),
             quantity: Number(item.quantity),
@@ -341,16 +371,14 @@ export function useOrdersLogic() {
         setAddingOrder(false);
       }
     },
-    [refreshOrders, refreshProducts]
+    [refreshOrders, refreshProducts],
   );
 
   const statusCounts = useMemo(() => {
     const counts = { all: orders.length };
 
     for (const status of STATUSES) {
-      counts[status] = orders.filter(
-        (order) => order.status === status
-      ).length;
+      counts[status] = orders.filter((order) => order.status === status).length;
     }
 
     return counts;
@@ -364,17 +392,14 @@ export function useOrdersLogic() {
       total: orders.length,
       pending: countByStatus("pending"),
       inProgress: orders.filter((order) =>
-        ["confirmed", "processing"].includes(order.status)
+        ["confirmed", "processing"].includes(order.status),
       ).length,
       shipped: countByStatus("shipped"),
       delivered: countByStatus("delivered"),
       cancelled: countByStatus("cancelled"),
       revenue: orders
         .filter((order) => order.status !== "cancelled")
-        .reduce(
-          (total, order) => total + Number(order.totalAmount || 0),
-          0
-        ),
+        .reduce((total, order) => total + Number(order.totalAmount || 0), 0),
     };
   }, [orders]);
 
@@ -407,7 +432,7 @@ export function useOrdersLogic() {
       .sort(
         (a, b) =>
           new Date(b.createdAt || 0).getTime() -
-          new Date(a.createdAt || 0).getTime()
+          new Date(a.createdAt || 0).getTime(),
       );
   }, [orders, search, statusFilter]);
 
@@ -418,28 +443,30 @@ export function useOrdersLogic() {
       if (!query) return true;
 
       return (
-        String(product.name || "").toLowerCase().includes(query) ||
-        String(product.itemId ?? "").toLowerCase().includes(query)
+        String(product.name || "")
+          .toLowerCase()
+          .includes(query) ||
+        String(product.itemId ?? "")
+          .toLowerCase()
+          .includes(query)
       );
     });
   }, [products, form.productSearch]);
 
   const selectedProduct = useMemo(
     () =>
-      products.find(
-        (product) => String(product.itemId) === form.productId
-      ) || null,
-    [products, form.productId]
+      products.find((product) => String(product.itemId) === form.productId) ||
+      null,
+    [products, form.productId],
   );
 
   const estimatedSubtotal = useMemo(
     () =>
       form.items.reduce(
-        (total, item) =>
-          total + Number(item.unitPrice) * Number(item.quantity),
-        0
+        (total, item) => total + Number(item.unitPrice) * Number(item.quantity),
+        0,
       ),
-    [form.items]
+    [form.items],
   );
 
   const parsedShippingCost = Number(form.shippingCost);
@@ -476,10 +503,7 @@ export function useOrdersLogic() {
     const requestedQuantity = Number(form.quantity);
     const stock = getStockForProduct(selectedProduct);
 
-    if (
-      !Number.isSafeInteger(requestedQuantity) ||
-      requestedQuantity < 1
-    ) {
+    if (!Number.isSafeInteger(requestedQuantity) || requestedQuantity < 1) {
       setFormError("Quantity must be a positive whole number.");
       return;
     }
@@ -501,7 +525,7 @@ export function useOrdersLogic() {
         ? current.items.map((item) =>
             item.itemId === itemId
               ? { ...item, quantity: item.quantity + requestedQuantity }
-              : item
+              : item,
           )
         : [
             ...current.items,
@@ -543,12 +567,12 @@ export function useOrdersLogic() {
         items: current.items.map((entry) =>
           entry.itemId === itemId
             ? { ...entry, quantity: nextQuantity }
-            : entry
+            : entry,
         ),
       }));
       setFormError("");
     },
-    [form.items]
+    [form.items],
   );
 
   const removeItem = useCallback((itemId) => {
@@ -581,6 +605,7 @@ export function useOrdersLogic() {
             quantity,
           })),
           shippingAddress: form.shippingAddress,
+          governorate: form.governorate,
           customerNote: form.customerNote,
           shippingCost: Number(form.shippingCost),
         });
@@ -591,7 +616,7 @@ export function useOrdersLogic() {
         setFormError(err.message || "Could not create this order.");
       }
     },
-    [form, addOrder]
+    [form, addOrder],
   );
 
   const clearFilters = useCallback(() => {
@@ -599,12 +624,94 @@ export function useOrdersLogic() {
     setStatusFilter("all");
   }, []);
 
-  const hasActiveFilters =
-    Boolean(search.trim()) || statusFilter !== "all";
+  const hasActiveFilters = Boolean(search.trim()) || statusFilter !== "all";
+
+  const [exportingOrders, setExportingOrders] = useState(false);
+
+  const exportQPExpresse = useCallback(async () => {
+    setExportingOrders(true);
+    setError("");
+
+    try {
+      const response = await authFetch("/api/orders/export/qp-expresse");
+
+      if (!response.ok) {
+        let message = "فشل تصدير الأوردرات";
+
+        try {
+          const data = await response.json();
+          message = data.message || data.error || message;
+        } catch {
+          // The response may not contain JSON.
+        }
+
+        throw new Error(message);
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = "qp-expresse-orders.xlsx";
+
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+
+      window.setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+      }, 1000);
+
+      setSuccessMessage("تم تصدير أوردرات QP Expresse بنجاح.");
+    } catch (err) {
+      setError(err.message || "فشل تصدير الأوردرات");
+    } finally {
+      setExportingOrders(false);
+    }
+  }, []);
+
+  const deleteOrder = async (order) => {
+    const orderId = order?._id || order?.id;
+
+    if (!orderId || deletingOrderId) return;
+
+    const confirmed = window.confirm(
+      `هل أنت متأكد من حذف الأوردر ${
+        order.orderNumber || orderId
+      }؟ لا يمكن التراجع عن هذا الإجراء.`,
+    );
+
+    if (!confirmed) return;
+
+    setDeletingOrderId(orderId);
+    setError("");
+
+    try {
+      const response = await authFetch(
+        `/api/orders/${encodeURIComponent(orderId)}`,
+        { method: "DELETE" },
+      );
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.message || "فشل حذف الأوردر");
+      }
+
+      setSuccessMessage("تم حذف الأوردر بنجاح");
+      await refreshOrders();
+    } catch (error) {
+      setError(error.message || "حدث خطأ أثناء حذف الأوردر");
+    } finally {
+      setDeletingOrderId(null);
+    }
+  };
 
   return {
     statuses: STATUSES,
     orders,
+    governorates: GOVERNORATES,
     products,
     loading,
     productsLoading,
@@ -629,6 +736,9 @@ export function useOrdersLogic() {
     refreshAll,
     addOrder,
 
+    deleteOrder,
+    deletingOrderId,
+
     showAddOrder,
     openAddOrder,
     closeAddOrder,
@@ -644,6 +754,9 @@ export function useOrdersLogic() {
     changeItemQuantity,
     removeItem,
     submitNewOrder,
+
+    exportQPExpresse,
+    exportingOrders,
 
     getCustomerName,
     getCustomerPhone,

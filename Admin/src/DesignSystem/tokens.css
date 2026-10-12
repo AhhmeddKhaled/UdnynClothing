@@ -1,13 +1,13 @@
-
 /* ======================================================
-   Udnyn — Design Tokens
+   Udnyn — Global Design Tokens
    المصدر الموحد للألوان والخطوط والمسافات
-====================================================== */
+   ====================================================== */
 
-:root {
-  /* ==================== Colors ==================== */
+:root,
+[data-theme="light"] {
+  color-scheme: light;
 
-  /* Neutral colors — Light Mode */
+  /* Backgrounds */
   --color-ink: #2a1f26;
   --color-paper: #ffffff;
   --color-sand: #ffffff;
@@ -21,9 +21,10 @@
   --color-plum-soft: #5a3f52;
   --color-plum-tint: #c9afc0;
 
-  /* Gold */
-  --color-gold: #b08968;
-  --color-gold-deep: #8c6a4f;
+  /* Neutral accent — replaces Gold */
+  --color-accent: #3b2436;
+  --color-accent-hover: #2a1826;
+  --color-accent-soft: #f1eaf0;
 
   /* Success */
   --color-sage: #5b7b5e;
@@ -35,20 +36,15 @@
 
   /* Borders */
   --color-line: #e5e7eb;
-  --color-line-dark: rgba(255, 255, 255, 0.12);
+  --color-line-dark: rgba(42, 31, 38, 0.15);
+  --color-page-bg: #ffffff;
+  --color-overlay: rgba(25, 18, 27, 0.5);
 
-  /* ==================== Typography ==================== */
-
+  /* Typography */
   --font-display: "Aref Ruqaa", serif;
+  --font-body: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
 
-  --font-body:
-    "IBM Plex Sans Arabic",
-    "Segoe UI",
-    Tahoma,
-    sans-serif;
-
-  /* ==================== Font Sizes ==================== */
-
+  /* Font sizes */
   --text-xs: 12px;
   --text-sm: 13px;
   --text-base: 15px;
@@ -57,8 +53,7 @@
   --text-2xl: 26px;
   --text-display: 36px;
 
-  /* ==================== Spacing — 4px Scale ==================== */
-
+  /* Spacing */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -68,32 +63,32 @@
   --space-8: 32px;
   --space-10: 40px;
 
-  /* ==================== Radius ==================== */
-
+  /* Radius */
   --radius-sm: 2px;
   --radius-md: 6px;
   --radius-lg: 12px;
   --radius-full: 999px;
 
-  /* ==================== Shadows ==================== */
-
+  /* Shadows */
   --shadow-card: 0 1px 3px rgba(42, 31, 38, 0.06);
 }
 
 /* ======================================================
    Dark Theme
-   الحفاظ على لوحة الألوان الحالية
-====================================================== */
+   ====================================================== */
 
 [data-theme="dark"] {
+  color-scheme: dark;
+
   /* Backgrounds */
   --color-paper: #17202b;
   --color-sand: #1d2936;
   --color-sand-deep: #263443;
   --color-card: #1d2936;
   --color-card-hover: #263443;
+  --color-page-bg: #121922;
 
-  /* Main Text */
+  /* Main text */
   --color-ink: #eee9ec;
 
   /* Plum */
@@ -102,9 +97,10 @@
   --color-plum: #d1b8c9;
   --color-plum-deep: #e3d5df;
 
-  /* Gold */
-  --color-gold: #d0ad87;
-  --color-gold-deep: #c39b72;
+  /* Neutral accent — replaces Gold */
+  --color-accent: #d1b8c9;
+  --color-accent-hover: #e3d5df;
+  --color-accent-soft: #2b2631;
 
   /* Success */
   --color-sage: #82b394;
@@ -117,34 +113,99 @@
   /* Borders */
   --color-line: rgba(238, 233, 236, 0.11);
   --color-line-dark: rgba(255, 255, 255, 0.14);
+  --color-overlay: rgba(0, 0, 0, 0.7);
 
   /* Shadows */
   --shadow-card: 0 1px 3px rgba(8, 15, 24, 0.28);
 }
 
 /* ======================================================
-   Global Theme Application
-====================================================== */
+   Global Application
+   ====================================================== */
 
-html,
-body {
-  background: var(--color-paper);
+html {
+  min-height: 100%;
+  background: var(--color-page-bg);
   color: var(--color-ink);
   font-family: var(--font-body);
 }
 
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
 body {
+  min-height: 100vh;
   margin: 0;
+  background: var(--color-page-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+#root {
+  min-height: 100vh;
+  background: var(--color-page-bg);
+  color: var(--color-ink);
 }
 
 button,
 input,
 select,
 textarea {
-  font-family: inherit;
+  font: inherit;
 }
 
-/* Common cards */
+button {
+  color: inherit;
+}
+
+/* ======================================================
+   Global Links — No Gold
+   ====================================================== */
+
+a,
+a:link,
+a:visited {
+  color: var(--color-plum);
+  text-decoration-color: transparent;
+  transition:
+    color 0.2s ease,
+    text-decoration-color 0.2s ease;
+}
+
+a:hover,
+a:focus-visible {
+  color: var(--color-plum-deep);
+  text-decoration-color: currentColor;
+}
+
+a:active {
+  color: var(--color-plum);
+}
+
+/* Common navigation links */
+.sb-aside a,
+.sb-aside a:link,
+.sb-aside a:visited,
+.sb-topbar a,
+.sb-topbar a:link,
+.sb-topbar a:visited {
+  color: var(--color-ink);
+}
+
+.sb-aside a:hover,
+.sb-topbar a:hover {
+  color: var(--color-plum);
+}
+
+/* ======================================================
+   Shared Surfaces
+   ====================================================== */
+
 .card,
 .stat-card,
 .dashboard-card,
@@ -156,17 +217,115 @@ textarea {
   box-shadow: var(--shadow-card);
 }
 
-/* Inputs */
+/* Main page containers */
+.dashboard-layout,
+.dashboard-content,
+.page-container,
+.page-content,
+.orders-page {
+  color: var(--color-ink);
+}
+
+/* ======================================================
+   Inputs
+   ====================================================== */
+
 input,
 select,
 textarea {
   color: var(--color-ink);
-  background: var(--color-paper);
+  background-color: var(--color-paper);
+  border: 1px solid var(--color-line);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-plum-soft);
+  opacity: 0.8;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-plum);
+  outline-color: var(--color-plum);
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-plum);
+  outline-offset: 1px;
+}
+
+/* ======================================================
+   Tables
+   ====================================================== */
+
+table {
+  color: var(--color-ink);
   border-color: var(--color-line);
 }
 
-/* Smooth theme changes */
+th,
+td {
+  border-color: var(--color-line);
+}
+
+/* ======================================================
+   Dark Theme — Common Components
+   ====================================================== */
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .dashboard-card,
+[data-theme="dark"] .product-card,
+[data-theme="dark"] .stock-card {
+  background: var(--color-card);
+  color: var(--color-ink);
+  border-color: var(--color-line);
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea,
+[data-theme="dark"] option {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  border-color: var(--color-line);
+}
+
+[data-theme="dark"] a,
+[data-theme="dark"] a:link,
+[data-theme="dark"] a:visited {
+  color: var(--color-plum);
+}
+
+[data-theme="dark"] a:hover,
+[data-theme="dark"] a:focus-visible {
+  color: var(--color-plum-deep);
+}
+
+[data-theme="dark"] .sb-aside a,
+[data-theme="dark"] .sb-aside a:link,
+[data-theme="dark"] .sb-aside a:visited,
+[data-theme="dark"] .sb-topbar a,
+[data-theme="dark"] .sb-topbar a:link,
+[data-theme="dark"] .sb-topbar a:visited {
+  color: var(--color-ink);
+}
+
+[data-theme="dark"] .sb-aside a:hover,
+[data-theme="dark"] .sb-topbar a:hover {
+  color: var(--color-plum);
+}
+
+/* ======================================================
+   Smooth Transitions
+   ====================================================== */
+
 body,
+#root,
 .dashboard-layout,
 .dashboard-content,
 .sb-aside,
@@ -178,9 +337,27 @@ body,
 .stock-card,
 input,
 select,
-textarea {
+textarea,
+button,
+table,
+th,
+td {
   transition:
     background-color 0.2s ease,
     color 0.2s ease,
     border-color 0.2s ease;
+}
+
+/* ======================================================
+   Accessibility
+   ====================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

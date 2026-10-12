@@ -1,5 +1,5 @@
-
-import { NavLink } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import "./Sidebar.css";
 
 import { useTheme } from "../../context/ThemeContext.jsx";
@@ -15,6 +15,11 @@ import { HiOutlineUsers } from "react-icons/hi2";
 import { MdDarkMode } from "react-icons/md";
 import { CiLight, CiSettings } from "react-icons/ci";
 import { RiLogoutBoxRLine } from "react-icons/ri";
+import {
+  HiOutlineChevronDown,
+  HiOutlineClipboardList,
+  HiOutlinePlus,
+} from "react-icons/hi";
 
 const NAV_ITEMS = [
   {
@@ -38,11 +43,6 @@ const NAV_ITEMS = [
     icon: <GrCatalog size={20} />,
   },
   {
-    path: "/orders",
-    label: "Orders",
-    icon: <GoGoal size={20} />,
-  },
-  {
     path: "/users",
     label: "Users",
     icon: <HiOutlineUsers size={20} />,
@@ -51,16 +51,26 @@ const NAV_ITEMS = [
 
 export default function Sidebar({ user, onLogout }) {
   const { theme, toggleTheme } = useTheme();
+  const location = useLocation();
 
   const {
     open,
-    sessionTime,
     handleNavigation,
     handleLogout,
     handleSettings,
     handleOpenMenu,
     handleCloseMenu,
   } = useSidebarLogic(onLogout);
+
+  const isOrdersRoute = location.pathname.startsWith("/orders");
+
+  const [ordersExpanded, setOrdersExpanded] = useState(isOrdersRoute);
+
+  useEffect(() => {
+    if (isOrdersRoute) {
+      setOrdersExpanded(true);
+    }
+  }, [isOrdersRoute]);
 
   const loginTime = getLoginTime();
 
@@ -70,6 +80,10 @@ export default function Sidebar({ user, onLogout }) {
         minute: "2-digit",
       })
     : null;
+
+  const toggleOrders = () => {
+    setOrdersExpanded((previous) => !previous);
+  };
 
   return (
     <>
@@ -143,11 +157,89 @@ export default function Sidebar({ user, onLogout }) {
 
         {/* Navigation */}
         <nav className="sb-nav">
-          {NAV_ITEMS.map((item) => (
+          {NAV_ITEMS.slice(0, 4).map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               end={item.path === "/dashboard"}
+              className={({ isActive }) =>
+                `sb-item ${isActive ? "sb-active" : ""}`
+              }
+              onClick={handleNavigation}
+            >
+              <span className="icon">{item.icon}</span>
+              <span className="label">{item.label}</span>
+            </NavLink>
+          ))}
+
+          {/* Orders Dropdown */}
+          <div
+            className={`sb-orders-group ${
+              isOrdersRoute ? "sb-orders-group-active" : ""
+            }`}
+          >
+            <button
+              type="button"
+              className={`sb-item sb-orders-toggle ${
+                isOrdersRoute ? "sb-active" : ""
+              }`}
+              onClick={toggleOrders}
+              aria-expanded={ordersExpanded}
+              aria-controls="sb-orders-submenu"
+            >
+              <span className="icon">
+                <GoGoal size={20} />
+              </span>
+
+              <span className="label">Orders</span>
+
+              <HiOutlineChevronDown
+                className={`sb-orders-chevron ${
+                  ordersExpanded ? "sb-chevron-open" : ""
+                }`}
+                size={16}
+              />
+            </button>
+
+            {ordersExpanded && (
+              <div
+                id="sb-orders-submenu"
+                className="sb-submenu"
+              >
+                <NavLink
+                  to="/orders"
+                  end
+                  className={({ isActive }) =>
+                    `sb-subitem ${
+                      isActive ? "sb-subitem-active" : ""
+                    }`
+                  }
+                  onClick={handleNavigation}
+                >
+                  <HiOutlineClipboardList size={18} />
+                  <span>All Orders</span>
+                </NavLink>
+
+                <NavLink
+                  to="/orders/new"
+                  className={({ isActive }) =>
+                    `sb-subitem ${
+                      isActive ? "sb-subitem-active" : ""
+                    }`
+                  }
+                  onClick={handleNavigation}
+                >
+                  <HiOutlinePlus size={18} />
+                  <span>Add Order</span>
+                </NavLink>
+              </div>
+            )}
+          </div>
+
+          {NAV_ITEMS.slice(4).map((item) => (
+            <NavLink
+              key={item.path}
+              to={item.path}
               className={({ isActive }) =>
                 `sb-item ${isActive ? "sb-active" : ""}`
               }

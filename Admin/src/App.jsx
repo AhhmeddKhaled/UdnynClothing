@@ -8,8 +8,11 @@ import Dashboard from "./pages/Dashboard/Dashboard.jsx";
 import AvailableStock from "./pages/AvailableStock/AvailableStock.jsx";
 import Products from "./pages/Products/Products";
 import Users from "./pages/Users/Users.jsx";
+
 import Catalog from "./pages/Catalog/Catalog.jsx";
+
 import Orders from "./pages/Orders/Orders.jsx";
+import AddOrder from "./pages/Orders/AddOrder/AddOrder.jsx";
 
 
 
@@ -44,6 +47,8 @@ function App() {
           <Route path="catalog" element={<Catalog />} />
 
           <Route path="orders" element={<Orders />} />
+
+          <Route path="/orders/new" element={<AddOrder />} />
 
           <Route path="users" element={<Users />} />
         </Route>

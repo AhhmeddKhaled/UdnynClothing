@@ -1,14 +1,29 @@
 import "./Button.css";
 
-export default function Button({load,loading}) {
+export default function Button({
+  children,
+  type = "button",
+  className = "",
+  onClick,
+  load,
+  disabled = false,
+  loading = false,
+  variant = "primary",
+  ...props
+}) {
+  const handleClick = onClick ?? load;
+  const isDisabled = disabled || loading;
+
   return (
     <button
-      type="button"
-      className="dash-btn dash-btn-primary"
-      onClick={load}
-      disabled={loading}
+      {...props}
+      type={type}
+      className={`dash-btn dash-btn-${variant} ${className}`.trim()}
+      onClick={handleClick}
+      disabled={isDisabled}
+      aria-busy={loading || undefined}
     >
-      {loading ? "Refreshing..." : "Refresh data"}
+      {loading ? "جاري التحميل..." : children}
     </button>
   );
 }

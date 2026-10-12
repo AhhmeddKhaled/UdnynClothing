@@ -1,7 +1,7 @@
-
 const mongoose = require("mongoose");
 const Order = require("../Models/Order");
 const AvailableStock = require("../Models/AvailableStock");
+const XLSX = require("xlsx");
 
 const VALID_STATUSES = [
   "pending",
@@ -11,6 +11,35 @@ const VALID_STATUSES = [
   "delivered",
   "cancelled",
 ];
+
+const EGYPTIAN_GOVERNORATES = [
+  "قاهره",
+  "جيزة",
+  "اسكندريه",
+  "قليوبية",
+  "البحيرة",
+  "مطروح",
+  "دمياط",
+  "دقهلية",
+  "كفر الشيخ",
+  "غربيه",
+  "المنوفية",
+  "شرقيه",
+  "بورسعيد",
+  "اسماعيلية",
+  "سويس",
+  "شرم الشيخ",
+  "فيوم",
+  "بني سويف",
+  "منيا",
+  "اسيوط",
+  "سوهاج",
+  "قنا",
+  "اقصر",
+  "اسوان",
+  "بحر الاحمر",
+];
+
 
 const ALLOWED_TRANSITIONS = {
   pending: ["confirmed", "cancelled"],
@@ -57,6 +86,7 @@ async function createOrder(req, res, next) {
       customerName,
       customerPhone,
       items,
+      governorate,
       shippingAddress,
       customerNote = "",
       shippingCost = 0,
@@ -79,10 +109,18 @@ async function createOrder(req, res, next) {
       return sendError(res, 400, "Valid customer phone is required");
     }
 
+    // Validate governorate.
+    if (
+      typeof governorate !== "string" ||
+      !EGYPTIAN_GOVERNORATES.includes(governorate.trim())
+    ) {
+      return sendError(res, 400, "Please select a valid governorate");
+    }
+
     if (
       typeof shippingAddress !== "string" ||
       !shippingAddress.trim() ||
-      shippingAddress.length > 1000
+      shippingAddress.trim().length > 1000
     ) {
       return sendError(res, 400, "Valid shipping address is required");
     }
@@ -224,7 +262,7 @@ async function createOrder(req, res, next) {
           {
             orderNumber: getOrderNumber(),
 
-            // This is a manual order, not linked to a registered customer.
+            // Manual order, not linked to a registered customer.
             customer: null,
             customerName: customerName.trim(),
             customerPhone: customerPhone.trim(),
@@ -234,6 +272,8 @@ async function createOrder(req, res, next) {
             shippingCost: parsedShippingCost,
             totalAmount,
 
+            // Save the selected governorate.
+            governorate: governorate.trim(),
             shippingAddress: shippingAddress.trim(),
             customerNote: customerNote.trim(),
             status: "pending",
@@ -497,10 +537,198 @@ async function updateOrderStatus(req, res, next) {
   }
 }
 
+// DELETE /api/orders/:id
+async function deleteOrder(req, res, next) {
+  let session;
+
+  try {
+    if (!isAdmin(req)) {
+      return sendError(res, 403, "Only admins can delete orders");
+    }
+
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return sendError(res, 400, "Invalid order ID");
+    }
+
+    session = await mongoose.startSession();
+
+    let deletedOrder = null;
+
+    await session.withTransaction(async () => {
+      const order = await Order.findById(id).session(session);
+
+      if (!order) {
+        const error = new Error("Order not found");
+        error.statusCode = 404;
+        throw error;
+      }
+
+      // Don't restore stock for shipped or delivered orders.
+      // Cancelled orders may already have had their stock restored.
+      const shouldRestoreStock =
+        !order.stockRestored &&
+        !["shipped", "delivered"].includes(order.status);
+
+      if (shouldRestoreStock) {
+        for (const item of order.items) {
+          const result = await AvailableStock.updateOne(
+            { itemId: item.itemId },
+            { $inc: { qty: item.quantity } },
+            { session }
+          );
+
+          if (result.matchedCount !== 1) {
+            const error = new Error(
+              `Cannot restore stock for item ${item.itemId}`
+            );
+            error.statusCode = 409;
+            throw error;
+          }
+        }
+      }
+
+      const result = await Order.deleteOne(
+        { _id: order._id },
+        { session }
+      );
+
+      if (result.deletedCount !== 1) {
+        const error = new Error("Order could not be deleted");
+        error.statusCode = 409;
+        throw error;
+      }
+
+      deletedOrder = {
+        _id: order._id,
+        orderNumber: order.orderNumber,
+      };
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Order deleted successfully",
+      order: deletedOrder,
+    });
+  } catch (error) {
+    if (error.statusCode) {
+      return sendError(res, error.statusCode, error.message);
+    }
+
+    return next(error);
+  } finally {
+    if (session) {
+      await session.endSession();
+    }
+  }
+}
+
+
+// GET /api/orders/export/qp-expresse
+async function exportQPExpresse(req, res, next) {
+  try {
+    const filter = {};
+
+    // Optional status filter
+    if (req.query.status) {
+      if (!VALID_STATUSES.includes(req.query.status)) {
+        return sendError(res, 400, "Invalid order status filter");
+      }
+
+      filter.status = req.query.status;
+    }
+
+    // Fetch all matching orders without pagination
+    const orders = await Order.find(filter)
+      .populate("customer", "name")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // Exact QP Expresse column names and order
+    const headers = [
+      "full name",
+      "phone",
+      "address",
+      "customer serial",
+      "total amount",
+      "notes",
+      "order date",
+      "shipment contents",
+      "weight",
+      "city",
+    ];
+
+    const rows = [
+      headers,
+      ...orders.map((order) => [
+        order.customerName || order.customer?.name || "",
+        order.customerPhone || "",
+        order.shippingAddress || "",
+        "", // customer serial
+        Number(order.totalAmount) || 0,
+        order.customerNote || "",
+        order.createdAt
+          ? new Date(order.createdAt).toLocaleDateString("en-GB")
+          : "",
+        "ملابس",
+        "", // weight
+        order.governorate || "",
+      ]),
+    ];
+
+    const worksheet = XLSX.utils.aoa_to_sheet(rows);
+
+    worksheet["!cols"] = [
+      { wch: 25 },
+      { wch: 18 },
+      { wch: 40 },
+      { wch: 18 },
+      { wch: 15 },
+      { wch: 30 },
+      { wch: 15 },
+      { wch: 22 },
+      { wch: 10 },
+      { wch: 20 },
+    ];
+
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "QP Expresse"
+    );
+
+    const buffer = XLSX.write(workbook, {
+      type: "buffer",
+      bookType: "xlsx",
+    });
+
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
+
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="qp-expresse-orders.xlsx"'
+    );
+
+    res.setHeader("Content-Length", buffer.length);
+
+    return res.status(200).send(buffer);
+  } catch (error) {
+    return next(error);
+  }
+}
+
 module.exports = {
   createOrder,
   getMyOrders,
   getAllOrders,
   getOrderById,
   updateOrderStatus,
+  exportQPExpresse,
+  deleteOrder
 };

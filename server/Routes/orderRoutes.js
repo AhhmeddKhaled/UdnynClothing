@@ -1,4 +1,3 @@
-
 const express = require("express");
 const router = express.Router();
 
@@ -11,27 +10,39 @@ const {
   getAllOrders,
   getOrderById,
   updateOrderStatus,
+  exportQPExpresse,
+  deleteOrder
 } = require("../Controllers/orderController");
 
 router.use(authenticate);
 
-// إنشاء الأوردر يحتاج صلاحية orders.create.
+// إنشاء أوردر.
 router.post("/", authorize("orders.create"), createOrder);
 
-// عرض أوردرات العميل المسجل دخوله.
+// أوردرات العميل المسجل دخوله.
 router.get("/my-orders", authorize("orders.read"), getMyOrders);
 
-// عرض كل الأوردرات يحتاج صلاحية orders.read.
+// تصدير أوردرات QP Expresse.
+// لازم المسار يكون قبل /:id.
+router.get(
+  "/export/qp-expresse",
+  authorize("orders.read"),
+  exportQPExpresse
+);
+
+// عرض كل الأوردرات.
 router.get("/", authorize("orders.read"), getAllOrders);
 
-// تعديل الحالة يحتاج صلاحية orders.updateStatus.
+// تعديل حالة الأوردر.
 router.patch(
   "/:id/status",
   authorize("orders.updateStatus"),
   updateOrderStatus
 );
 
-// عرض أوردر محدد: يتحقق الـ controller من الملكية أو صلاحية الأدمن.
+// عرض أوردر محدد.
 router.get("/:id", getOrderById);
+
+router.delete("/:id", authorize("orders.delete"), deleteOrder);
 
 module.exports = router;

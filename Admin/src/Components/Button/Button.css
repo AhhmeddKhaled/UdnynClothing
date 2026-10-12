@@ -3,7 +3,7 @@
    ====================================================== */
 
 .dash-btn {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
@@ -15,12 +15,16 @@
   color: var(--color-ink);
   font: inherit;
   font-size: var(--text-sm);
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition:
     background 0.15s ease,
     border-color 0.15s ease,
+    color 0.15s ease,
     opacity 0.15s ease;
+}
+.dash-btn .icon {
+  display: inline-flex;
 }
 
 .dash-btn:disabled {
@@ -34,6 +38,16 @@
   border-color: var(--color-plum);
 }
 
+.dash-btn-text {
+  color: #0EA5E9;
+
+}
+
+.dash-btn-text:hover {
+  background-color: #0EA5E9;
+  color: var(--color-paper);
+
+}
 .dash-btn-primary:hover:not(:disabled) {
   opacity: 0.88;
 }

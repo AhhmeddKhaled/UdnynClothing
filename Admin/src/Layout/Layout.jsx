@@ -57,7 +57,9 @@ export default function Layout() {
       : "Login time unavailable"}
   </span>
 
-  <Button load={load} loading={loading} />
+  <Button load={load} loading={loading}>
+    Refresh
+  </Button>
 
   <span className="footer-checks">
     Data checks: {missingDataTotal ?? 0}
