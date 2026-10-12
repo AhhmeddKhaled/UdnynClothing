@@ -259,6 +259,9 @@
     flex-direction: column;
   }
 
+.stock-product-card {
+  height: 800px;
+}
   .available-stock-tools {
     grid-template-columns: 1fr;
   }
