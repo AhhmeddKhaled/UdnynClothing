@@ -1,3 +1,4 @@
+
 import "./Orders.css";
 import { useOrdersLogic } from "../../UI_Logic/OrdersLogic.jsx";
 import { useNavigate } from "react-router-dom";
@@ -72,7 +73,10 @@ function OrderDetailsModal({ order, logic }) {
   const onClose = () => setSelectedOrder(null);
 
   return (
-    <div className="orders-modal-backdrop" onClick={onClose}>
+    <div
+      className="orders-modal-backdrop"
+      onClick={onClose}
+    >
       <section
         className="orders-modal"
         role="dialog"
@@ -82,7 +86,10 @@ function OrderDetailsModal({ order, logic }) {
       >
         <header className="orders-modal-header">
           <div>
-            <span className="orders-eyebrow">ORDER DETAILS</span>
+            <span className="orders-eyebrow">
+              ORDER DETAILS
+            </span>
+
             <h2 id="order-details-title">
               {order.orderNumber || "Order details"}
             </h2>
@@ -136,7 +143,9 @@ function OrderDetailsModal({ order, logic }) {
 
             <div>
               <span>Governorate</span>
-              <strong>{order.governorate || "Not specified"}</strong>
+              <strong>
+                {order.governorate || "Not specified"}
+              </strong>
             </div>
 
             <div className="orders-detail-address">
@@ -160,10 +169,12 @@ function OrderDetailsModal({ order, logic }) {
               >
                 <div>
                   <strong>{getItemName(item)}</strong>
+
                   <span>
                     Quantity: {item.quantity || 0}
                     {" · "}
-                    Unit price: {formatMoney(getItemUnitPrice(item))}
+                    Unit price:{" "}
+                    {formatMoney(getItemUnitPrice(item))}
                   </span>
                 </div>
 
@@ -176,7 +187,9 @@ function OrderDetailsModal({ order, logic }) {
 
           <div className="orders-detail-total">
             <span>Products subtotal</span>
-            <strong>{formatMoney(getOrderSubtotal(order))}</strong>
+            <strong>
+              {formatMoney(getOrderSubtotal(order))}
+            </strong>
           </div>
 
           <div className="orders-detail-total">
@@ -385,7 +398,9 @@ export default function Orders() {
         <header className="orders-panel-header">
           <div>
             <h2>All orders</h2>
-            <p>Review orders from the connected database.</p>
+            <p>
+              Review orders from the connected database.
+            </p>
           </div>
 
           <span className="orders-stat-caption">
@@ -457,7 +472,9 @@ export default function Orders() {
             </span>
 
             <h3>Loading orders</h3>
-            <p>Please wait while your orders are loaded.</p>
+            <p>
+              Please wait while your orders are loaded.
+            </p>
           </div>
         ) : error && filteredOrders.length === 0 ? (
           <div className="orders-empty">
@@ -466,6 +483,7 @@ export default function Orders() {
             </span>
 
             <h3>Unable to load orders</h3>
+
             <p>
               Check your API connection and account permissions.
             </p>
@@ -511,13 +529,13 @@ export default function Orders() {
             <table className="orders-table">
               <thead>
                 <tr>
-                  <th>Order</th>
-                  <th>Customer</th>
-                  <th>Date</th>
-                  <th>Items</th>
-                  <th>Total</th>
-                  <th>Status</th>
-                  <th>Actions</th>
+                  <th scope="col">Order</th>
+                  <th scope="col">Customer</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Items</th>
+                  <th scope="col">Total</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Actions</th>
                 </tr>
               </thead>
 
@@ -532,7 +550,7 @@ export default function Orders() {
                         orderId || order.orderNumber || index
                       }
                     >
-                      <td>
+                      <td data-label="Order">
                         <span className="orders-number">
                           {String(
                             order._id ||
@@ -543,7 +561,7 @@ export default function Orders() {
                         </span>
                       </td>
 
-                      <td>
+                      <td data-label="Customer">
                         <div className="orders-customer">
                           <span className="orders-customer-name">
                             {getCustomerName(order)}
@@ -551,26 +569,34 @@ export default function Orders() {
                         </div>
                       </td>
 
-                      <td>{formatDate(order.createdAt)}</td>
+                      <td data-label="Date">
+                        {formatDate(order.createdAt)}
+                      </td>
 
-                      <td>
+                      <td data-label="Items">
                         <span className="orders-items-count">
                           {getItemCount(order)}
                         </span>
                       </td>
 
-                      <td className="orders-total">
+                      <td
+                        data-label="Total"
+                        className="orders-total"
+                      >
                         {formatMoney(order.totalAmount)}
                       </td>
 
-                      <td>
+                      <td data-label="Status">
                         <StatusBadge
                           status={order.status}
                           statuses={statuses}
                         />
                       </td>
 
-                      <td>
+                      <td
+                        data-label="Actions"
+                        className="orders-actions-cell"
+                      >
                         <div className="orders-row-actions">
                           <button
                             type="button"
