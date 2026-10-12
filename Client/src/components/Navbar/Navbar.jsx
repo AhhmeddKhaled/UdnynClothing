@@ -1,4 +1,4 @@
-
+import { useState } from "react";
 import ThemeToggle from "../ThemeToggle/ThemeToggle";
 import "./Navbar.css";
 
@@ -10,11 +10,23 @@ export default function Navbar({
   onLanguageChange,
   onLogout,
 }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   const canViewAvailableStock = [
     "moderator",
     "admin",
     "owner",
   ].includes(user?.role);
+
+  const navigateTo = (page) => {
+    setMenuOpen(false);
+    onNavigate(page);
+  };
+
+  const handleLogout = () => {
+    setMenuOpen(false);
+    onLogout();
+  };
 
   return (
     <header className="navbar">
@@ -22,89 +34,125 @@ export default function Navbar({
         <button
           type="button"
           className="navbar-logo"
-          onClick={() => onNavigate("home")}
+          onClick={() => navigateTo("home")}
         >
           {language === "ar" ? "يدنين" : "UDNYN"}
         </button>
 
-        <nav className="navbar-links">
-          <button type="button" onClick={() => onNavigate("home")}>
+        <button
+          type="button"
+          className="navbar-menu-toggle"
+          onClick={() => setMenuOpen((open) => !open)}
+          aria-label={
+            menuOpen
+              ? language === "ar"
+                ? "إغلاق القائمة"
+                : "Close menu"
+              : language === "ar"
+                ? "فتح القائمة"
+                : "Open menu"
+          }
+          aria-expanded={menuOpen}
+          aria-controls="navbar-menu"
+        >
+          {menuOpen ? "✕" : "☰"}
+        </button>
+
+        <nav
+          id="navbar-menu"
+          className={`navbar-links ${menuOpen ? "is-open" : ""}`}
+        >
+          <button
+            type="button"
+            onClick={() => navigateTo("home")}
+          >
             {t.nav.home}
           </button>
 
-          <button type="button" onClick={() => onNavigate("catalog")}>
+          <button
+            type="button"
+            onClick={() => navigateTo("catalog")}
+          >
             {t.nav.catalog}
           </button>
 
-          <button type="button" onClick={() => onNavigate("offers")}>
+          <button
+            type="button"
+            onClick={() => navigateTo("offers")}
+          >
             {t.nav.offers}
           </button>
 
-          <button type="button" onClick={() => onNavigate("categories")}>
+          <button
+            type="button"
+            onClick={() => navigateTo("categories")}
+          >
             {t.nav.categories}
           </button>
 
           {canViewAvailableStock && (
             <button
               type="button"
-              onClick={() => onNavigate("availableStock")}
+              onClick={() => navigateTo("availableStock")}
             >
               {t.nav.availableStock}
             </button>
           )}
-        </nav>
 
-        <div className="navbar-actions">
-          <button
-            className="navbar-icon"
-            type="button"
-            onClick={() => onNavigate("favorites")}
-            title={t.nav.favorites}
-            aria-label={t.nav.favorites}
-          >
-            ♡
-          </button>
-
-          <button
-            className="navbar-language"
-            type="button"
-            onClick={() =>
-              onLanguageChange(language === "ar" ? "en" : "ar")
-            }
-          >
-            {language === "ar" ? "EN" : "AR"}
-          </button>
-
-          <ThemeToggle />
-
-          {!user ? (
-            <>
-              <button
-                className="navbar-login"
-                type="button"
-                onClick={() => onNavigate("login")}
-              >
-                {t.nav.login}
-              </button>
-
-              <button
-                className="navbar-register"
-                type="button"
-                onClick={() => onNavigate("register")}
-              >
-                {language === "ar" ? "إنشاء حساب" : "Register"}
-              </button>
-            </>
-          ) : (
+          <div className="navbar-actions">
             <button
-              className="navbar-logout"
+              className="navbar-icon"
               type="button"
-              onClick={onLogout}
+              onClick={() => navigateTo("favorites")}
+              title={t.nav.favorites}
+              aria-label={t.nav.favorites}
             >
-              {t.nav.logout}
+              ♡
             </button>
-          )}
-        </div>
+
+            <button
+              className="navbar-language"
+              type="button"
+              onClick={() =>
+                onLanguageChange(language === "ar" ? "en" : "ar")
+              }
+            >
+              {language === "ar" ? "EN" : "AR"}
+            </button>
+
+            <div className="navbar-theme">
+              <ThemeToggle />
+            </div>
+
+            {!user ? (
+              <>
+                <button
+                  className="navbar-login"
+                  type="button"
+                  onClick={() => navigateTo("login")}
+                >
+                  {t.nav.login}
+                </button>
+
+                <button
+                  className="navbar-register"
+                  type="button"
+                  onClick={() => navigateTo("register")}
+                >
+                  {language === "ar" ? "إنشاء حساب" : "Register"}
+                </button>
+              </>
+            ) : (
+              <button
+                className="navbar-logout"
+                type="button"
+                onClick={handleLogout}
+              >
+                {t.nav.logout}
+              </button>
+            )}
+          </div>
+        </nav>
       </div>
     </header>
   );
