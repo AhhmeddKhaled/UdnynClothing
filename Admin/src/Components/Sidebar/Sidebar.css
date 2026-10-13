@@ -633,6 +633,23 @@
   pointer-events: auto;
 }
 
+/* Disabled sidebar links for non-admin users */
+.sb-item-disabled,
+.sb-subitem-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.sb-item-disabled:hover,
+.sb-subitem-disabled:hover {
+  background: transparent;
+}
+
+/* Keep disabled links from looking clickable */
+.sb-item-disabled,
+.sb-subitem-disabled {
+  user-select: none;
+}
 /* =========================
    Responsive Sidebar
 ========================= */

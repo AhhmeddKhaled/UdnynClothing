@@ -4,7 +4,7 @@ import "./Sidebar.css";
 
 import { useTheme } from "../../context/ThemeContext.jsx";
 import { useSidebarLogic } from "../../UI_Logic/SidebarLogic.jsx";
-import { getLoginTime } from "../../pages/Login/auth.js";
+import { getLoginTime, getUser } from "../../pages/Login/auth.js";
 
 import { RxDashboard } from "react-icons/rx";
 import { PiStorefrontThin } from "react-icons/pi";
@@ -62,6 +62,13 @@ export default function Sidebar({ user, onLogout }) {
     handleCloseMenu,
   } = useSidebarLogic(onLogout);
 
+  // Get the current user's role
+  const currentUser = getUser();
+  const role = String(currentUser?.role || user?.role || "").toLowerCase();
+
+  // Only admins can access all sidebar pages
+  const isAdmin = role === "admin";
+
   const isOrdersRoute = location.pathname.startsWith("/orders");
 
   const [ordersExpanded, setOrdersExpanded] = useState(isOrdersRoute);
@@ -84,6 +91,22 @@ export default function Sidebar({ user, onLogout }) {
   const toggleOrders = () => {
     setOrdersExpanded((previous) => !previous);
   };
+
+  // Prevent unauthorized navigation through disabled sidebar links
+  const handleRestrictedNavigation = (event) => {
+    if (!isAdmin) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
+
+    handleNavigation();
+  };
+
+  const getNavClassName = (isActive, disabled) =>
+    `sb-item ${isActive ? "sb-active" : ""} ${
+      disabled ? "sb-item-disabled" : ""
+    }`;
 
   return (
     <>
@@ -157,15 +180,18 @@ export default function Sidebar({ user, onLogout }) {
 
         {/* Navigation */}
         <nav className="sb-nav">
+          {/* Dashboard, Available Stock, Products, Catalog */}
           {NAV_ITEMS.slice(0, 4).map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               end={item.path === "/dashboard"}
               className={({ isActive }) =>
-                `sb-item ${isActive ? "sb-active" : ""}`
+                getNavClassName(isActive, !isAdmin)
               }
-              onClick={handleNavigation}
+              onClick={handleRestrictedNavigation}
+              aria-disabled={!isAdmin}
+              tabIndex={isAdmin ? 0 : -1}
             >
               <span className="icon">{item.icon}</span>
               <span className="label">{item.label}</span>
@@ -202,24 +228,25 @@ export default function Sidebar({ user, onLogout }) {
             </button>
 
             {ordersExpanded && (
-              <div
-                id="sb-orders-submenu"
-                className="sb-submenu"
-              >
+              <div id="sb-orders-submenu" className="sb-submenu">
+                {/* All Orders: Admin only */}
                 <NavLink
                   to="/orders"
                   end
                   className={({ isActive }) =>
                     `sb-subitem ${
                       isActive ? "sb-subitem-active" : ""
-                    }`
+                    } ${!isAdmin ? "sb-subitem-disabled" : ""}`
                   }
-                  onClick={handleNavigation}
+                  onClick={handleRestrictedNavigation}
+                  aria-disabled={!isAdmin}
+                  tabIndex={isAdmin ? 0 : -1}
                 >
                   <HiOutlineClipboardList size={18} />
                   <span>All Orders</span>
                 </NavLink>
 
+                {/* Add Order: Available to all roles */}
                 <NavLink
                   to="/orders/new"
                   className={({ isActive }) =>
@@ -236,14 +263,17 @@ export default function Sidebar({ user, onLogout }) {
             )}
           </div>
 
+          {/* Users: Admin only */}
           {NAV_ITEMS.slice(4).map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `sb-item ${isActive ? "sb-active" : ""}`
+                getNavClassName(isActive, !isAdmin)
               }
-              onClick={handleNavigation}
+              onClick={handleRestrictedNavigation}
+              aria-disabled={!isAdmin}
+              tabIndex={isAdmin ? 0 : -1}
             >
               <span className="icon">{item.icon}</span>
               <span className="label">{item.label}</span>
@@ -263,7 +293,7 @@ export default function Sidebar({ user, onLogout }) {
               <div className="sb-user-main">
                 <b>{user?.name || "User"}</b>
                 <span className="sb-user-role">
-                  {user?.role || "Admin"}
+                  {role || "User"}
                 </span>
               </div>
 
