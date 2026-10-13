@@ -1,3 +1,4 @@
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { authFetch } from "../pages/Login/auth.js";
 
@@ -153,7 +154,8 @@ function getItemUnitPrice(item) {
 function getItemLineTotal(item) {
   return Number(
     item?.lineTotal ??
-      Number(item?.unitPrice ?? item?.price ?? 0) * Number(item?.quantity || 0),
+      Number(item?.unitPrice ?? item?.price ?? 0) *
+        Number(item?.quantity || 0),
   );
 }
 
@@ -178,6 +180,7 @@ function validateOrderForm(form) {
   if (!GOVERNORATES.includes(form.governorate)) {
     return "Please select a valid governorate.";
   }
+
   if (!customerName) {
     return "Please enter the customer's name.";
   }
@@ -225,6 +228,20 @@ function validateOrderForm(form) {
     if (Number(item.quantity) > Number(item.availableStock)) {
       return `Only ${item.availableStock} unit(s) of ${item.name} are available.`;
     }
+
+    if (
+      item.realImageFile &&
+      !(item.realImageFile instanceof File)
+    ) {
+      return `Invalid actual photo for ${item.name}.`;
+    }
+
+    if (
+      item.realImageFile &&
+      !item.realImageFile.type.startsWith("image/")
+    ) {
+      return `The file selected for ${item.name} is not an image.`;
+    }
   }
 
   return "";
@@ -254,6 +271,21 @@ export function useOrdersLogic() {
 
   const updateFormField = useCallback((field, value) => {
     setForm((current) => ({ ...current, [field]: value }));
+    setFormError("");
+  }, []);
+
+  // تحديث صورة الطبيعة لمنتج معين داخل الأوردر.
+  // الصورة مستقلة تمامًا عن صورة الكتالوج.
+  const setItemRealImage = useCallback((itemId, file) => {
+    setForm((current) => ({
+      ...current,
+      items: current.items.map((item) =>
+        String(item.itemId) === String(itemId)
+          ? { ...item, realImageFile: file || null }
+          : item,
+      ),
+    }));
+
     setFormError("");
   }, []);
 
@@ -302,6 +334,7 @@ export function useOrdersLogic() {
     refreshAll();
   }, [refreshAll]);
 
+  // إنشاء أوردر وإرسال صور الطبيعة باستخدام multipart/form-data.
   const addOrder = useCallback(
     async ({
       customerName,
@@ -339,22 +372,37 @@ export function useOrdersLogic() {
           throw new Error("Shipping cost must be zero or greater.");
         }
 
-        const payload = {
-          customerName: customerName.trim(),
-          customerPhone: customerPhone.trim(),
-          governorate: governorate,
-          items: items.map((item) => ({
-            itemId: Number(item.itemId),
-            quantity: Number(item.quantity),
-          })),
-          shippingAddress: shippingAddress.trim(),
-          customerNote: customerNote.trim(),
-          shippingCost: parsedShippingCost,
-        };
+        const formData = new FormData();
+
+        formData.append("customerName", customerName.trim());
+        formData.append("customerPhone", customerPhone.trim());
+        formData.append("governorate", governorate);
+        formData.append("shippingAddress", shippingAddress.trim());
+        formData.append("customerNote", customerNote.trim());
+        formData.append("shippingCost", String(parsedShippingCost));
+
+        // بيانات المنتجات فقط، بدون تضمين الملفات داخل JSON.
+        const orderItems = items.map((item) => ({
+          itemId: Number(item.itemId),
+          quantity: Number(item.quantity),
+        }));
+
+        formData.append("items", JSON.stringify(orderItems));
+
+        // ربط اسم كل ملف بمعرّف المنتج الخاص به.
+        items.forEach((item) => {
+          if (item.realImageFile instanceof File) {
+            formData.append(
+              `itemImage_${item.itemId}`,
+              item.realImageFile,
+              item.realImageFile.name,
+            );
+          }
+        });
 
         const response = await authFetch("/api/orders", {
           method: "POST",
-          body: JSON.stringify(payload),
+          body: formData,
         });
 
         const data = await readResponse(response);
@@ -378,7 +426,9 @@ export function useOrdersLogic() {
     const counts = { all: orders.length };
 
     for (const status of STATUSES) {
-      counts[status] = orders.filter((order) => order.status === status).length;
+      counts[status] = orders.filter(
+        (order) => order.status === status,
+      ).length;
     }
 
     return counts;
@@ -399,7 +449,10 @@ export function useOrdersLogic() {
       cancelled: countByStatus("cancelled"),
       revenue: orders
         .filter((order) => order.status !== "cancelled")
-        .reduce((total, order) => total + Number(order.totalAmount || 0), 0),
+        .reduce(
+          (total, order) => total + Number(order.totalAmount || 0),
+          0,
+        ),
     };
   }, [orders]);
 
@@ -443,33 +496,32 @@ export function useOrdersLogic() {
       if (!query) return true;
 
       return (
-        String(product.name || "")
-          .toLowerCase()
-          .includes(query) ||
-        String(product.itemId ?? "")
-          .toLowerCase()
-          .includes(query)
+        String(product.name || "").toLowerCase().includes(query) ||
+        String(product.itemId ?? "").toLowerCase().includes(query)
       );
     });
   }, [products, form.productSearch]);
 
   const selectedProduct = useMemo(
     () =>
-      products.find((product) => String(product.itemId) === form.productId) ||
-      null,
+      products.find(
+        (product) => String(product.itemId) === form.productId,
+      ) || null,
     [products, form.productId],
   );
 
   const estimatedSubtotal = useMemo(
     () =>
       form.items.reduce(
-        (total, item) => total + Number(item.unitPrice) * Number(item.quantity),
+        (total, item) =>
+          total + Number(item.unitPrice) * Number(item.quantity),
         0,
       ),
     [form.items],
   );
 
   const parsedShippingCost = Number(form.shippingCost);
+
   const validShippingCost =
     Number.isFinite(parsedShippingCost) && parsedShippingCost >= 0
       ? parsedShippingCost
@@ -503,13 +555,19 @@ export function useOrdersLogic() {
     const requestedQuantity = Number(form.quantity);
     const stock = getStockForProduct(selectedProduct);
 
-    if (!Number.isSafeInteger(requestedQuantity) || requestedQuantity < 1) {
+    if (
+      !Number.isSafeInteger(requestedQuantity) ||
+      requestedQuantity < 1
+    ) {
       setFormError("Quantity must be a positive whole number.");
       return;
     }
 
     const itemId = Number(selectedProduct.itemId);
-    const existingItem = form.items.find((item) => item.itemId === itemId);
+    const existingItem = form.items.find(
+      (item) => Number(item.itemId) === itemId,
+    );
+
     const totalRequested =
       requestedQuantity + Number(existingItem?.quantity || 0);
 
@@ -519,12 +577,17 @@ export function useOrdersLogic() {
     }
 
     setForm((current) => {
-      const existing = current.items.find((item) => item.itemId === itemId);
+      const existing = current.items.find(
+        (item) => Number(item.itemId) === itemId,
+      );
 
       const nextItems = existing
         ? current.items.map((item) =>
-            item.itemId === itemId
-              ? { ...item, quantity: item.quantity + requestedQuantity }
+            Number(item.itemId) === itemId
+              ? {
+                  ...item,
+                  quantity: Number(item.quantity) + requestedQuantity,
+                }
               : item,
           )
         : [
@@ -535,6 +598,12 @@ export function useOrdersLogic() {
               quantity: requestedQuantity,
               unitPrice: getProductPrice(selectedProduct),
               availableStock: stock,
+
+              // صورة الكتالوج للعرض فقط.
+              imagePath: selectedProduct.imagePath || null,
+
+              // صورة الطبيعة تُرفع بشكل مستقل.
+              realImageFile: null,
             },
           ];
 
@@ -551,13 +620,15 @@ export function useOrdersLogic() {
   const changeItemQuantity = useCallback(
     (itemId, value) => {
       const nextQuantity = Number(value);
-      const item = form.items.find((entry) => entry.itemId === itemId);
+      const item = form.items.find(
+        (entry) => String(entry.itemId) === String(itemId),
+      );
 
       if (
         !item ||
         !Number.isSafeInteger(nextQuantity) ||
         nextQuantity < 1 ||
-        nextQuantity > item.availableStock
+        nextQuantity > Number(item.availableStock)
       ) {
         return;
       }
@@ -565,11 +636,12 @@ export function useOrdersLogic() {
       setForm((current) => ({
         ...current,
         items: current.items.map((entry) =>
-          entry.itemId === itemId
+          String(entry.itemId) === String(itemId)
             ? { ...entry, quantity: nextQuantity }
             : entry,
         ),
       }));
+
       setFormError("");
     },
     [form.items],
@@ -578,20 +650,23 @@ export function useOrdersLogic() {
   const removeItem = useCallback((itemId) => {
     setForm((current) => ({
       ...current,
-      items: current.items.filter((item) => item.itemId !== itemId),
+      items: current.items.filter(
+        (item) => String(item.itemId) !== String(itemId),
+      ),
     }));
+
     setFormError("");
   }, []);
 
   const submitNewOrder = useCallback(
     async (event) => {
-      event.preventDefault();
+      event?.preventDefault?.();
 
       const validationError = validateOrderForm(form);
 
       if (validationError) {
         setFormError(validationError);
-        return;
+        return false;
       }
 
       setFormError("");
@@ -600,10 +675,10 @@ export function useOrdersLogic() {
         await addOrder({
           customerName: form.customerName,
           customerPhone: form.customerPhone,
-          items: form.items.map(({ itemId, quantity }) => ({
-            itemId,
-            quantity,
-          })),
+
+          // نمرر الملفات للدالة، وهي تفصلها عن بيانات JSON.
+          items: form.items,
+
           shippingAddress: form.shippingAddress,
           governorate: form.governorate,
           customerNote: form.customerNote,
@@ -612,8 +687,11 @@ export function useOrdersLogic() {
 
         setShowAddOrder(false);
         setForm({ ...EMPTY_FORM });
+
+        return true;
       } catch (err) {
         setFormError(err.message || "Could not create this order.");
+        return false;
       }
     },
     [form, addOrder],
@@ -624,7 +702,8 @@ export function useOrdersLogic() {
     setStatusFilter("all");
   }, []);
 
-  const hasActiveFilters = Boolean(search.trim()) || statusFilter !== "all";
+  const hasActiveFilters =
+    Boolean(search.trim()) || statusFilter !== "all";
 
   const [exportingOrders, setExportingOrders] = useState(false);
 
@@ -753,6 +832,7 @@ export function useOrdersLogic() {
     handleAddItem,
     changeItemQuantity,
     removeItem,
+    setItemRealImage,
     submitNewOrder,
 
     exportQPExpresse,

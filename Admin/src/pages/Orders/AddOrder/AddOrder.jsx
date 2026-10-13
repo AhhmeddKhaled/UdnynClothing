@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -8,39 +9,98 @@ import {
   HiOutlineClipboard,
 } from "react-icons/hi";
 
-import './AddOrder.css'
+import "./AddOrder.css";
+import "./RealImagePicker.css";
 
 import { useOrdersLogic } from "../../../UI_Logic/OrdersLogic.jsx";
 import ContentHeader from "../../../Components/ContentHeader/ContentHeader.jsx";
 import Button from "../../../Components/Button/Button";
 
 import BarcodeScanner from "./BarcodeScanner.jsx";
+import RealImagePicker from "./RealImagePicker.jsx";
+
 import {
   parseCustomerMessage,
   normalizePhone,
   normalizeDigits,
   isValidPhone,
 } from "./parseCustomerMessage.js";
-import { findGovernorateOption, getShippingFeeFor } from "./governorates.js";
 
-import "./AddOrder.css";
+import {
+  findGovernorateOption,
+  getShippingFeeFor,
+} from "./governorates.js";
 
-// Product fields that may hold the printed barcode value (first match wins).
-// Adjust to whatever your products API returns.
 const CODE_FIELDS = ["barcode", "sku", "code", "itemId"];
 
-// Tiny local toast (no dependency): success / error / warning.
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "").replace(
+  /\/+$/,
+  ""
+);
+
+// Build the product image URL.
+function getProductImageUrl(imagePath) {
+  if (!imagePath) return "";
+
+  const path = String(imagePath).trim();
+
+  if (/^(https?:\/\/|data:|blob:)/i.test(path)) {
+    return path;
+  }
+
+  return `${API_BASE_URL}/${path.replace(/^\/+/, "")}`;
+}
+
+// Display the catalog image independently of the actual order photo.
+function ProductImage({ imagePath, name, itemId }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const imageUrl = getProductImageUrl(imagePath);
+
+  useEffect(() => {
+    setImageFailed(false);
+  }, [imageUrl]);
+
+  if (!imageUrl || imageFailed) {
+    return (
+      <span className="ao-product-image ao-product-image-empty">
+        No image
+      </span>
+    );
+  }
+
+  return (
+    <img
+      className="ao-product-image"
+      src={imageUrl}
+      alt={name || `Item ${itemId}`}
+      loading="lazy"
+      onError={() => setImageFailed(true)}
+    />
+  );
+}
+
+// Success and error notifications.
 function useToast() {
   const [toast, setToast] = useState(null);
   const timer = useRef(null);
 
   const showToast = (message, type = "success") => {
     clearTimeout(timer.current);
-    setToast({ message, type, id: Date.now() });
-    timer.current = setTimeout(() => setToast(null), 2800);
+
+    setToast({
+      message,
+      type,
+      id: Date.now(),
+    });
+
+    timer.current = setTimeout(() => {
+      setToast(null);
+    }, 2800);
   };
 
-  useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => {
+    return () => clearTimeout(timer.current);
+  }, []);
 
   return { toast, showToast };
 }
@@ -65,6 +125,7 @@ export default function AddOrder() {
     handleAddItem,
     changeItemQuantity,
     removeItem,
+    setItemRealImage,
     submitNewOrder,
     formatMoney,
     getProductPrice,
@@ -73,7 +134,7 @@ export default function AddOrder() {
 
   const [showProductResults, setShowProductResults] = useState(false);
   const [rawMessage, setRawMessage] = useState("");
-  const [autofill, setAutofill] = useState({}); // field -> "auto" | "review"
+  const [autofill, setAutofill] = useState({});
   const [parseInfo, setParseInfo] = useState(null);
   const [shippingOverridden, setShippingOverridden] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
@@ -82,28 +143,39 @@ export default function AddOrder() {
   const pasteRef = useRef(null);
   const { toast, showToast } = useToast();
 
-  // Only admins should edit shipping. Until your hook exposes `canEditShipping`
-  // (or `isAdmin`) this stays editable so nothing breaks. Enforce it on the server too.
-  const canEditShipping = logic.canEditShipping ?? logic.isAdmin ?? true;
+  const canEditShipping =
+    logic.canEditShipping ?? logic.isAdmin ?? true;
+
   const getFee = (governorate) =>
-    logic.getShippingFee?.(governorate) ?? getShippingFeeFor(governorate);
-  const defaultFee = form.governorate ? getFee(form.governorate) : null;
+    logic.getShippingFee?.(governorate) ??
+    getShippingFeeFor(governorate);
 
-  // ---------------------------------------------------------------- helpers
+  const defaultFee = form.governorate
+    ? getFee(form.governorate)
+    : null;
+
+  // -------------------------------------------------
+  // Helpers
+  // -------------------------------------------------
+
   const clearMark = (field) =>
-    setAutofill((prev) => (prev[field] ? { ...prev, [field]: undefined } : prev));
+    setAutofill((prev) =>
+      prev[field]
+        ? { ...prev, [field]: undefined }
+        : prev
+    );
 
-  // For fields the user types in: the "Extracted" badge disappears once they edit it.
   const userEdit = (field, value) => {
     updateFormField(field, value);
     clearMark(field);
   };
 
-  // Choosing a governorate also sets the shipping cost automatically.
   const applyGovernorate = (governorate) => {
     updateFormField("governorate", governorate);
     setShippingOverridden(false);
+
     const fee = governorate ? getFee(governorate) : null;
+
     if (fee !== null && fee !== undefined) {
       updateFormField("shippingCost", String(fee));
     }
@@ -121,9 +193,13 @@ export default function AddOrder() {
       <em className="ao-badge ao-badge-review">Check</em>
     ) : null;
 
-  // ------------------------------------------------- smart paste / extraction
+  // -------------------------------------------------
+  // Smart paste and customer information extraction
+  // -------------------------------------------------
+
   const runExtraction = (text) => {
     const raw = String(text ?? rawMessage).trim();
+
     if (!raw) return;
 
     const r = parseCustomerMessage(raw);
@@ -144,7 +220,11 @@ export default function AddOrder() {
     fill("customerPhone", r.phones[0], "phone");
     fill("shippingAddress", r.address, "address");
 
-    const option = findGovernorateOption(r.govIndex, governorates);
+    const option = findGovernorateOption(
+      r.govIndex,
+      governorates
+    );
+
     if (option) {
       applyGovernorate(option);
       marks.governorate = "auto";
@@ -154,17 +234,28 @@ export default function AddOrder() {
     }
 
     const noteParts = [];
-    if (r.notes) noteParts.push(r.notes);
-    if (r.phones[1]) noteParts.push(`Second phone: ${r.phones[1]}`);
+
+    if (r.notes) {
+      noteParts.push(r.notes);
+    }
+
+    if (r.phones[1]) {
+      noteParts.push(`Second phone: ${r.phones[1]}`);
+    }
+
     if (noteParts.length) {
       updateFormField("customerNote", noteParts.join(" | "));
       marks.customerNote = "auto";
     }
 
     const multipleNames = r.warnings.includes("multiple-names");
-    if (multipleNames) marks.customerName = "review";
+
+    if (multipleNames) {
+      marks.customerName = "review";
+    }
 
     setAutofill(marks);
+
     setParseInfo({
       statedTotal: r.statedTotal,
       hints: r.hints,
@@ -173,75 +264,131 @@ export default function AddOrder() {
     });
 
     if (missing.length || multipleNames) {
-      showToast("Extracted. Please check the highlighted fields.", "warning");
+      showToast(
+        "Extracted. Please check the highlighted fields.",
+        "warning"
+      );
     } else {
-      showToast("Details extracted. Review them before saving.");
+      showToast(
+        "Details extracted. Review them before saving."
+      );
     }
   };
 
   const pasteFromClipboard = async () => {
     try {
       const text = await navigator.clipboard.readText();
+
       setRawMessage(text);
       runExtraction(text);
     } catch {
       pasteRef.current?.focus();
-      showToast("Long-press the box and paste the message.", "warning");
+
+      showToast(
+        "Long-press the box and paste the message.",
+        "warning"
+      );
     }
   };
 
-  // ------------------------------------------------------------- scanning
-  // Returns { ok, message } so both the camera and the keyboard-scanner can show feedback.
+  // -------------------------------------------------
+  // Barcode scanning
+  // -------------------------------------------------
+
   const handleScannedCode = (rawCode) => {
     const code = normalizeDigits(String(rawCode)).trim();
-    if (!code) return { ok: false, message: "Empty code" };
+
+    if (!code) {
+      return {
+        ok: false,
+        message: "Empty code",
+      };
+    }
 
     const lower = code.toLowerCase();
+
     const product = products.find((p) =>
       CODE_FIELDS.some(
-        (f) => p[f] != null && String(p[f]).trim().toLowerCase() === lower
+        (field) =>
+          p[field] != null &&
+          String(p[field]).trim().toLowerCase() === lower
       )
     );
+
     if (!product) {
-      return { ok: false, notFound: true, message: `Code ${code} is not registered` };
+      return {
+        ok: false,
+        notFound: true,
+        message: `Code ${code} is not registered`,
+      };
     }
 
     const name = product.name || `Item ${product.itemId}`;
     const stock = getStockForProduct(product);
+
     const existing = form.items.find(
-      (i) => String(i.itemId) === String(product.itemId)
+      (item) =>
+        String(item.itemId) === String(product.itemId)
     );
 
-    // Same product scanned again: +1 quantity instead of a new row.
     if (existing) {
       const next = Number(existing.quantity) + 1;
       const max = Number(existing.availableStock ?? stock);
-      if (next > max) return { ok: false, message: `${name}: only ${max} in stock` };
-      changeItemQuantity(existing.itemId, String(next));
-      return { ok: true, message: `${name} × ${next}` };
+
+      if (next > max) {
+        return {
+          ok: false,
+          message: `${name}: only ${max} in stock`,
+        };
+      }
+
+      changeItemQuantity(
+        existing.itemId,
+        String(next)
+      );
+
+      return {
+        ok: true,
+        message: `${name} × ${next}`,
+      };
     }
 
-    if (stock < 1) return { ok: false, message: `${name} is out of stock` };
+    if (stock < 1) {
+      return {
+        ok: false,
+        message: `${name} is out of stock`,
+      };
+    }
 
-    // New product: select it, then let the effect below call handleAddItem
-    // once the form state has updated.
     updateFormField("productId", String(product.itemId));
     updateFormField("quantity", "1");
     setPendingScan(String(product.itemId));
-    return { ok: true, message: `Added: ${name}` };
+
+    return {
+      ok: true,
+      message: `Added: ${name}`,
+    };
   };
 
   useEffect(() => {
     if (!pendingScan) return;
-    if (form.productId === pendingScan && String(form.quantity) === "1") {
+
+    if (
+      form.productId === pendingScan &&
+      String(form.quantity) === "1"
+    ) {
       handleAddItem?.({ preventDefault() {} });
       updateFormField("productSearch", "");
       setPendingScan(null);
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingScan, form.productId, form.quantity]);
 
-  // ------------------------------------------------------------ submit/reset
+  // -------------------------------------------------
+  // Reset form
+  // -------------------------------------------------
+
   const resetPage = () => {
     if (typeof logic.resetForm === "function") {
       logic.resetForm();
@@ -255,9 +402,15 @@ export default function AddOrder() {
         "customerNote",
         "productSearch",
         "productId",
-      ].forEach((field) => updateFormField(field, ""));
+      ].forEach((field) => {
+        updateFormField(field, "");
+      });
+
       updateFormField("quantity", "1");
-      form.items.forEach((item) => removeItem(item.itemId));
+
+      form.items.forEach((item) => {
+        removeItem(item.itemId);
+      });
     }
 
     setRawMessage("");
@@ -265,9 +418,19 @@ export default function AddOrder() {
     setParseInfo(null);
     setShippingOverridden(false);
     setPendingScan(null);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    setShowProductResults(false);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+
     pasteRef.current?.focus();
   };
+
+  // -------------------------------------------------
+  // Submit order
+  // -------------------------------------------------
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -278,24 +441,38 @@ export default function AddOrder() {
     };
 
     if (!form.customerName?.trim()) {
-      return fail("ao-name", "Please enter the customer's name.");
+      return fail(
+        "ao-name",
+        "Please enter the customer's name."
+      );
     }
 
-    // Egyptian mobile numbers only. Relax this if you take international customers.
     if (!isValidPhone(form.customerPhone)) {
-      return fail("ao-phone", "Phone must be 11 digits and start with 01.");
+      return fail(
+        "ao-phone",
+        "Phone must be 11 digits and start with 01."
+      );
     }
 
     if (!form.items?.length) {
-      return fail("add-order-product-search", "Please add at least one product.");
+      return fail(
+        "add-order-product-search",
+        "Please add at least one product."
+      );
     }
 
     if (!form.governorate) {
-      return fail("ao-governorate", "Please select a governorate.");
+      return fail(
+        "ao-governorate",
+        "Please select a governorate."
+      );
     }
 
     if (!form.shippingAddress?.trim()) {
-      return fail("ao-address", "Please enter the shipping address.");
+      return fail(
+        "ao-address",
+        "Please enter the shipping address."
+      );
     }
 
     if (
@@ -303,7 +480,10 @@ export default function AddOrder() {
       !Number.isFinite(Number(form.shippingCost)) ||
       Number(form.shippingCost) < 0
     ) {
-      return fail("ao-shipping", "Please enter a valid shipping cost.");
+      return fail(
+        "ao-shipping",
+        "Please enter a valid shipping cost."
+      );
     }
 
     const invalidItem = form.items.some(
@@ -314,12 +494,16 @@ export default function AddOrder() {
     );
 
     if (invalidItem) {
-      showToast("Please check product quantities and available stock.", "error");
+      showToast(
+        "Please check product quantities and available stock.",
+        "error"
+      );
+
       return;
     }
 
-    // submitNewOrder should return `false` on failure (and true/undefined on success).
     const ok = await submitNewOrder(event);
+
     if (ok === false) return;
 
     showToast("Order added successfully ✓");
@@ -327,41 +511,59 @@ export default function AddOrder() {
   };
 
   const phoneInvalid =
-    Boolean(form.customerPhone) && !isValidPhone(form.customerPhone);
+    Boolean(form.customerPhone) &&
+    !isValidPhone(form.customerPhone);
 
   const totalDiff =
     parseInfo?.statedTotal != null && form.items.length > 0
       ? parseInfo.statedTotal - Number(estimatedTotal)
       : null;
 
-  // ----------------------------------------------------------------- render
+  // -------------------------------------------------
+  // Render
+  // -------------------------------------------------
+
   return (
     <section className="orders-page add-order-page">
       <ContentHeader
         title="Add New Order"
         subTitle="Paste the customer's message, check the details, and add products."
         action={
-          <Button variant="text" onClick={() => navigate("/orders")}>
+          <Button
+            variant="text"
+            onClick={() => navigate("/orders")}
+          >
             <HiOutlineArrowLeft />
             Back to Orders
           </Button>
         }
       />
 
-      <form className="orders-panel add-order-form" onSubmit={handleSubmit}>
+      <form
+        className="orders-panel add-order-form"
+        onSubmit={handleSubmit}
+      >
         <div className="orders-modal-content">
-          {/* ---------------------------------------------- 1. smart paste */}
-          <h3 className="orders-detail-section-title">Customer Message</h3>
+          {/* 1. Customer message */}
+
+          <h3 className="orders-detail-section-title">
+            Customer Message
+          </h3>
 
           <div className="ao-paste">
             <textarea
               ref={pasteRef}
               rows="4"
               value={rawMessage}
-              onChange={(event) => setRawMessage(event.target.value)}
+              onChange={(event) =>
+                setRawMessage(event.target.value)
+              }
               onPaste={(event) => {
                 event.preventDefault();
-                const text = event.clipboardData.getData("text");
+
+                const text =
+                  event.clipboardData.getData("text");
+
                 setRawMessage(text);
                 runExtraction(text);
               }}
@@ -385,7 +587,9 @@ export default function AddOrder() {
                 type="button"
                 className="orders-details-button"
                 onClick={() => runExtraction()}
-                disabled={addingOrder || !rawMessage.trim()}
+                disabled={
+                  addingOrder || !rawMessage.trim()
+                }
               >
                 Extract details
               </button>
@@ -395,8 +599,9 @@ export default function AddOrder() {
               <div className="ao-paste-notes">
                 {parseInfo.missing.length > 0 ? (
                   <p className="ao-paste-note is-warning">
-                    Couldn't find: {parseInfo.missing.join(", ")}. Please fill in
-                    the highlighted fields.
+                    Couldn't find:{" "}
+                    {parseInfo.missing.join(", ")}.
+                    Please fill in the highlighted fields.
                   </p>
                 ) : (
                   <p className="ao-paste-note is-ok">
@@ -406,14 +611,15 @@ export default function AddOrder() {
 
                 {parseInfo.multipleNames && (
                   <p className="ao-paste-note is-warning">
-                    The message contains more than one name. The other name was
-                    added to the notes. Check who the customer is.
+                    The message contains more than one name.
+                    Check who the customer is.
                   </p>
                 )}
 
                 {parseInfo.hints.length > 0 && (
                   <div className="ao-hints">
                     <span>Mentioned in the message:</span>
+
                     {parseInfo.hints.map((hint) => (
                       <em key={hint}>{hint}</em>
                     ))}
@@ -423,17 +629,28 @@ export default function AddOrder() {
             )}
           </div>
 
-          {/* ------------------------------------------ 2. customer details */}
-          <h3 className="orders-detail-section-title">Customer Details</h3>
+          {/* 2. Customer details */}
+
+          <h3 className="orders-detail-section-title">
+            Customer Details
+          </h3>
 
           <div className="orders-form-grid">
             <label className={fieldClass("customerName")}>
-              <span>Customer Name * {badge("customerName")}</span>
+              <span>
+                Customer Name * {badge("customerName")}
+              </span>
+
               <input
                 id="ao-name"
                 type="text"
                 value={form.customerName}
-                onChange={(event) => userEdit("customerName", event.target.value)}
+                onChange={(event) =>
+                  userEdit(
+                    "customerName",
+                    event.target.value
+                  )
+                }
                 maxLength={120}
                 autoComplete="name"
                 required
@@ -443,15 +660,20 @@ export default function AddOrder() {
             </label>
 
             <label className={fieldClass("customerPhone")}>
-              <span>Phone Number * {badge("customerPhone")}</span>
+              <span>
+                Phone Number * {badge("customerPhone")}
+              </span>
+
               <input
                 id="ao-phone"
                 type="tel"
                 inputMode="tel"
                 value={form.customerPhone}
-                // Arabic digits become English digits as the user types / pastes.
                 onChange={(event) =>
-                  userEdit("customerPhone", normalizePhone(event.target.value))
+                  userEdit(
+                    "customerPhone",
+                    normalizePhone(event.target.value)
+                  )
                 }
                 maxLength={30}
                 autoComplete="tel"
@@ -460,6 +682,7 @@ export default function AddOrder() {
                 placeholder="01xxxxxxxxx"
                 aria-invalid={phoneInvalid}
               />
+
               {phoneInvalid && (
                 <small className="ao-field-msg">
                   Phone must be 11 digits and start with 01.
@@ -468,8 +691,11 @@ export default function AddOrder() {
             </label>
           </div>
 
-          {/* ------------------------------------------------- 3. products */}
-          <h3 className="orders-detail-section-title">Products</h3>
+          {/* 3. Products */}
+
+          <h3 className="orders-detail-section-title">
+            Products
+          </h3>
 
           {productsLoading ? (
             <p>Loading products...</p>
@@ -493,26 +719,42 @@ export default function AddOrder() {
                       type="search"
                       value={form.productSearch || ""}
                       onChange={(event) => {
-                        updateFormField("productSearch", event.target.value);
+                        updateFormField(
+                          "productSearch",
+                          event.target.value
+                        );
+
                         updateFormField("productId", "");
                         setShowProductResults(true);
                       }}
-                      onFocus={() => setShowProductResults(true)}
+                      onFocus={() =>
+                        setShowProductResults(true)
+                      }
                       onKeyDown={(event) => {
                         if (event.key !== "Enter") return;
-                        // A hardware scanner types the code and presses Enter:
-                        // never let that submit the whole form.
+
                         event.preventDefault();
 
-                        const code = event.currentTarget.value.trim();
+                        const code =
+                          event.currentTarget.value.trim();
+
                         if (!code) return;
 
-                        const res = handleScannedCode(code);
-                        // Typing a product *name* + Enter shouldn't show a "not registered" error.
-                        if (res.notFound && !/^[A-Za-z0-9._-]{4,}$/.test(code)) return;
+                        const result = handleScannedCode(code);
 
-                        showToast(res.message, res.ok ? "success" : "error");
-                        if (res.ok) {
+                        if (
+                          result.notFound &&
+                          !/^[A-Za-z0-9._-]{4,}$/.test(code)
+                        ) {
+                          return;
+                        }
+
+                        showToast(
+                          result.message,
+                          result.ok ? "success" : "error"
+                        );
+
+                        if (result.ok) {
                           updateFormField("productSearch", "");
                           setShowProductResults(false);
                         }
@@ -537,37 +779,57 @@ export default function AddOrder() {
                     <div className="orders-product-results">
                       {filteredProducts.length > 0 ? (
                         filteredProducts.map((product) => {
-                          const stock = getStockForProduct(product);
+                          const stock =
+                            getStockForProduct(product);
 
                           return (
                             <button
                               type="button"
                               key={product.itemId}
                               className="orders-product-result"
-                              disabled={addingOrder || stock < 1}
+                              disabled={
+                                addingOrder || stock < 1
+                              }
                               onClick={() => {
                                 updateFormField(
                                   "productId",
                                   String(product.itemId)
                                 );
+
                                 updateFormField(
                                   "productSearch",
-                                  product.name || `Item ${product.itemId}`
+                                  product.name ||
+                                    `Item ${product.itemId}`
                                 );
+
                                 setShowProductResults(false);
                               }}
                             >
-                              <span>
-                                <strong>
-                                  {product.name || `Item ${product.itemId}`}
-                                </strong>
-                                <small>
-                                  {formatMoney(getProductPrice(product))}
-                                </small>
+                              <span className="ao-product-info">
+                                <ProductImage
+                                  imagePath={product.imagePath}
+                                  name={product.name}
+                                  itemId={product.itemId}
+                                />
+
+                                <span className="ao-product-text">
+                                  <strong>
+                                    {product.name ||
+                                      `Item ${product.itemId}`}
+                                  </strong>
+
+                                  <small>
+                                    {formatMoney(
+                                      getProductPrice(product)
+                                    )}
+                                  </small>
+                                </span>
                               </span>
 
-                              <small>
-                                {stock > 0 ? `Stock: ${stock}` : "Out of stock"}
+                              <small className="ao-product-stock">
+                                {stock > 0
+                                  ? `Stock: ${stock}`
+                                  : "Out of stock"}
                               </small>
                             </button>
                           );
@@ -583,6 +845,7 @@ export default function AddOrder() {
 
                 <label className="orders-form-field">
                   <span>Quantity *</span>
+
                   <input
                     type="number"
                     inputMode="numeric"
@@ -590,7 +853,10 @@ export default function AddOrder() {
                     step="1"
                     value={form.quantity}
                     onChange={(event) =>
-                      updateFormField("quantity", event.target.value)
+                      updateFormField(
+                        "quantity",
+                        event.target.value
+                      )
                     }
                     required
                     disabled={addingOrder}
@@ -615,6 +881,8 @@ export default function AddOrder() {
             </>
           )}
 
+          {/* Selected products and actual product photos */}
+
           {form.items.length > 0 && (
             <>
               <h3 className="orders-detail-section-title">
@@ -627,68 +895,111 @@ export default function AddOrder() {
                   const max = Number(item.availableStock);
 
                   return (
-                    <div className="orders-detail-item" key={item.itemId}>
-                      <div>
-                        <strong>{item.name}</strong>
-                        <span>Unit Price: {formatMoney(item.unitPrice)}</span>
+                    <div
+                      className="orders-detail-item"
+                      key={item.itemId}
+                    >
+                      <div className="ao-selected-product">
+                        <ProductImage
+                          imagePath={item.imagePath}
+                          name={item.name}
+                          itemId={item.itemId}
+                        />
 
-                        {/* Change the quantity without adding the product again. */}
-                        <div className="ao-stepper">
-                          <button
-                            type="button"
-                            aria-label="Decrease quantity"
-                            disabled={addingOrder || qty <= 1}
-                            onClick={() =>
-                              changeItemQuantity(item.itemId, String(qty - 1))
-                            }
-                          >
-                            −
-                          </button>
+                        <div className="ao-selected-product-details">
+                          <strong>{item.name}</strong>
 
-                          <input
-                            type="number"
-                            inputMode="numeric"
-                            aria-label="Quantity"
-                            min="1"
-                            max={item.availableStock}
-                            step="1"
-                            value={item.quantity}
-                            required
-                            disabled={addingOrder}
-                            onChange={(event) =>
-                              changeItemQuantity(item.itemId, event.target.value)
-                            }
-                          />
+                          <span>
+                            Unit Price:{" "}
+                            {formatMoney(item.unitPrice)}
+                          </span>
 
-                          <button
-                            type="button"
-                            aria-label="Increase quantity"
-                            disabled={addingOrder || qty >= max}
-                            onClick={() =>
-                              changeItemQuantity(item.itemId, String(qty + 1))
-                            }
-                          >
-                            +
-                          </button>
+                          <div className="ao-stepper">
+                            <button
+                              type="button"
+                              aria-label="Decrease quantity"
+                              disabled={
+                                addingOrder || qty <= 1
+                              }
+                              onClick={() =>
+                                changeItemQuantity(
+                                  item.itemId,
+                                  String(qty - 1)
+                                )
+                              }
+                            >
+                              −
+                            </button>
+
+                            <input
+                              type="number"
+                              inputMode="numeric"
+                              aria-label="Quantity"
+                              min="1"
+                              max={item.availableStock}
+                              step="1"
+                              value={item.quantity}
+                              required
+                              disabled={addingOrder}
+                              onChange={(event) =>
+                                changeItemQuantity(
+                                  item.itemId,
+                                  event.target.value
+                                )
+                              }
+                            />
+
+                            <button
+                              type="button"
+                              aria-label="Increase quantity"
+                              disabled={
+                                addingOrder || qty >= max
+                              }
+                              onClick={() =>
+                                changeItemQuantity(
+                                  item.itemId,
+                                  String(qty + 1)
+                                )
+                              }
+                            >
+                              +
+                            </button>
+                          </div>
+
+                          {qty >= max && (
+                            <small className="ao-field-msg">
+                              Maximum available stock reached ({max}).
+                            </small>
+                          )}
                         </div>
-
-                        {qty >= max && (
-                          <small className="ao-field-msg">
-                            Maximum available stock reached ({max}).
-                          </small>
-                        )}
                       </div>
 
-                      <div>
+                      {/* Actual photo is separate from the catalog image. */}
+                      <RealImagePicker
+                        file={item.realImageFile || null}
+                        onChange={(file) => {
+                          setItemRealImage(
+                            item.itemId,
+                            file
+                          );
+                        }}
+                        disabled={addingOrder}
+                      />
+
+                      <div className="ao-selected-product-actions">
                         <strong>
-                          {formatMoney(Number(item.unitPrice) * qty)}
+                          {formatMoney(
+                            Number(item.unitPrice) * qty
+                          )}
                         </strong>
 
                         <button
                           type="button"
                           className="orders-details-button"
                           disabled={addingOrder}
-                          onClick={() => removeItem(item.itemId)}
+                          onClick={() =>
+                            removeItem(item.itemId)
+                          }
                         >
                           Remove
                         </button>
@@ -700,11 +1011,17 @@ export default function AddOrder() {
             </>
           )}
 
-          {/* ----------------------------------------------- 4. delivery */}
-          <h3 className="orders-detail-section-title">Delivery Details</h3>
+          {/* 4. Delivery details */}
+
+          <h3 className="orders-detail-section-title">
+            Delivery Details
+          </h3>
 
           <label className={fieldClass("governorate")}>
-            <span>Governorate * {badge("governorate")}</span>
+            <span>
+              Governorate * {badge("governorate")}
+            </span>
+
             <select
               id="ao-governorate"
               value={form.governorate}
@@ -718,7 +1035,10 @@ export default function AddOrder() {
               <option value="">Select a governorate</option>
 
               {governorates.map((governorate) => (
-                <option key={governorate} value={governorate}>
+                <option
+                  key={governorate}
+                  value={governorate}
+                >
                   {governorate}
                 </option>
               ))}
@@ -726,13 +1046,19 @@ export default function AddOrder() {
           </label>
 
           <label className={fieldClass("shippingAddress")}>
-            <span>Shipping Address * {badge("shippingAddress")}</span>
+            <span>
+              Shipping Address * {badge("shippingAddress")}
+            </span>
+
             <textarea
               id="ao-address"
               rows="3"
               value={form.shippingAddress}
               onChange={(event) =>
-                userEdit("shippingAddress", event.target.value)
+                userEdit(
+                  "shippingAddress",
+                  event.target.value
+                )
               }
               maxLength={1000}
               required
@@ -746,7 +1072,9 @@ export default function AddOrder() {
             <label htmlFor="ao-shipping">
               Shipping Cost (EGP) *{" "}
               {shippingOverridden && (
-                <em className="ao-badge ao-badge-review">Manual</em>
+                <em className="ao-badge ao-badge-review">
+                  Manual
+                </em>
               )}
             </label>
 
@@ -759,7 +1087,11 @@ export default function AddOrder() {
               value={form.shippingCost}
               readOnly={!canEditShipping}
               onChange={(event) => {
-                updateFormField("shippingCost", event.target.value);
+                updateFormField(
+                  "shippingCost",
+                  event.target.value
+                );
+
                 setShippingOverridden(true);
               }}
               required
@@ -776,7 +1108,9 @@ export default function AddOrder() {
                 <button
                   type="button"
                   className="ao-link"
-                  onClick={() => applyGovernorate(form.governorate)}
+                  onClick={() =>
+                    applyGovernorate(form.governorate)
+                  }
                 >
                   Reset to default ({formatMoney(defaultFee)})
                 </button>
@@ -785,19 +1119,30 @@ export default function AddOrder() {
           </div>
 
           <label className={fieldClass("customerNote")}>
-            <span>Customer Notes (Optional) {badge("customerNote")}</span>
+            <span>
+              Customer Notes (Optional) {badge("customerNote")}
+            </span>
+
             <textarea
               rows="3"
               value={form.customerNote}
-              onChange={(event) => userEdit("customerNote", event.target.value)}
+              onChange={(event) =>
+                userEdit(
+                  "customerNote",
+                  event.target.value
+                )
+              }
               maxLength={2000}
               disabled={addingOrder}
               placeholder="Enter any additional instructions"
             />
           </label>
 
-          {/* ------------------------------------------------- 5. summary */}
-          <h3 className="orders-detail-section-title">Order Summary</h3>
+          {/* 5. Order summary */}
+
+          <h3 className="orders-detail-section-title">
+            Order Summary
+          </h3>
 
           <div className="orders-detail-total">
             <span>Products Subtotal</span>
@@ -814,7 +1159,6 @@ export default function AddOrder() {
             <strong>{formatMoney(estimatedTotal)}</strong>
           </div>
 
-          {/* Cross-check against the total written in the customer's message. */}
           {totalDiff !== null &&
             (totalDiff === 0 ? (
               <p className="ao-chip is-ok">
@@ -823,10 +1167,11 @@ export default function AddOrder() {
               </p>
             ) : (
               <p className="ao-chip is-warning">
-                ⚠ The message says {formatMoney(parseInfo.statedTotal)} but this
-                order is {formatMoney(estimatedTotal)} (difference{" "}
-                {formatMoney(Math.abs(totalDiff))}). Check the products and
-                shipping.
+                ⚠ The message says{" "}
+                {formatMoney(parseInfo.statedTotal)} but this order
+                is {formatMoney(estimatedTotal)} (difference{" "}
+                {formatMoney(Math.abs(totalDiff))}). Check the
+                products and shipping.
               </p>
             ))}
 
@@ -870,7 +1215,9 @@ export default function AddOrder() {
         <BarcodeScanner
           onScan={handleScannedCode}
           onClose={() => setShowScanner(false)}
-          summary={`${form.items.length} products · ${formatMoney(estimatedTotal)}`}
+          summary={`${form.items.length} products · ${formatMoney(
+            estimatedTotal
+          )}`}
         />
       )}
 

@@ -1,3 +1,4 @@
+
 const mongoose = require("mongoose");
 
 const GOVERNORATES = [
@@ -57,6 +58,14 @@ const orderItemSchema = new mongoose.Schema(
       type: Number,
       required: true,
       min: 0,
+    },
+
+    // Actual photo uploaded for this order item.
+    // This is separate from the catalog/product image.
+    realImagePath: {
+      type: String,
+      default: null,
+      trim: true,
     },
   },
   { _id: false }

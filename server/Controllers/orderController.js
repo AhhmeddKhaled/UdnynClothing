@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const fs = require("fs/promises");
+const path = require("path");
 const Order = require("../Models/Order");
 const AvailableStock = require("../Models/AvailableStock");
 const XLSX = require("xlsx");
@@ -40,7 +42,6 @@ const EGYPTIAN_GOVERNORATES = [
   "بحر الاحمر",
 ];
 
-
 const ALLOWED_TRANSITIONS = {
   pending: ["confirmed", "cancelled"],
   confirmed: ["processing", "cancelled"],
@@ -68,10 +69,32 @@ function getOrderNumber() {
   return `UDN-${timestamp}-${random}`;
 }
 
+// Delete uploaded files if the order creation request fails.
+async function removeUploadedFiles(files = []) {
+  await Promise.all(
+    files.map(async (file) => {
+      if (!file?.path) return;
+
+      try {
+        await fs.unlink(file.path);
+      } catch (error) {
+        if (error.code !== "ENOENT") {
+          console.error(
+            "Unable to remove unused order image:",
+            error.message
+          );
+        }
+      }
+    })
+  );
+}
+
 // POST /api/orders
 // Manual orders can only be created by admins/owners.
 async function createOrder(req, res, next) {
   let session;
+  let orderCreated = false;
+  const uploadedFiles = Array.isArray(req.files) ? req.files : [];
 
   try {
     if (!isAdmin(req)) {
@@ -82,15 +105,36 @@ async function createOrder(req, res, next) {
       );
     }
 
+    const body = req.body || {};
+
+    // Temporary diagnostic: inspect the received multipart form fields.
+    console.log("[CREATE ORDER DIAGNOSTIC]", {
+      contentType: req.headers["content-type"],
+      bodyKeys: Object.keys(body),
+      customerName: body.customerName,
+      customerNameType: typeof body.customerName,
+      filesCount: uploadedFiles.length,
+    });
+
     const {
       customerName,
       customerPhone,
-      items,
       governorate,
       shippingAddress,
       customerNote = "",
       shippingCost = 0,
-    } = req.body || {};
+    } = body;
+
+    // Multipart form data sends the items array as a JSON string.
+    let items = body.items;
+
+    if (typeof items === "string") {
+      try {
+        items = JSON.parse(items);
+      } catch {
+        return sendError(res, 400, "Invalid order items format");
+      }
+    }
 
     // Validate customer details.
     if (
@@ -145,11 +189,53 @@ async function createOrder(req, res, next) {
 
     // Validate requested items.
     if (!Array.isArray(items) || items.length === 0) {
-      return sendError(res, 400, "Order must contain at least one item");
+      return sendError(
+        res,
+        400,
+        "Order must contain at least one item"
+      );
     }
 
     if (items.length > 100) {
       return sendError(res, 400, "Order contains too many items");
+    }
+
+    // Map uploaded photos to their corresponding product IDs.
+    const imagePathByItemId = new Map();
+
+    for (const file of uploadedFiles) {
+      const match = /^itemImage_(\d+)$/.exec(file.fieldname);
+
+      if (!match) {
+        return sendError(
+          res,
+          400,
+          "An uploaded image has an invalid field name"
+        );
+      }
+
+      const itemId = Number(match[1]);
+
+      if (!Number.isSafeInteger(itemId) || itemId <= 0) {
+        return sendError(
+          res,
+          400,
+          "An uploaded image has an invalid product ID"
+        );
+      }
+
+      if (imagePathByItemId.has(itemId)) {
+        return sendError(
+          res,
+          400,
+          `More than one image was uploaded for item ${itemId}`
+        );
+      }
+
+      imagePathByItemId.set(
+        itemId,
+        `/uploads/order-items/${path.basename(file.filename)}`
+      );
     }
 
     // Combine duplicate item IDs and validate quantities.
@@ -160,7 +246,11 @@ async function createOrder(req, res, next) {
       const quantity = Number(item?.quantity);
 
       if (!Number.isSafeInteger(itemId) || itemId <= 0) {
-        return sendError(res, 400, "Each item must have a valid itemId");
+        return sendError(
+          res,
+          400,
+          "Each item must have a valid itemId"
+        );
       }
 
       if (!Number.isSafeInteger(quantity) || quantity <= 0) {
@@ -175,10 +265,25 @@ async function createOrder(req, res, next) {
         (quantitiesByItemId.get(itemId) || 0) + quantity;
 
       if (!Number.isSafeInteger(combinedQuantity)) {
-        return sendError(res, 400, "Invalid combined item quantity");
+        return sendError(
+          res,
+          400,
+          "Invalid combined item quantity"
+        );
       }
 
       quantitiesByItemId.set(itemId, combinedQuantity);
+    }
+
+    // Do not accept images for products that aren't in the order.
+    for (const itemId of imagePathByItemId.keys()) {
+      if (!quantitiesByItemId.has(itemId)) {
+        return sendError(
+          res,
+          400,
+          `An image was uploaded for item ${itemId}, which is not in the order`
+        );
+      }
     }
 
     const requestedItems = [...quantitiesByItemId.entries()].sort(
@@ -250,6 +355,7 @@ async function createOrder(req, res, next) {
           unitPrice,
           quantity,
           lineTotal,
+          realImagePath: imagePathByItemId.get(itemId) || null,
         });
       }
 
@@ -272,7 +378,6 @@ async function createOrder(req, res, next) {
             shippingCost: parsedShippingCost,
             totalAmount,
 
-            // Save the selected governorate.
             governorate: governorate.trim(),
             shippingAddress: shippingAddress.trim(),
             customerNote: customerNote.trim(),
@@ -284,6 +389,8 @@ async function createOrder(req, res, next) {
 
       responseOrder = createdOrder;
     });
+
+    orderCreated = true;
 
     return res.status(201).json({
       success: true,
@@ -307,6 +414,10 @@ async function createOrder(req, res, next) {
   } finally {
     if (session) {
       await session.endSession();
+    }
+
+    if (!orderCreated) {
+      await removeUploadedFiles(uploadedFiles);
     }
   }
 }
@@ -624,13 +735,11 @@ async function deleteOrder(req, res, next) {
   }
 }
 
-
 // GET /api/orders/export/qp-expresse
 async function exportQPExpresse(req, res, next) {
   try {
     const filter = {};
 
-    // Optional status filter
     if (req.query.status) {
       if (!VALID_STATUSES.includes(req.query.status)) {
         return sendError(res, 400, "Invalid order status filter");
@@ -639,13 +748,11 @@ async function exportQPExpresse(req, res, next) {
       filter.status = req.query.status;
     }
 
-    // Fetch all matching orders without pagination
     const orders = await Order.find(filter)
       .populate("customer", "name")
       .sort({ createdAt: -1 })
       .lean();
 
-    // Exact QP Expresse column names and order
     const headers = [
       "full name",
       "phone",
@@ -665,14 +772,14 @@ async function exportQPExpresse(req, res, next) {
         order.customerName || order.customer?.name || "",
         order.customerPhone || "",
         order.shippingAddress || "",
-        "", // customer serial
+        "",
         Number(order.totalAmount) || 0,
         order.customerNote || "",
         order.createdAt
           ? new Date(order.createdAt).toLocaleDateString("en-GB")
           : "",
         "ملابس",
-        "", // weight
+        "",
         order.governorate || "",
       ]),
     ];
@@ -730,5 +837,5 @@ module.exports = {
   getOrderById,
   updateOrderStatus,
   exportQPExpresse,
-  deleteOrder
+  deleteOrder,
 };
