@@ -7,6 +7,9 @@
 [data-theme="light"] {
   color-scheme: light;
 
+  /*######################################################
+  Colors System  
+  #######################################################*/
   /* Backgrounds */
   --color-ink: #2a1f26;
   --color-paper: #ffffff;
@@ -14,6 +17,9 @@
   --color-sand-deep: #f3f4f6;
   --color-card: #f8f9fb;
   --color-card-hover: #f1f3f6;
+
+  --color-primary: #2a1f26;
+  --color-secondary: #e7e7e7;
 
   /* Plum */
   --color-plum: #3b2436;
@@ -26,13 +32,60 @@
   --color-accent-hover: #2a1826;
   --color-accent-soft: #f1eaf0;
 
-  /* Success */
   --color-sage: #5b7b5e;
-  --color-sage-bg: #e7eee4;
+  --color-sage-bg: #dcfce7;
+
+  /* Success */
+  --status-success: #216c42;
+  --status-success-bg: #effaf3;
 
   /* Danger */
-  --color-clay: #b5563d;
-  --color-clay-bg: #f6e4dd;
+  --status-clay: #b5563d;
+  --status-clay-bg: #f6e4dd;
+
+  /* Error */
+  --status-error: #dc2626;
+  --status-error-bg: #fee2e2;
+
+  /* Warning */
+  --status-warning: #d97706;
+  --status-warning-bg: #fef3c7;
+
+  /* Info */
+  --status-info: #2563eb;
+  --status-info-bg: #dbeafe;
+
+  /* Oders Status */
+  --status-pending: #64748b;
+  --status-pending-bg: #f1f5f9;
+
+  /* Confirmed */
+  --status-confirmed: #2563eb;
+  --status-confirmed-bg: #dbeafe;
+
+  /* Preparing */
+  --status-preparing: #7c3aed;
+  --status-preparing-bg: #ede9fe;
+
+  /* Shipping */
+  --status-shipping: #d97706;
+  --status-shipping-bg: #fef3c7;
+
+  /* Delivered */
+  --status-delivered: #16a34a;
+  --status-delivered-bg: #dcfce7;
+
+  /* Return */
+  --status-return: #0891b2;
+  --status-return-bg: #cffafe;
+
+  /* Cancelled */
+  --status-cancelled: #dc2626;
+  --status-cancelled-bg: #fee2e2;
+
+  /* Buttons Variant  */
+  --btn-download: #7CB9E8;
+  --btn-download-hover: #5A9BD5;
 
   /* Borders */
   --color-line: #e5e7eb;
@@ -67,6 +120,7 @@
   --radius-sm: 2px;
   --radius-md: 6px;
   --radius-lg: 12px;
+  --radius-xl: 18px;
   --radius-full: 999px;
 
   /* Shadows */
@@ -202,20 +256,6 @@ a:active {
   color: var(--color-plum);
 }
 
-/* ======================================================
-   Shared Surfaces
-   ====================================================== */
-
-.card,
-.stat-card,
-.dashboard-card,
-.product-card,
-.stock-card {
-  background: var(--color-card);
-  color: var(--color-ink);
-  border: 1px solid var(--color-line);
-  box-shadow: var(--shadow-card);
-}
 
 /* Main page containers */
 .dashboard-layout,
@@ -330,7 +370,6 @@ body,
 .dashboard-content,
 .sb-aside,
 .sb-topbar,
-.card,
 .stat-card,
 .dashboard-card,
 .product-card,

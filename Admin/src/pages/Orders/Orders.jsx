@@ -1,8 +1,6 @@
 
 import "./Orders.css";
-import { useOrdersLogic } from "../../UI_Logic/OrdersLogic.jsx";
 import { useNavigate } from "react-router-dom";
-
 import {
   HiOutlineClipboardList,
   HiOutlineSearch,
@@ -11,33 +9,24 @@ import {
   HiOutlineTrash,
   HiOutlinePlus,
 } from "react-icons/hi";
-
 import { GoDownload } from "react-icons/go";
+import { BsCashCoin } from "react-icons/bs";
+import { ImCancelCircle } from "react-icons/im";
+import { TbTruckDelivery } from "react-icons/tb";
+import { VscSessionInProgress } from "react-icons/vsc";
+import { SiVirustotal } from "react-icons/si";
+import { CiDeliveryTruck } from "react-icons/ci";
+import { GoArrowUpRight } from "react-icons/go";
 
+
+
+import { useOrdersLogic } from "../../UI_Logic/OrdersLogic.jsx";
 import ContentHeader from "../../Components/ContentHeader/ContentHeader.jsx";
 import Button from "../../Components/Button/Button";
+import Tost from '../../Components/Tost/Tost';
+import StatsContainer from "../../Components/StatCard/StatsContainer";
+import StatCard from '../../Components/StatCard/StatCard';
 
-function Icon({ name, size = 18 }) {
-  const icons = {
-    orders: HiOutlineClipboardList,
-    search: HiOutlineSearch,
-    close: HiOutlineX,
-    eye: HiOutlineEye,
-    trash: HiOutlineTrash,
-  };
-
-  const IconComponent = icons[name];
-
-  if (!IconComponent) return null;
-
-  return (
-    <IconComponent
-      aria-hidden="true"
-      size={size}
-      focusable="false"
-    />
-  );
-}
 
 function StatusBadge({ status, statuses = [] }) {
   const normalizedStatus = statuses.includes(status)
@@ -101,7 +90,6 @@ function OrderDetailsModal({ order, logic }) {
             onClick={onClose}
             aria-label="Close order details"
           >
-            <Icon name="close" />
           </button>
         </header>
 
@@ -258,46 +246,60 @@ export default function Orders() {
 
   const statCards = [
     {
-      label: "Total orders",
+      title: "Total orders",
       value: stats.total,
-      caption: "All orders",
-      className: "orders-stat-total",
+      description: "All orders",
+      icon: <SiVirustotal />,
+      rate: "+25%",
+      status: "confirmed"
     },
     {
-      label: "Pending",
+      title: "Pending",
       value: stats.pending,
-      caption: "Awaiting processing",
-      className: "orders-stat-pending",
+      description: "Awaiting processing",
+      icon: <BsCashCoin />,
+      rate: "+12%",
+      status: "pending"
     },
     {
-      label: "In progress",
+      title: "In progress",
       value: stats.inProgress,
-      caption: "Confirmed or processing",
-      className: "orders-stat-progress",
+      description: "Confirmed or processing",
+      icon: <VscSessionInProgress />,
+      rate: "-32%",
+      rateStatus: false,
+      status: "preparing"
     },
     {
-      label: "Shipped",
+      title: "shipping",
       value: stats.shipped,
-      caption: "On the way",
-      className: "orders-stat-shipped",
+      description: "On the way",
+      icon: <TbTruckDelivery />,
+      rate: "+42%",
+      status: "shipping"
     },
     {
-      label: "Delivered",
+      title: "delivered",
       value: stats.delivered,
-      caption: "Successfully delivered",
-      className: "orders-stat-delivered",
+      description: "Successfully delivered",
+      icon: <CiDeliveryTruck />,
+      rate: "+48%",
+      status: "delivered"
     },
     {
-      label: "Cancelled",
+      title: "cancelled",
       value: stats.cancelled,
-      caption: "Cancelled orders",
-      className: "orders-stat-cancelled",
+      description: "Cancelled orders",
+      icon: <ImCancelCircle />,
+      rate: "-22%",
+      status: "cancelled"
     },
     {
-      label: "Revenue",
+      title: "Revenue",
       value: formatMoney(stats.revenue),
-      caption: "Excluding cancelled orders",
-      className: "orders-stat-revenue",
+      description: "Excluding cancelled orders",
+      icon: <BsCashCoin />,
+      rate: "+26%"
     },
   ];
 
@@ -311,8 +313,7 @@ export default function Orders() {
             <Button
               onClick={exportQPExpresse}
               loading={exportingOrders}
-              className="orders-export-btn"
-              variant="text"
+              variant="download"
             >
               <span className="icon">
                 <GoDownload />
@@ -354,45 +355,25 @@ export default function Orders() {
         </div>
       )}
 
-      {successMessage && (
-        <div
-          className="orders-message orders-message-success"
-          role="status"
-        >
-          <span>{successMessage}</span>
+      {successMessage && <Tost 
+      status="success"
+      description={successMessage}
+      />}
 
-          <button
-            type="button"
-            className="orders-message-dismiss"
-            onClick={() => setSuccessMessage("")}
-            aria-label="Dismiss success message"
-          >
-            ×
-          </button>
-        </div>
-      )}
-
-      <section
-        className="orders-stats"
-        aria-label="Order statistics"
-      >
-        {statCards.map((stat) => (
-          <article
-            className={`orders-stat-card ${stat.className}`}
-            key={stat.label}
-          >
-            <span className="orders-stat-label">
-              {stat.label}
-            </span>
-
-            <strong>{stat.value}</strong>
-
-            <span className="orders-stat-caption">
-              {stat.caption}
-            </span>
-          </article>
+      <StatsContainer>
+        {statCards.map((stat,i) => (
+          <StatCard 
+          key={i}
+          title={stat.title}
+          value={stat.value}
+          description={stat.description}
+          status={stat.status}
+          icon={stat.icon}
+          rate={stat.rate}
+          rateStatus={stat.rateStatus}
+          />
         ))}
-      </section>
+        </StatsContainer>
 
       <section className="orders-panel">
         <header className="orders-panel-header">
@@ -411,7 +392,6 @@ export default function Orders() {
 
         <div className="orders-toolbar">
           <label className="orders-search">
-            <Icon name="search" />
 
             <input
               type="search"
@@ -468,7 +448,6 @@ export default function Orders() {
         {loading ? (
           <div className="orders-empty" role="status">
             <span className="orders-empty-icon">
-              <Icon name="orders" />
             </span>
 
             <h3>Loading orders</h3>
@@ -479,7 +458,6 @@ export default function Orders() {
         ) : error && filteredOrders.length === 0 ? (
           <div className="orders-empty">
             <span className="orders-empty-icon">
-              <Icon name="orders" />
             </span>
 
             <h3>Unable to load orders</h3>
@@ -499,7 +477,6 @@ export default function Orders() {
         ) : filteredOrders.length === 0 ? (
           <div className="orders-empty">
             <span className="orders-empty-icon">
-              <Icon name="orders" />
             </span>
 
             <h3>
@@ -608,7 +585,6 @@ export default function Orders() {
                               order.orderNumber || ""
                             }`}
                           >
-                            <Icon name="eye" />
                             Details
                           </button>
 
@@ -621,7 +597,6 @@ export default function Orders() {
                               order.orderNumber || ""
                             }`}
                           >
-                            <Icon name="trash" />
                             {isDeleting
                               ? "Deleting..."
                               : "Delete"}

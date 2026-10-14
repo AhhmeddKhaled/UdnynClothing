@@ -12,21 +12,11 @@
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-.orders-page *,
-.orders-page *::before,
-.orders-page *::after {
-  box-sizing: border-box;
-}
-
 .orders-page button,
 .orders-page input,
 .orders-page select,
 .orders-page textarea {
   font: inherit;
-}
-
-.orders-page button {
-  cursor: pointer;
 }
 
 .orders-page button:focus-visible,
@@ -35,11 +25,6 @@
 .orders-page textarea:focus-visible {
   outline: 2px solid var(--color-gold);
   outline-offset: 3px;
-}
-
-.orders-page button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
 }
 
 .orders-page h1,
@@ -102,13 +87,6 @@
   gap: var(--space-3);
 }
 
-.orders-header-actions > button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-}
-
 .orders-header-actions .icon {
   display: inline-flex;
   align-items: center;
@@ -123,79 +101,6 @@
    Statistics Cards
 ========================= */
 
-.orders-stats {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-4);
-  margin-bottom: var(--space-6);
-}
-
-.orders-stat-card {
-  --state-bg: var(--color-card);
-
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  min-width: 0;
-  padding: var(--space-5);
-  overflow: hidden;
-  color: var(--color-ink);
-  background: var(--state-bg);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-.orders-stat-total,
-.orders-stat-pending,
-.orders-stat-confirmed,
-.orders-stat-progress,
-.orders-stat-shipped,
-.orders-stat-delivered,
-.orders-stat-cancelled,
-.orders-stat-revenue {
-  --state-bg: var(--color-card);
-}
-
-.orders-stat-card:hover {
-  background: var(--color-card-hover);
-  border-color: var(--color-gold);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card);
-}
-
-.orders-stat-label,
-.orders-stat-title {
-  margin: 0;
-  color: var(--color-plum-soft);
-  font-size: var(--text-sm);
-  font-weight: 600;
-}
-
-.orders-stat-card > strong,
-.orders-stat-value {
-  margin: 0;
-  color: var(--color-ink);
-  font-size: var(--text-2xl);
-  font-weight: 700;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
-  font-variant-numeric: tabular-nums;
-}
-
-.orders-stat-caption,
-.orders-stat-description {
-  margin: 0;
-  color: var(--color-plum-soft);
-  font-size: var(--text-xs);
-  line-height: 1.7;
-}
 
 /* =========================
    Main Panel

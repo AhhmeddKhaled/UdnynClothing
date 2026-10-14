@@ -18,7 +18,7 @@ export default function Button({
     <button
       {...props}
       type={type}
-      className={`dash-btn dash-btn-${variant} ${className}`.trim()}
+      className={`btn btn-${variant} ${className}`.trim()}
       onClick={handleClick}
       disabled={isDisabled}
       aria-busy={loading || undefined}

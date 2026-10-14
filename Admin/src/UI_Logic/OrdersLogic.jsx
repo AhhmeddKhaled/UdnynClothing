@@ -1,6 +1,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { authFetch } from "../pages/Login/auth.js";
+import { Audio } from '../services/audio.js';
 
 const STATUSES = [
   "pending",
@@ -274,8 +275,6 @@ export function useOrdersLogic() {
     setFormError("");
   }, []);
 
-  // تحديث صورة الطبيعة لمنتج معين داخل الأوردر.
-  // الصورة مستقلة تمامًا عن صورة الكتالوج.
   const setItemRealImage = useCallback((itemId, file) => {
     setForm((current) => ({
       ...current,
@@ -289,7 +288,11 @@ export function useOrdersLogic() {
     setFormError("");
   }, []);
 
-  const refreshOrders = useCallback(async () => {
+  setTimeout(() => {
+    setSuccessMessage("")
+  }, 10000);
+
+ const refreshOrders = useCallback(async () => {
     const response = await authFetch("/api/orders");
     const data = await readResponse(response);
     const fetchedOrders = Array.isArray(data.orders) ? data.orders : [];
@@ -334,7 +337,6 @@ export function useOrdersLogic() {
     refreshAll();
   }, [refreshAll]);
 
-  // إنشاء أوردر وإرسال صور الطبيعة باستخدام multipart/form-data.
   const addOrder = useCallback(
     async ({
       customerName,
@@ -381,7 +383,6 @@ export function useOrdersLogic() {
         formData.append("customerNote", customerNote.trim());
         formData.append("shippingCost", String(parsedShippingCost));
 
-        // بيانات المنتجات فقط، بدون تضمين الملفات داخل JSON.
         const orderItems = items.map((item) => ({
           itemId: Number(item.itemId),
           quantity: Number(item.quantity),
@@ -389,7 +390,6 @@ export function useOrdersLogic() {
 
         formData.append("items", JSON.stringify(orderItems));
 
-        // ربط اسم كل ملف بمعرّف المنتج الخاص به.
         items.forEach((item) => {
           if (item.realImageFile instanceof File) {
             formData.append(
@@ -742,7 +742,9 @@ export function useOrdersLogic() {
         window.URL.revokeObjectURL(url);
       }, 1000);
 
-      setSuccessMessage("تم تصدير أوردرات QP Expresse بنجاح.");
+      setSuccessMessage("The data has been successfully exported.");
+      Audio('/audio/success.mp3');
+
     } catch (err) {
       setError(err.message || "فشل تصدير الأوردرات");
     } finally {

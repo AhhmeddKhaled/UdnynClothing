@@ -2,7 +2,7 @@
    Buttons
    ====================================================== */
 
-.dash-btn {
+.btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -10,12 +10,11 @@
   min-height: 36px;
   padding: var(--space-2) var(--space-4);
   border: 1px solid var(--color-line);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-xl);
   background: var(--color-paper);
-  color: var(--color-ink);
-  font: inherit;
-  font-size: var(--text-sm);
-  font-weight: 600;
+  color: var(--color-primary);
+  font-size: var(--text-lg);
+  font-weight: 700;
   cursor: pointer;
   transition:
     background 0.15s ease,
@@ -23,36 +22,35 @@
     color 0.15s ease,
     opacity 0.15s ease;
 }
-.dash-btn .icon {
+
+.btn .icon {
   display: inline-flex;
 }
 
-.dash-btn:disabled {
+.btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.dash-btn-primary {
+.btn-primary {
   background: var(--color-plum);
   color: var(--color-paper);
   border-color: var(--color-plum);
 }
 
-.dash-btn-text {
-  color: #0EA5E9;
-
+.btn-download {
+  background-color: var(--btn-download);
 }
 
-.dash-btn-text:hover {
-  background-color: #0EA5E9;
-  color: var(--color-paper);
-
+.btn-download:hover {
+  background-color: var(--btn-download-hover);
 }
-.dash-btn-primary:hover:not(:disabled) {
+
+.btn-primary:hover:not(:disabled) {
   opacity: 0.88;
 }
 
-.dash-btn svg {
+.btn svg {
   width: 16px;
   height: 16px;
 }

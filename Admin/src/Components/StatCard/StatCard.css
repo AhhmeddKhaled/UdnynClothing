@@ -1,83 +1,127 @@
 /* ======================================================
    Cards
    ====================================================== */
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
+}
 
-.dash-card {
-  min-width: 0;
-  padding: var(--space-4) var(--space-5);
-  background: var(--color-paper);
+.card {
+  padding: var(--space-4);
   border: 1px solid var(--color-line);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+
+  .top-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .card-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-primary);
+  }
+
+  .card-icon-pending {
+    background-color: hsl(from var(--status-pending) h s l / 0.3);
+  }
+
+  .card-icon-confirmed {
+    background-color: hsl(from var(--status-confirmed) h s l / 0.3);
+
+  }
+
+  .card-icon-preparing {
+    background-color: hsl(from var(--status-preparing) h s l / 0.3);
+  }
+
+  .card-icon-shipping {
+    background-color: hsl(from var(--status-shipping) h s l / 0.3);
+  }
+
+  .card-icon-delivered {
+    background-color: hsl(from var(--status-delivered) h s l / 0.3);
+  }
+
+  .card-icon-return {
+    background-color: hsl(from var(--status-return) h s l / 0.3);
+  }
+
+  .card-icon-cancelled {
+    background-color: hsl(from var(--status-cancelled) h s l / 0.3);
+  }
+
+  .card-title {
+    font-size: var(--text-lg);
+    font-weight: 500;
+    text-transform: capitalize;
+  }
+
+  .card-rate {
+    font-size: var(--text-sm);
+    justify-self: end;
+    margin-left: auto;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+
+    .icon {
+      font-weight: bold;
+    }
+  }
+
+  .card-value {
+    font-size: var(--text-2xl);
+  }
+
+  .card-description {
+    font-size: var(--text-md);
+    font-weight: 400;
+    text-transform: capitalize;
+  }
+}
+
+/* Card Status  */
+.card-pending {
+  background-color: hsl(from var(--status-pending) h s l / 0.3);
+}
+
+.card-confirmed {
+  background-color: hsl(from var(--status-confirmed) h s l / 0.3);
+}
+
+.card-preparing {
+  background-color: hsl(from var(--status-preparing) h s l / 0.3);
+}
+
+.card-shipping {
+  background-color: hsl(from var(--status-shipping) h s l / 0.3);
+}
+
+.card-delivered {
+  background-color: hsl(from var(--status-delivered) h s l / 0.3);
+}
+
+.card-return {
+  background-color: hsl(from var(--status-return) h s l / 0.3);
+}
+
+.card-cancelled {
+  background-color: hsl(from var(--status-cancelled) h s l / 0.3);
 }
 
 /* ======================================================
    Stats
    ====================================================== */
-
-.dash-stats {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-3);
-  margin-bottom: var(--space-8);
-}
-
-.dash-stat {
-  min-width: 0;
-}
-
-.dash-stat-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  margin-bottom: var(--space-3);
-  border-radius: var(--radius-md);
-}
-
-.dash-stat-icon svg {
-  width: 19px;
-  height: 19px;
-}
-
-.dash-icon-accent {
-  background: rgba(59, 36, 54, 0.08);
-  color: var(--color-plum);
-}
-
-.dash-icon-success {
-  background: var(--color-sage-bg);
-  color: var(--color-sage);
-}
-
-.dash-icon-gold {
-  background: var(--color-sand);
-  color: var(--color-gold-deep);
-}
-
-.dash-icon-danger {
-  background: var(--color-clay-bg);
-  color: var(--color-clay);
-}
-
-.dash-label {
-  margin-bottom: var(--space-1);
-  color: var(--color-plum-soft);
-  font-size: var(--text-xs);
-}
-
-.dash-value {
-  color: var(--color-ink);
-  font-size: var(--text-2xl);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  overflow-wrap: anywhere;
-}
-
-.dash-hint {
-  margin-top: var(--space-1);
-  color: var(--color-plum-soft);
-  font-size: var(--text-xs);
-  line-height: 1.6;
-}

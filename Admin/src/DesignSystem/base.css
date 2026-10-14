@@ -44,56 +44,6 @@ h1, h2, h3 { margin: 0; }
 }
 
 /* ======================================================
-   أزرار
-   ====================================================== */
-
-.btn {
-  font: inherit;
-  font-size: var(--text-sm);
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
-  padding: 10px 18px;
-  min-height: 40px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  transition: background .15s, border-color .15s, color .15s;
-}
-.btn:disabled { opacity: .5; cursor: default; }
-.btn:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 2px; }
-
-.btn-primary {
-  background: var(--color-plum);
-  color: var(--color-paper);
-}
-.btn-primary:hover:not(:disabled) { background: var(--color-plum-deep); }
-
-.btn-secondary {
-  background: var(--color-paper);
-  color: var(--color-plum);
-  border-color: var(--color-line);
-}
-.btn-secondary:hover:not(:disabled) { border-color: var(--color-plum); }
-
-.btn-danger {
-  background: var(--color-paper);
-  color: var(--color-clay);
-  border-color: var(--color-clay-bg);
-}
-.btn-danger:hover:not(:disabled) { background: var(--color-clay-bg); }
-
-.btn-text {
-  background: none;
-  border: 0;
-  color: var(--color-gold-deep);
-  text-decoration: underline;
-  padding: 0;
-  min-height: auto;
-}
-
-/* ======================================================
    حقول الإدخال
    ====================================================== */
 
@@ -123,17 +73,6 @@ h1, h2, h3 { margin: 0; }
 .field textarea:focus-visible {
   outline: 2px solid var(--color-gold);
   outline-offset: 1px;
-}
-
-/* ======================================================
-   كروت
-   ====================================================== */
-
-.card {
-  background: var(--color-paper);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-sm);
-  padding: var(--space-5);
 }
 
 /* ======================================================
