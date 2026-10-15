@@ -221,98 +221,11 @@
   opacity: 0.8;
 }
 
-/* =========================
-   Buttons
-========================= */
-
-.orders-button,
-.orders-reset-button,
-.orders-details-button,
-.orders-close-button,
-.orders-delete-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  min-height: 40px;
-  padding: var(--space-2) var(--space-4);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  line-height: 1.4;
-  text-decoration: none;
-  white-space: nowrap;
-  transition:
-    color 0.2s ease,
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.orders-button-primary,
-.orders-close-button {
-  color: #fff;
-  background: var(--color-plum);
-  border-color: var(--color-plum);
-}
-
-.orders-button-primary:hover:not(:disabled),
-.orders-close-button:hover:not(:disabled) {
-  color: #fff;
-  background: var(--color-plum-deep);
-  border-color: var(--color-plum-deep);
-}
-
-.orders-button-secondary,
-.orders-reset-button,
-.orders-details-button {
-  color: var(--color-ink);
-  background: var(--color-card);
-  border-color: var(--color-line);
-}
-
-.orders-button-secondary:hover:not(:disabled),
-.orders-reset-button:hover:not(:disabled),
-.orders-details-button:hover:not(:disabled) {
-  color: var(--color-ink);
-  background: var(--color-card-hover);
-  border-color: var(--color-gold);
-}
-
-.orders-delete-button,
-.orders-button-danger {
-  color: var(--color-clay);
-  background: var(--color-clay-bg);
-  border-color: var(--color-line);
-}
-
-.orders-delete-button:hover:not(:disabled),
-.orders-button-danger:hover:not(:disabled) {
-  color: #fff;
-  background: #b42318;
-  border-color: #b42318;
-}
-
-.orders-button:disabled,
-.orders-reset-button:disabled,
-.orders-details-button:disabled,
-.orders-close-button:disabled,
-.orders-delete-button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-
 .orders-row-actions {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: var(--space-2);
-}
-
-.orders-row-actions button {
-  min-height: 34px;
-  padding: var(--space-2) var(--space-3);
 }
 
 .orders-row-actions svg {
@@ -410,7 +323,7 @@
 }
 
 .orders-status-tab.tab-pending {
-  color: #2563eb;
+  color: var(--status-pending);
 }
 
 .orders-status-tab.tab-confirmed {
@@ -582,66 +495,6 @@
 .orders-icon-button.danger:hover {
   color: var(--color-clay);
   background: var(--color-clay-bg);
-}
-
-/* =========================
-   Status Badges
-========================= */
-
-.orders-status,
-.orders-status-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-2);
-  padding: 6px 10px;
-  border-radius: var(--radius-full);
-  font-size: var(--text-xs);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.orders-status-dot {
-  flex: 0 0 auto;
-  width: 7px;
-  height: 7px;
-  background: currentColor;
-  border-radius: var(--radius-full);
-}
-
-.orders-status-pending {
-  color: #2563eb;
-  background: #f0f7ff;
-}
-
-.orders-status-confirmed {
-  color: #a16207;
-  background: #fffbea;
-}
-
-.orders-status-processing {
-  color: #c2410c;
-  background: #fff7f0;
-}
-
-.orders-status-shipped {
-  color: #0e7490;
-  background: #f0fcfd;
-}
-
-.orders-status-delivered {
-  color: #15803d;
-  background: #f1faf2;
-}
-
-.orders-status-cancelled {
-  color: #b91c1c;
-  background: #fff0f0;
-}
-
-.orders-status-unknown {
-  color: #64748b;
-  background: #f1f4f8;
 }
 
 /* =========================

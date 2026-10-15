@@ -1,4 +1,7 @@
 import "./Button.css";
+import { FiEdit2 } from "react-icons/fi";
+import { MdDeleteOutline } from "react-icons/md";
+import { CgDetailsMore } from "react-icons/cg";
 
 export default function Button({
   children,
@@ -23,6 +26,12 @@ export default function Button({
       disabled={isDisabled}
       aria-busy={loading || undefined}
     >
+
+      {
+      variant == 
+      "edit" ? <FiEdit2 /> 
+      : "delet" ? <MdDeleteOutline /> 
+      : "details" ? <CgDetailsMore /> : ''}
       {loading ? "جاري التحميل..." : children}
     </button>
   );

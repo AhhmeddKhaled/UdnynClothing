@@ -88,21 +88,16 @@ router.post(
   createOrder
 );
 
-// أوردرات العميل المسجل دخوله.
 router.get("/my-orders", authorize("orders.read"), getMyOrders);
 
-// تصدير أوردرات QP Expresse.
-// يجب أن يسبق المسار العام /:id.
 router.get(
   "/export/qp-expresse",
   authorize("orders.read"),
   exportQPExpresse
 );
 
-// عرض كل الأوردرات.
 router.get("/", authorize("orders.read"), getAllOrders);
 
-// تعديل حالة الأوردر.
 router.patch(
   "/:id/status",
   authorize("orders.updateStatus"),

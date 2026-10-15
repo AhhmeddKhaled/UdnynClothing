@@ -1,4 +1,3 @@
-
 import "./Orders.css";
 import { useNavigate } from "react-router-dom";
 import {
@@ -18,20 +17,19 @@ import { SiVirustotal } from "react-icons/si";
 import { CiDeliveryTruck } from "react-icons/ci";
 import { GoArrowUpRight } from "react-icons/go";
 
-
+// Import Services
+import { changeOrderStatus } from "../../services/changeOrderStatus";
 
 import { useOrdersLogic } from "../../UI_Logic/OrdersLogic.jsx";
 import ContentHeader from "../../Components/ContentHeader/ContentHeader.jsx";
 import Button from "../../Components/Button/Button";
-import Tost from '../../Components/Tost/Tost';
+import Tost from "../../Components/Tost/Tost";
 import StatsContainer from "../../Components/StatCard/StatsContainer";
-import StatCard from '../../Components/StatCard/StatCard';
-
+import StatCard from "../../Components/StatCard/StatCard";
+import OrderStatus from "../../Components/OrderStatus/OrderStatus";
 
 function StatusBadge({ status, statuses = [] }) {
-  const normalizedStatus = statuses.includes(status)
-    ? status
-    : "unknown";
+  const normalizedStatus = statuses.includes(status) ? status : "unknown";
 
   return (
     <span className={`orders-status orders-status-${normalizedStatus}`}>
@@ -62,10 +60,7 @@ function OrderDetailsModal({ order, logic }) {
   const onClose = () => setSelectedOrder(null);
 
   return (
-    <div
-      className="orders-modal-backdrop"
-      onClick={onClose}
-    >
+    <div className="orders-modal-backdrop" onClick={onClose}>
       <section
         className="orders-modal"
         role="dialog"
@@ -75,9 +70,7 @@ function OrderDetailsModal({ order, logic }) {
       >
         <header className="orders-modal-header">
           <div>
-            <span className="orders-eyebrow">
-              ORDER DETAILS
-            </span>
+            <span className="orders-eyebrow">ORDER DETAILS</span>
 
             <h2 id="order-details-title">
               {order.orderNumber || "Order details"}
@@ -89,8 +82,7 @@ function OrderDetailsModal({ order, logic }) {
             className="orders-modal-close"
             onClick={onClose}
             aria-label="Close order details"
-          >
-          </button>
+          ></button>
         </header>
 
         <div className="orders-modal-content">
@@ -98,10 +90,7 @@ function OrderDetailsModal({ order, logic }) {
             <div>
               <span>Order status</span>
               <strong>
-                <StatusBadge
-                  status={order.status}
-                  statuses={statuses}
-                />
+                <StatusBadge status={order.status} statuses={statuses} />
               </strong>
             </div>
 
@@ -117,37 +106,28 @@ function OrderDetailsModal({ order, logic }) {
 
             <div>
               <span>Customer phone</span>
-              <strong>
-                {getCustomerPhone(order) || "Not available"}
-              </strong>
+              <strong>{getCustomerPhone(order) || "Not available"}</strong>
             </div>
 
             <div>
               <span>Email</span>
-              <strong>
-                {getCustomerEmail(order) || "Not available"}
-              </strong>
+              <strong>{getCustomerEmail(order) || "Not available"}</strong>
             </div>
 
             <div>
               <span>Governorate</span>
-              <strong>
-                {order.governorate || "Not specified"}
-              </strong>
+              <strong>{order.governorate || "Not specified"}</strong>
             </div>
 
             <div className="orders-detail-address">
               <span>Shipping address</span>
               <strong>
-                {order.shippingAddress ||
-                  "No shipping address provided"}
+                {order.shippingAddress || "No shipping address provided"}
               </strong>
             </div>
           </div>
 
-          <h3 className="orders-detail-section-title">
-            Order items
-          </h3>
+          <h3 className="orders-detail-section-title">Order items</h3>
 
           <div className="orders-detail-items">
             {(order.items || []).map((item, index) => (
@@ -161,23 +141,18 @@ function OrderDetailsModal({ order, logic }) {
                   <span>
                     Quantity: {item.quantity || 0}
                     {" · "}
-                    Unit price:{" "}
-                    {formatMoney(getItemUnitPrice(item))}
+                    Unit price: {formatMoney(getItemUnitPrice(item))}
                   </span>
                 </div>
 
-                <strong>
-                  {formatMoney(getItemLineTotal(item))}
-                </strong>
+                <strong>{formatMoney(getItemLineTotal(item))}</strong>
               </div>
             ))}
           </div>
 
           <div className="orders-detail-total">
             <span>Products subtotal</span>
-            <strong>
-              {formatMoney(getOrderSubtotal(order))}
-            </strong>
+            <strong>{formatMoney(getOrderSubtotal(order))}</strong>
           </div>
 
           <div className="orders-detail-total">
@@ -190,9 +165,7 @@ function OrderDetailsModal({ order, logic }) {
             <strong>{formatMoney(getOrderTotal(order))}</strong>
           </div>
 
-          <h3 className="orders-detail-section-title">
-            Customer note
-          </h3>
+          <h3 className="orders-detail-section-title">Customer note</h3>
 
           <p>{order.customerNote || "No customer note."}</p>
         </div>
@@ -214,6 +187,8 @@ function OrderDetailsModal({ order, logic }) {
 export default function Orders() {
   const navigate = useNavigate();
   const logic = useOrdersLogic();
+
+  changeOrderStatus(25);
 
   const {
     statuses,
@@ -246,12 +221,20 @@ export default function Orders() {
 
   const statCards = [
     {
+      title: "Revenue",
+      value: formatMoney(stats.revenue),
+      description: "Excluding cancelled orders",
+      icon: <BsCashCoin />,
+      rate: "+26%",
+      status: "revenue",
+    },
+    {
       title: "Total orders",
       value: stats.total,
       description: "All orders",
       icon: <SiVirustotal />,
       rate: "+25%",
-      status: "confirmed"
+      status: "total",
     },
     {
       title: "Pending",
@@ -259,7 +242,7 @@ export default function Orders() {
       description: "Awaiting processing",
       icon: <BsCashCoin />,
       rate: "+12%",
-      status: "pending"
+      status: "pending",
     },
     {
       title: "In progress",
@@ -268,7 +251,7 @@ export default function Orders() {
       icon: <VscSessionInProgress />,
       rate: "-32%",
       rateStatus: false,
-      status: "preparing"
+      status: "preparing",
     },
     {
       title: "shipping",
@@ -276,7 +259,7 @@ export default function Orders() {
       description: "On the way",
       icon: <TbTruckDelivery />,
       rate: "+42%",
-      status: "shipping"
+      status: "shipping",
     },
     {
       title: "delivered",
@@ -284,7 +267,7 @@ export default function Orders() {
       description: "Successfully delivered",
       icon: <CiDeliveryTruck />,
       rate: "+48%",
-      status: "delivered"
+      status: "delivered",
     },
     {
       title: "cancelled",
@@ -292,14 +275,7 @@ export default function Orders() {
       description: "Cancelled orders",
       icon: <ImCancelCircle />,
       rate: "-22%",
-      status: "cancelled"
-    },
-    {
-      title: "Revenue",
-      value: formatMoney(stats.revenue),
-      description: "Excluding cancelled orders",
-      icon: <BsCashCoin />,
-      rate: "+26%"
+      status: "cancelled",
     },
   ];
 
@@ -330,10 +306,7 @@ export default function Orders() {
       />
 
       {error && (
-        <div
-          className="orders-message orders-message-error"
-          role="alert"
-        >
+        <div className="orders-message orders-message-error" role="alert">
           <span>{error}</span>
 
           <button
@@ -355,33 +328,28 @@ export default function Orders() {
         </div>
       )}
 
-      {successMessage && <Tost 
-      status="success"
-      description={successMessage}
-      />}
+      {successMessage && <Tost status="success" description={successMessage} />}
 
       <StatsContainer>
-        {statCards.map((stat,i) => (
-          <StatCard 
-          key={i}
-          title={stat.title}
-          value={stat.value}
-          description={stat.description}
-          status={stat.status}
-          icon={stat.icon}
-          rate={stat.rate}
-          rateStatus={stat.rateStatus}
+        {statCards.map((stat, i) => (
+          <StatCard
+            key={i}
+            title={stat.title}
+            value={stat.value}
+            description={stat.description}
+            status={stat.status}
+            icon={stat.icon}
+            rate={stat.rate}
+            rateStatus={stat.rateStatus}
           />
         ))}
-        </StatsContainer>
+      </StatsContainer>
 
       <section className="orders-panel">
         <header className="orders-panel-header">
           <div>
             <h2>All orders</h2>
-            <p>
-              Review orders from the connected database.
-            </p>
+            <p>Review orders from the connected database.</p>
           </div>
 
           <span className="orders-stat-caption">
@@ -392,7 +360,6 @@ export default function Orders() {
 
         <div className="orders-toolbar">
           <label className="orders-search">
-
             <input
               type="search"
               value={search}
@@ -411,10 +378,7 @@ export default function Orders() {
           </button>
         </div>
 
-        <div
-          className="orders-status-tabs"
-          aria-label="Filter by status"
-        >
+        <div className="orders-status-tabs" aria-label="Filter by status">
           {["all", ...statuses].map((status) => {
             const isActive = statusFilter === status;
 
@@ -434,8 +398,7 @@ export default function Orders() {
               >
                 {status === "all"
                   ? "All"
-                  : status.charAt(0).toUpperCase() +
-                    status.slice(1)}
+                  : status.charAt(0).toUpperCase() + status.slice(1)}
 
                 <span className="orders-tab-count">
                   {statusCounts[status] ?? 0}
@@ -447,24 +410,18 @@ export default function Orders() {
 
         {loading ? (
           <div className="orders-empty" role="status">
-            <span className="orders-empty-icon">
-            </span>
+            <span className="orders-empty-icon"></span>
 
             <h3>Loading orders</h3>
-            <p>
-              Please wait while your orders are loaded.
-            </p>
+            <p>Please wait while your orders are loaded.</p>
           </div>
         ) : error && filteredOrders.length === 0 ? (
           <div className="orders-empty">
-            <span className="orders-empty-icon">
-            </span>
+            <span className="orders-empty-icon"></span>
 
             <h3>Unable to load orders</h3>
 
-            <p>
-              Check your API connection and account permissions.
-            </p>
+            <p>Check your API connection and account permissions.</p>
 
             <button
               type="button"
@@ -476,14 +433,9 @@ export default function Orders() {
           </div>
         ) : filteredOrders.length === 0 ? (
           <div className="orders-empty">
-            <span className="orders-empty-icon">
-            </span>
+            <span className="orders-empty-icon"></span>
 
-            <h3>
-              {hasActiveFilters
-                ? "No matching orders"
-                : "No orders yet"}
-            </h3>
+            <h3>{hasActiveFilters ? "No matching orders" : "No orders yet"}</h3>
 
             <p>
               {hasActiveFilters
@@ -506,34 +458,35 @@ export default function Orders() {
             <table className="orders-table">
               <thead>
                 <tr>
+                  <th>
+                    <input type="checkbox" />
+                  </th>
                   <th scope="col">Order</th>
                   <th scope="col">Customer</th>
-                  <th scope="col">Date</th>
+                  <th scope="col">Status</th>
                   <th scope="col">Items</th>
                   <th scope="col">Total</th>
-                  <th scope="col">Status</th>
+                  <th scope="col">Date</th>
                   <th scope="col">Actions</th>
                 </tr>
               </thead>
 
               <tbody>
                 {filteredOrders.map((order, index) => {
+                  console.log(order.status);
                   const orderId = order._id || order.id;
                   const isDeleting = deletingOrderId === orderId;
 
                   return (
-                    <tr
-                      key={
-                        orderId || order.orderNumber || index
-                      }
-                    >
+                    <tr key={orderId || order.orderNumber || index}>
+                      <td>
+                        <input type="checkbox" />
+                      </td>
+
                       <td data-label="Order">
                         <span className="orders-number">
                           {String(
-                            order._id ||
-                              order.id ||
-                              order.orderNumber ||
-                              "",
+                            order._id || order.id || order.orderNumber || "",
                           ).slice(0, 6)}
                         </span>
                       </td>
@@ -546,8 +499,8 @@ export default function Orders() {
                         </div>
                       </td>
 
-                      <td data-label="Date">
-                        {formatDate(order.createdAt)}
+                      <td data-label="Status">
+                        <OrderStatus status={order.status} />
                       </td>
 
                       <td data-label="Items">
@@ -556,51 +509,29 @@ export default function Orders() {
                         </span>
                       </td>
 
-                      <td
-                        data-label="Total"
-                        className="orders-total"
-                      >
+                      <td data-label="Total" className="orders-total">
                         {formatMoney(order.totalAmount)}
                       </td>
 
-                      <td data-label="Status">
-                        <StatusBadge
-                          status={order.status}
-                          statuses={statuses}
-                        />
-                      </td>
+                      <td data-label="Date">{formatDate(order.createdAt)}</td>
 
-                      <td
-                        data-label="Actions"
-                        className="orders-actions-cell"
-                      >
+                      <td data-label="Actions" className="orders-actions-cell">
                         <div className="orders-row-actions">
-                          <button
-                            type="button"
-                            className="orders-details-button"
-                            onClick={() =>
-                              setSelectedOrder(order)
-                            }
-                            aria-label={`View order ${
-                              order.orderNumber || ""
-                            }`}
-                          >
-                            Details
-                          </button>
+                          <Button
+                            variant="details"
+                            onClick={() => setSelectedOrder(order)}
+                            aria-label={`View order ${order.orderNumber || ""}`}
+                          ></Button>
 
-                          <button
-                            type="button"
-                            className="orders-delete-button"
+                          <Button
+                            variant="delet"
                             onClick={() => deleteOrder(order)}
                             disabled={Boolean(deletingOrderId)}
                             aria-label={`Delete order ${
                               order.orderNumber || ""
                             }`}
                           >
-                            {isDeleting
-                              ? "Deleting..."
-                              : "Delete"}
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -625,10 +556,7 @@ export default function Orders() {
       </section>
 
       {selectedOrder && (
-        <OrderDetailsModal
-          order={selectedOrder}
-          logic={logic}
-        />
+        <OrderDetailsModal order={selectedOrder} logic={logic} />
       )}
     </section>
   );

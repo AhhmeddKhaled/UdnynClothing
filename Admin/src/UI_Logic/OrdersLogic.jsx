@@ -6,7 +6,7 @@ import { Audio } from '../services/audio.js';
 const STATUSES = [
   "pending",
   "confirmed",
-  "processing",
+  "preparing",
   "shipped",
   "delivered",
   "cancelled",

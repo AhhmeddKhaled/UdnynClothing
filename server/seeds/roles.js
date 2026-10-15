@@ -20,6 +20,7 @@ const roles = {
     "users.update",
     "orders.read",
     "orders.update",
+    "orders.create",
 
     "availableStock.read",
   ],
@@ -36,7 +37,6 @@ const roles = {
     "users.delete",
 
     "orders.read",
-    "orders.create",
     "orders.update",
     "orders.delete",
     "orders.updateStatus",

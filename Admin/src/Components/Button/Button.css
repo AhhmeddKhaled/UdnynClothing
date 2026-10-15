@@ -6,15 +6,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
   min-height: 36px;
   padding: var(--space-2) var(--space-4);
-  border: 1px solid var(--color-line);
+  border: none;
   border-radius: var(--radius-xl);
   background: var(--color-paper);
-  color: var(--color-primary);
   font-size: var(--text-lg);
-  font-weight: 700;
+  font-weight: bold;
   cursor: pointer;
   transition:
     background 0.15s ease,
@@ -42,6 +40,11 @@
   background-color: var(--btn-download);
 }
 
+.btn-primary,
+.btn-download {
+  color: var(--color-card);
+}
+
 .btn-download:hover {
   background-color: var(--btn-download-hover);
 }
@@ -49,6 +52,20 @@
 .btn-primary:hover:not(:disabled) {
   opacity: 0.88;
 }
+
+.btn-edit {
+  color: var(--status-warning);
+}
+
+.btn-delet {
+  color: var(--status-error);
+}
+
+.btn-edit:hover,
+.btn-delet:hover {
+  background-color: var(--color-secondary);
+}
+
 
 .btn svg {
   width: 16px;

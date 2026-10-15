@@ -83,6 +83,12 @@
   --status-cancelled: #dc2626;
   --status-cancelled-bg: #fee2e2;
 
+  /* revenue */
+  --status-revenue: #5A9BD5;
+
+  /* Confirmed */
+  --status-total: #2563eb;
+
   /* Buttons Variant  */
   --btn-download: #7CB9E8;
   --btn-download-hover: #5A9BD5;

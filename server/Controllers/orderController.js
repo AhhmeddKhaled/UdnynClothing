@@ -5,10 +5,12 @@ const Order = require("../Models/Order");
 const AvailableStock = require("../Models/AvailableStock");
 const XLSX = require("xlsx");
 
+const role = require('../seeds/roles');
+
 const VALID_STATUSES = [
   "pending",
   "confirmed",
-  "processing",
+  "preparing",
   "shipped",
   "delivered",
   "cancelled",
@@ -96,14 +98,16 @@ async function createOrder(req, res, next) {
   let orderCreated = false;
   const uploadedFiles = Array.isArray(req.files) ? req.files : [];
 
+  
   try {
-    if (!isAdmin(req)) {
-      return sendError(
-        res,
-        403,
-        "Only admins can create manual orders"
-      );
-    }
+    console.log(role);
+    // if (!isAdmin(req)) {
+    //   return sendError(
+    //     res,
+    //     403,
+    //     "Only admins can create manual orders"
+    //   );
+    // }
 
     const body = req.body || {};
 

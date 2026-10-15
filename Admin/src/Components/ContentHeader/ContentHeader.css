@@ -27,6 +27,7 @@
   font-family: var(--font-body);
   font-size: var(--text-sm);
   color: var(--color-plum-soft);
+  text-transform: capitalize;
 }
 
 .header-right {

@@ -3,7 +3,7 @@
    ====================================================== */
 .stats-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: var(--space-3);
   margin-bottom: var(--space-8);
 }
@@ -95,31 +95,49 @@
 
 /* Card Status  */
 .card-pending {
-  background-color: hsl(from var(--status-pending) h s l / 0.3);
+  background-color: hsl(from var(--status-pending) h s l / 0.1);
 }
 
 .card-confirmed {
-  background-color: hsl(from var(--status-confirmed) h s l / 0.3);
+  background-color: hsl(from var(--status-confirmed) h s l / 0.1);
 }
 
 .card-preparing {
-  background-color: hsl(from var(--status-preparing) h s l / 0.3);
+  background-color: hsl(from var(--status-preparing) h s l / 0.1);
 }
 
 .card-shipping {
-  background-color: hsl(from var(--status-shipping) h s l / 0.3);
+  background-color: hsl(from var(--status-shipping) h s l / 0.1);
 }
 
 .card-delivered {
-  background-color: hsl(from var(--status-delivered) h s l / 0.3);
+  background-color: hsl(from var(--status-delivered) h s l / 0.1);
 }
 
 .card-return {
-  background-color: hsl(from var(--status-return) h s l / 0.3);
+  background-color: hsl(from var(--status-return) h s l / 0.1);
 }
 
 .card-cancelled {
-  background-color: hsl(from var(--status-cancelled) h s l / 0.3);
+  background-color: hsl(from var(--status-cancelled) h s l / 0.1);
+}
+
+.card-revenue {
+  background-color: var(--status-revenue);
+  color: var(--color-card);
+  grid-column: 1 / 3;
+  .card-icon {
+  color: var(--color-card);
+  }
+}
+
+.card-total {
+  background-color: hsl(from var(--status-total) h s l / .8);
+  color: var(--color-card);
+  grid-column: 3 / 5;
+  .card-icon {
+  color: var(--color-card);
+  }
 }
 
 /* ======================================================

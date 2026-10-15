@@ -1,0 +1,44 @@
+.order-status {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  text-transform: capitalize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.order-status-pending {
+  color: var(--status-pending);
+  background: var(--status-pending-bg);
+}
+
+.order-status-confirmed {
+  color: var(--status-confirmed);
+  background: var(--status-confirmed-bg);
+}
+
+.order-status-preparing {
+  color: var(--status-preparing);
+  background: var(--status-preparing-bg);
+}
+
+.order-status-shipped {
+  color: var(--status-shipped);
+  background: var(--status-shipped-bg);
+}
+
+.order-status-delivered {
+  color: var(--status-delivered);
+  background: var(--status-delivered-bg);
+}
+
+.order-status-cancelled {
+  color: var(--status-cancelled);
+  background: var(--status-cancelled-bg);
+}
+
+.order-status-unknown {
+  color: var(--status-pending);
+  background: var(--status-pending-bg);
+}
