@@ -5,6 +5,7 @@ import "./AvailableStock.css";
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
 import { useAvailableStockLogic } from "../../UI_Logic/AvailableStockLogic.jsx";
 import ContentHeader from "../../Components/ContentHeader/ContentHeader";
+// import Tost from "../../Components/Tost/Tost";
 
 export default function AvailableStock() {
   const {
@@ -34,6 +35,8 @@ export default function AvailableStock() {
     handleImageUpload,
     handleImport,
     clearFilters,
+
+    successMessage
   } = useAvailableStockLogic();
 
   function renderImageControls(product, view) {
@@ -120,6 +123,9 @@ export default function AvailableStock() {
 
   return (
     <main className="page available-stock-page" dir="ltr">
+
+      {/* {successMessage && <Tost status="success" description={successMessage}/>} */}
+
       {/* Page Header */}
       <section className="ds-page-head">
 

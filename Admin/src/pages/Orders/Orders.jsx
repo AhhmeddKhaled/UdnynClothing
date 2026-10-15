@@ -1,13 +1,6 @@
 import "./Orders.css";
 import { useNavigate } from "react-router-dom";
-import {
-  HiOutlineClipboardList,
-  HiOutlineSearch,
-  HiOutlineX,
-  HiOutlineEye,
-  HiOutlineTrash,
-  HiOutlinePlus,
-} from "react-icons/hi";
+
 import { GoDownload } from "react-icons/go";
 import { BsCashCoin } from "react-icons/bs";
 import { ImCancelCircle } from "react-icons/im";
@@ -15,180 +8,24 @@ import { TbTruckDelivery } from "react-icons/tb";
 import { VscSessionInProgress } from "react-icons/vsc";
 import { SiVirustotal } from "react-icons/si";
 import { CiDeliveryTruck } from "react-icons/ci";
-import { GoArrowUpRight } from "react-icons/go";
-
-// Import Services
-import { changeOrderStatus } from "../../services/changeOrderStatus";
+import { HiOutlinePlus } from "react-icons/hi";
 
 import { useOrdersLogic } from "../../UI_Logic/OrdersLogic.jsx";
+
 import ContentHeader from "../../Components/ContentHeader/ContentHeader.jsx";
 import Button from "../../Components/Button/Button";
-import Tost from "../../Components/Tost/Tost";
 import StatsContainer from "../../Components/StatCard/StatsContainer";
 import StatCard from "../../Components/StatCard/StatCard";
 import OrderStatus from "../../Components/OrderStatus/OrderStatus";
 
-function StatusBadge({ status, statuses = [] }) {
-  const normalizedStatus = statuses.includes(status) ? status : "unknown";
-
-  return (
-    <span className={`orders-status orders-status-${normalizedStatus}`}>
-      <span className="orders-status-dot" />
-      {status || "Unknown"}
-    </span>
-  );
-}
-
-function OrderDetailsModal({ order, logic }) {
-  if (!order) return null;
-
-  const {
-    setSelectedOrder,
-    getCustomerName,
-    getCustomerPhone,
-    getCustomerEmail,
-    getItemName,
-    getItemUnitPrice,
-    getItemLineTotal,
-    getOrderSubtotal,
-    getOrderTotal,
-    formatMoney,
-    formatDate,
-    statuses,
-  } = logic;
-
-  const onClose = () => setSelectedOrder(null);
-
-  return (
-    <div className="orders-modal-backdrop" onClick={onClose}>
-      <section
-        className="orders-modal"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="order-details-title"
-        onClick={(event) => event.stopPropagation()}
-      >
-        <header className="orders-modal-header">
-          <div>
-            <span className="orders-eyebrow">ORDER DETAILS</span>
-
-            <h2 id="order-details-title">
-              {order.orderNumber || "Order details"}
-            </h2>
-          </div>
-
-          <button
-            type="button"
-            className="orders-modal-close"
-            onClick={onClose}
-            aria-label="Close order details"
-          ></button>
-        </header>
-
-        <div className="orders-modal-content">
-          <div className="orders-detail-grid">
-            <div>
-              <span>Order status</span>
-              <strong>
-                <StatusBadge status={order.status} statuses={statuses} />
-              </strong>
-            </div>
-
-            <div>
-              <span>Order date</span>
-              <strong>{formatDate(order.createdAt)}</strong>
-            </div>
-
-            <div>
-              <span>Customer name</span>
-              <strong>{getCustomerName(order)}</strong>
-            </div>
-
-            <div>
-              <span>Customer phone</span>
-              <strong>{getCustomerPhone(order) || "Not available"}</strong>
-            </div>
-
-            <div>
-              <span>Email</span>
-              <strong>{getCustomerEmail(order) || "Not available"}</strong>
-            </div>
-
-            <div>
-              <span>Governorate</span>
-              <strong>{order.governorate || "Not specified"}</strong>
-            </div>
-
-            <div className="orders-detail-address">
-              <span>Shipping address</span>
-              <strong>
-                {order.shippingAddress || "No shipping address provided"}
-              </strong>
-            </div>
-          </div>
-
-          <h3 className="orders-detail-section-title">Order items</h3>
-
-          <div className="orders-detail-items">
-            {(order.items || []).map((item, index) => (
-              <div
-                className="orders-detail-item"
-                key={`${item.itemId || getItemName(item)}-${index}`}
-              >
-                <div>
-                  <strong>{getItemName(item)}</strong>
-
-                  <span>
-                    Quantity: {item.quantity || 0}
-                    {" · "}
-                    Unit price: {formatMoney(getItemUnitPrice(item))}
-                  </span>
-                </div>
-
-                <strong>{formatMoney(getItemLineTotal(item))}</strong>
-              </div>
-            ))}
-          </div>
-
-          <div className="orders-detail-total">
-            <span>Products subtotal</span>
-            <strong>{formatMoney(getOrderSubtotal(order))}</strong>
-          </div>
-
-          <div className="orders-detail-total">
-            <span>Shipping cost</span>
-            <strong>{formatMoney(order.shippingCost)}</strong>
-          </div>
-
-          <div className="orders-detail-total">
-            <span>Total amount</span>
-            <strong>{formatMoney(getOrderTotal(order))}</strong>
-          </div>
-
-          <h3 className="orders-detail-section-title">Customer note</h3>
-
-          <p>{order.customerNote || "No customer note."}</p>
-        </div>
-
-        <footer className="orders-modal-footer">
-          <button
-            type="button"
-            className="orders-close-button"
-            onClick={onClose}
-          >
-            Close
-          </button>
-        </footer>
-      </section>
-    </div>
-  );
-}
+import OrderDetailsModal from
+  "../../Components/OrderDetailsModal/OrderDetailsModal";
 
 export default function Orders() {
+
+
   const navigate = useNavigate();
   const logic = useOrdersLogic();
-
-  changeOrderStatus(25);
 
   const {
     statuses,
@@ -208,8 +45,6 @@ export default function Orders() {
     setError,
     exportQPExpresse,
     exportingOrders,
-    successMessage,
-    setSuccessMessage,
     refreshOrders,
     getCustomerName,
     getItemCount,
@@ -254,7 +89,7 @@ export default function Orders() {
       status: "preparing",
     },
     {
-      title: "shipping",
+      title: "Shipping",
       value: stats.shipped,
       description: "On the way",
       icon: <TbTruckDelivery />,
@@ -262,7 +97,7 @@ export default function Orders() {
       status: "shipping",
     },
     {
-      title: "delivered",
+      title: "Delivered",
       value: stats.delivered,
       description: "Successfully delivered",
       icon: <CiDeliveryTruck />,
@@ -270,7 +105,7 @@ export default function Orders() {
       status: "delivered",
     },
     {
-      title: "cancelled",
+      title: "Cancelled",
       value: stats.cancelled,
       description: "Cancelled orders",
       icon: <ImCancelCircle />,
@@ -328,12 +163,10 @@ export default function Orders() {
         </div>
       )}
 
-      {successMessage && <Tost status="success" description={successMessage} />}
-
       <StatsContainer>
-        {statCards.map((stat, i) => (
+        {statCards.map((stat) => (
           <StatCard
-            key={i}
+            key={stat.status}
             title={stat.title}
             value={stat.value}
             description={stat.description}
@@ -410,17 +243,16 @@ export default function Orders() {
 
         {loading ? (
           <div className="orders-empty" role="status">
-            <span className="orders-empty-icon"></span>
+            <span className="orders-empty-icon" />
 
             <h3>Loading orders</h3>
             <p>Please wait while your orders are loaded.</p>
           </div>
         ) : error && filteredOrders.length === 0 ? (
           <div className="orders-empty">
-            <span className="orders-empty-icon"></span>
+            <span className="orders-empty-icon" />
 
             <h3>Unable to load orders</h3>
-
             <p>Check your API connection and account permissions.</p>
 
             <button
@@ -433,9 +265,11 @@ export default function Orders() {
           </div>
         ) : filteredOrders.length === 0 ? (
           <div className="orders-empty">
-            <span className="orders-empty-icon"></span>
+            <span className="orders-empty-icon" />
 
-            <h3>{hasActiveFilters ? "No matching orders" : "No orders yet"}</h3>
+            <h3>
+              {hasActiveFilters ? "No matching orders" : "No orders yet"}
+            </h3>
 
             <p>
               {hasActiveFilters
@@ -458,8 +292,8 @@ export default function Orders() {
             <table className="orders-table">
               <thead>
                 <tr>
-                  <th>
-                    <input type="checkbox" />
+                  <th scope="col">
+                    <input type="checkbox" aria-label="Select all orders" />
                   </th>
                   <th scope="col">Order</th>
                   <th scope="col">Customer</th>
@@ -473,20 +307,22 @@ export default function Orders() {
 
               <tbody>
                 {filteredOrders.map((order, index) => {
-                  console.log(order.status);
                   const orderId = order._id || order.id;
                   const isDeleting = deletingOrderId === orderId;
 
                   return (
                     <tr key={orderId || order.orderNumber || index}>
                       <td>
-                        <input type="checkbox" />
+                        <input
+                          type="checkbox"
+                          aria-label={`Select order ${order.orderNumber || orderId || index + 1}`}
+                        />
                       </td>
 
                       <td data-label="Order">
                         <span className="orders-number">
                           {String(
-                            order._id || order.id || order.orderNumber || "",
+                            order._id || order.id || order.orderNumber || ""
                           ).slice(0, 6)}
                         </span>
                       </td>
@@ -513,25 +349,28 @@ export default function Orders() {
                         {formatMoney(order.totalAmount)}
                       </td>
 
-                      <td data-label="Date">{formatDate(order.createdAt)}</td>
+                      <td data-label="Date">
+                        {formatDate(order.createdAt)}
+                      </td>
 
-                      <td data-label="Actions" className="orders-actions-cell">
+                      <td
+                        data-label="Actions"
+                        className="orders-actions-cell"
+                      >
                         <div className="orders-row-actions">
                           <Button
                             variant="details"
                             onClick={() => setSelectedOrder(order)}
                             aria-label={`View order ${order.orderNumber || ""}`}
-                          ></Button>
+                          />
 
                           <Button
-                            variant="delet"
+                            variant="delete"
                             onClick={() => deleteOrder(order)}
                             disabled={Boolean(deletingOrderId)}
-                            aria-label={`Delete order ${
-                              order.orderNumber || ""
-                            }`}
-                          >
-                          </Button>
+                            loading={isDeleting}
+                            aria-label={`Delete order ${order.orderNumber || ""}`}
+                          />
                         </div>
                       </td>
                     </tr>
@@ -556,7 +395,10 @@ export default function Orders() {
       </section>
 
       {selectedOrder && (
-        <OrderDetailsModal order={selectedOrder} logic={logic} />
+        <OrderDetailsModal
+          order={selectedOrder}
+          logic={logic}
+        />
       )}
     </section>
   );

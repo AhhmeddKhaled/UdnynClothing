@@ -33,10 +33,7 @@ import {
 
 const CODE_FIELDS = ["barcode", "sku", "code", "itemId"];
 
-const API_BASE_URL = (import.meta.env.VITE_API_URL || "").replace(
-  /\/+$/,
-  ""
-);
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api/orders`
 
 // Build the product image URL.
 function getProductImageUrl(imagePath) {

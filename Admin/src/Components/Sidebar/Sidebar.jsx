@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import "./Sidebar.css";
 
+
 import { useTheme } from "../../context/ThemeContext.jsx";
 import { useSidebarLogic } from "../../UI_Logic/SidebarLogic.jsx";
+import { useOrdersLogic } from '../../UI_Logic/OrdersLogic.jsx';
 import { getLoginTime, getUser } from "../../pages/Login/auth.js";
 
 import { RxDashboard } from "react-icons/rx";
@@ -20,6 +22,7 @@ import {
   HiOutlineClipboardList,
   HiOutlinePlus,
 } from "react-icons/hi";
+
 
 const NAV_ITEMS = [
   {
@@ -50,6 +53,10 @@ const NAV_ITEMS = [
 ];
 
 export default function Sidebar({ user, onLogout }) {
+
+  const {orders} = useOrdersLogic();
+
+  console.log(orders)
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
 
@@ -92,7 +99,6 @@ export default function Sidebar({ user, onLogout }) {
     setOrdersExpanded((previous) => !previous);
   };
 
-  // Prevent unauthorized navigation through disabled sidebar links
   const handleRestrictedNavigation = (event) => {
     if (!isAdmin) {
       event.preventDefault();
@@ -195,6 +201,7 @@ export default function Sidebar({ user, onLogout }) {
             >
               <span className="icon">{item.icon}</span>
               <span className="label">{item.label}</span>
+              <span className="note">{item.note}</span>
             </NavLink>
           ))}
 
@@ -219,6 +226,9 @@ export default function Sidebar({ user, onLogout }) {
 
               <span className="label">Orders</span>
 
+              <span className="orders-note">
+                {orders.length}
+              </span>
               <HiOutlineChevronDown
                 className={`sb-orders-chevron ${
                   ordersExpanded ? "sb-chevron-open" : ""

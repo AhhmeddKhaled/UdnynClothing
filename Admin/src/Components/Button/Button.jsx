@@ -17,6 +17,12 @@ export default function Button({
   const handleClick = onClick ?? load;
   const isDisabled = disabled || loading;
 
+  const icons = {
+    edit: <FiEdit2 />,
+    delete: <MdDeleteOutline />,
+    details: <CgDetailsMore />,
+  };
+
   return (
     <button
       {...props}
@@ -26,12 +32,7 @@ export default function Button({
       disabled={isDisabled}
       aria-busy={loading || undefined}
     >
-
-      {
-      variant == 
-      "edit" ? <FiEdit2 /> 
-      : "delet" ? <MdDeleteOutline /> 
-      : "details" ? <CgDetailsMore /> : ''}
+      {icons[variant] || null}
       {loading ? "جاري التحميل..." : children}
     </button>
   );

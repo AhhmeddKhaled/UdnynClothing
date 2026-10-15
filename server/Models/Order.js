@@ -60,8 +60,6 @@ const orderItemSchema = new mongoose.Schema(
       min: 0,
     },
 
-    // Actual photo uploaded for this order item.
-    // This is separate from the catalog/product image.
     realImagePath: {
       type: String,
       default: null,
@@ -80,8 +78,6 @@ const orderSchema = new mongoose.Schema(
       index: true,
     },
 
-    // Optional: used when the order belongs to a registered user.
-    // Manual orders can leave this field null.
     customer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -89,7 +85,6 @@ const orderSchema = new mongoose.Schema(
       index: true,
     },
 
-    // Customer details for manually created orders.
     customerName: {
       type: String,
       required: true,

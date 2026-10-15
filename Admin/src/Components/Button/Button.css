@@ -6,6 +6,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-2);
   min-height: 36px;
   padding: var(--space-2) var(--space-4);
   border: none;
@@ -23,6 +24,7 @@
 
 .btn .icon {
   display: inline-flex;
+  align-items: center;
 }
 
 .btn:disabled {
@@ -30,44 +32,52 @@
   cursor: not-allowed;
 }
 
+/* Primary */
 .btn-primary {
   background: var(--color-plum);
-  color: var(--color-paper);
-  border-color: var(--color-plum);
-}
-
-.btn-download {
-  background-color: var(--btn-download);
-}
-
-.btn-primary,
-.btn-download {
   color: var(--color-card);
-}
-
-.btn-download:hover {
-  background-color: var(--btn-download-hover);
+  border-color: var(--color-plum);
 }
 
 .btn-primary:hover:not(:disabled) {
   opacity: 0.88;
 }
 
+/* Download */
+.btn-download {
+  background-color: var(--btn-download);
+  color: var(--color-card);
+}
+
+.btn-download:hover:not(:disabled) {
+  background-color: var(--btn-download-hover);
+}
+
+/* Edit */
 .btn-edit {
   color: var(--status-warning);
 }
 
-.btn-delet {
+/* Delete */
+.btn-delete {
   color: var(--status-error);
 }
 
-.btn-edit:hover,
-.btn-delet:hover {
+/* Details */
+.btn-details {
+  color: var(--color-plum);
+}
+
+/* Icon buttons hover */
+.btn-edit:hover:not(:disabled),
+.btn-delete:hover:not(:disabled),
+.btn-details:hover:not(:disabled) {
   background-color: var(--color-secondary);
 }
 
-
+/* Icons */
 .btn svg {
   width: 16px;
   height: 16px;
+  flex-shrink: 0;
 }

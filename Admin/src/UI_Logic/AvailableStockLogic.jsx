@@ -27,6 +27,8 @@ export function useAvailableStockLogic() {
   const [importing, setImporting] = useState(false);
   const [imageUploadingFor, setImageUploadingFor] = useState(null);
 
+  const [successMessage,setSuccessMessage] = useState("");
+
   const fileInputRefs = useRef({});
   const currentUser = useMemo(() => getCurrentUser(), []);
 
@@ -219,7 +221,6 @@ export function useAvailableStockLogic() {
   const handleImport = useCallback(async (event) => {
     const file = event.target.files?.[0];
 
-    // Allow selecting the same file again.
     event.target.value = "";
 
     if (!file) return;
@@ -253,7 +254,8 @@ export function useAvailableStockLogic() {
 
       await fetchProducts();
 
-      window.alert(data.message || "Products imported successfully.");
+      setSuccessMessage(data.message || "Products imported successfully.");
+
     } catch (err) {
       console.error("Excel import error:", err);
       window.alert(err.message || "An error occurred while importing the file.");
@@ -296,5 +298,7 @@ export function useAvailableStockLogic() {
     handleImageUpload,
     handleImport,
     clearFilters,
+
+    successMessage
   };
 }

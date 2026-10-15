@@ -48,13 +48,11 @@ const AvailableStockSchema = new mongoose.Schema(
       default: null,
     },
 
-    // الصورة تفضل محفوظة حتى لو المنتج اختفى من Excel
     imagePath: {
       type: String,
       default: null,
     },
 
-    // هل المنتج موجود في ملف Excel الحالي؟
     active: {
       type: Boolean,
       default: true,

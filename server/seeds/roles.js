@@ -37,6 +37,7 @@ const roles = {
     "users.delete",
 
     "orders.read",
+    "orders.create",
     "orders.update",
     "orders.delete",
     "orders.updateStatus",

@@ -248,6 +248,9 @@ function validateOrderForm(form) {
   return "";
 }
 
+function changeOrderStatus(id,status) {
+  
+}
 export function useOrdersLogic() {
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);

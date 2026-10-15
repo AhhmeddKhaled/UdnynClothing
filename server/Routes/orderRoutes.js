@@ -19,7 +19,6 @@ const {
   deleteOrder,
 } = require("../Controllers/orderController");
 
-// تخزين صور المنتجات الفعلية في مجلد مستقل عن صور الكتالوج.
 const orderImagesDirectory = path.join(
   __dirname,
   "..",
@@ -80,7 +79,6 @@ const uploadOrderImages = multer({
 
 router.use(authenticate);
 
-// إنشاء أوردر يدوي مع استقبال صور المنتجات.
 router.post(
   "/",
   authorize("orders.create"),
@@ -104,10 +102,8 @@ router.patch(
   updateOrderStatus
 );
 
-// عرض أوردر محدد.
 router.get("/:id", getOrderById);
 
-// حذف أوردر.
 router.delete("/:id", authorize("orders.delete"), deleteOrder);
 
 module.exports = router;

@@ -71,7 +71,6 @@ function getOrderNumber() {
   return `UDN-${timestamp}-${random}`;
 }
 
-// Delete uploaded files if the order creation request fails.
 async function removeUploadedFiles(files = []) {
   await Promise.all(
     files.map(async (file) => {
@@ -91,8 +90,6 @@ async function removeUploadedFiles(files = []) {
   );
 }
 
-// POST /api/orders
-// Manual orders can only be created by admins/owners.
 async function createOrder(req, res, next) {
   let session;
   let orderCreated = false;
@@ -100,18 +97,8 @@ async function createOrder(req, res, next) {
 
   
   try {
-    console.log(role);
-    // if (!isAdmin(req)) {
-    //   return sendError(
-    //     res,
-    //     403,
-    //     "Only admins can create manual orders"
-    //   );
-    // }
-
     const body = req.body || {};
 
-    // Temporary diagnostic: inspect the received multipart form fields.
     console.log("[CREATE ORDER DIAGNOSTIC]", {
       contentType: req.headers["content-type"],
       bodyKeys: Object.keys(body),
@@ -129,7 +116,6 @@ async function createOrder(req, res, next) {
       shippingCost = 0,
     } = body;
 
-    // Multipart form data sends the items array as a JSON string.
     let items = body.items;
 
     if (typeof items === "string") {
@@ -140,7 +126,6 @@ async function createOrder(req, res, next) {
       }
     }
 
-    // Validate customer details.
     if (
       typeof customerName !== "string" ||
       !customerName.trim() ||
@@ -157,7 +142,6 @@ async function createOrder(req, res, next) {
       return sendError(res, 400, "Valid customer phone is required");
     }
 
-    // Validate governorate.
     if (
       typeof governorate !== "string" ||
       !EGYPTIAN_GOVERNORATES.includes(governorate.trim())
@@ -180,7 +164,6 @@ async function createOrder(req, res, next) {
       return sendError(res, 400, "Invalid customer note");
     }
 
-    // Validate shipping cost.
     const parsedShippingCost = Number(shippingCost);
 
     if (
@@ -191,7 +174,6 @@ async function createOrder(req, res, next) {
       return sendError(res, 400, "Invalid shipping cost");
     }
 
-    // Validate requested items.
     if (!Array.isArray(items) || items.length === 0) {
       return sendError(
         res,
@@ -204,7 +186,6 @@ async function createOrder(req, res, next) {
       return sendError(res, 400, "Order contains too many items");
     }
 
-    // Map uploaded photos to their corresponding product IDs.
     const imagePathByItemId = new Map();
 
     for (const file of uploadedFiles) {
@@ -242,7 +223,6 @@ async function createOrder(req, res, next) {
       );
     }
 
-    // Combine duplicate item IDs and validate quantities.
     const quantitiesByItemId = new Map();
 
     for (const item of items) {
@@ -279,7 +259,6 @@ async function createOrder(req, res, next) {
       quantitiesByItemId.set(itemId, combinedQuantity);
     }
 
-    // Do not accept images for products that aren't in the order.
     for (const itemId of imagePathByItemId.keys()) {
       if (!quantitiesByItemId.has(itemId)) {
         return sendError(
@@ -303,7 +282,6 @@ async function createOrder(req, res, next) {
       let subtotal = 0;
 
       for (const [itemId, quantity] of requestedItems) {
-        // Reserve stock atomically, only for active products.
         const stockItem = await AvailableStock.findOneAndUpdate(
           {
             itemId,
@@ -337,7 +315,6 @@ async function createOrder(req, res, next) {
           throw error;
         }
 
-        // Prices always come from the database, never from the UI.
         const offerPrice = Number(stockItem.offerPrice) || 0;
         const retailPrice = Number(stockItem.retailPrice) || 0;
         const unitPrice = offerPrice > 0 ? offerPrice : retailPrice;
@@ -372,7 +349,6 @@ async function createOrder(req, res, next) {
           {
             orderNumber: getOrderNumber(),
 
-            // Manual order, not linked to a registered customer.
             customer: null,
             customerName: customerName.trim(),
             customerPhone: customerPhone.trim(),
@@ -426,7 +402,6 @@ async function createOrder(req, res, next) {
   }
 }
 
-// GET /api/orders/my-orders
 async function getMyOrders(req, res, next) {
   try {
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
@@ -456,12 +431,12 @@ async function getMyOrders(req, res, next) {
         pages: Math.ceil(total / limit),
       },
     });
+
   } catch (error) {
     return next(error);
   }
 }
 
-// GET /api/orders
 async function getAllOrders(req, res, next) {
   try {
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
@@ -505,7 +480,6 @@ async function getAllOrders(req, res, next) {
   }
 }
 
-// GET /api/orders/:id
 async function getOrderById(req, res, next) {
   try {
     const { id } = req.params;
@@ -547,7 +521,6 @@ async function getOrderById(req, res, next) {
   }
 }
 
-// PATCH /api/orders/:id/status
 async function updateOrderStatus(req, res, next) {
   let session;
 
@@ -652,7 +625,6 @@ async function updateOrderStatus(req, res, next) {
   }
 }
 
-// DELETE /api/orders/:id
 async function deleteOrder(req, res, next) {
   let session;
 
@@ -739,7 +711,6 @@ async function deleteOrder(req, res, next) {
   }
 }
 
-// GET /api/orders/export/qp-expresse
 async function exportQPExpresse(req, res, next) {
   try {
     const filter = {};
