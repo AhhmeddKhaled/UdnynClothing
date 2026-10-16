@@ -7,6 +7,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: red;
 }
 
 .order-status-pending {
@@ -24,9 +25,9 @@
   background: var(--status-preparing-bg);
 }
 
-.order-status-shipped {
-  color: var(--status-shipped);
-  background: var(--status-shipped-bg);
+.order-status-shipping {
+  color: var(--status-shipping);
+  background-color: var(--status-shipping-bg);
 }
 
 .order-status-delivered {
@@ -39,7 +40,8 @@
   background: var(--status-cancelled-bg);
 }
 
-.order-status-unknown {
-  color: var(--status-pending);
-  background: var(--status-pending-bg);
+.order-status-returned {
+  color: var(--status-returned);
+  background: var(--status-returned-bg);
+  background-color: green;
 }

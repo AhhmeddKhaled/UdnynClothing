@@ -55,7 +55,7 @@
   }
 
   .card-icon-return {
-    background-color: hsl(from var(--status-return) h s l / 0.3);
+    background-color: hsl(from var(--status-returned) h s l / 0.3);
   }
 
   .card-icon-cancelled {

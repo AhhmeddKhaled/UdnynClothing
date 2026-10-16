@@ -1,187 +1,14 @@
 /* ======================================================
-   Udnyn — Global Design Tokens
-   نظام موحد للألوان والخطوط والمسافات
-   Light Mode: White + Gray + Burgundy
-   Dark Mode: Navy + Soft Burgundy
-   ====================================================== */
+   Udnyn — Global Design Tokens (v2)
 
 /* ======================================================
-   1. LIGHT THEME — الوضع الفاتح
+   1. Shared (does not change with theme or palette)
    ====================================================== */
 
-:root,
-[data-theme="light"] {
-  color-scheme: light;
-
-  /* ------------------------------------------------------
-     Backgrounds — خلفيات الموقع
-     ------------------------------------------------------ */
-
-  --color-background: #FFFFFF;       /* خلفية الصفحة */
-  --color-page-bg: var(--color-background);
-  --color-paper: #FFFFFF;            /* سطح أبيض */
-  --color-sand: #F5F5F5;             /* خلفية رمادية فاتحة */
-  --color-sand-deep: #E5E7EB;        /* رمادي أغمق */
-  --color-surface: #FFFFFF;          /* أسطح الواجهة */
-  --color-card: #FFFFFF;             /* كروت المنتجات والإحصائيات */
-  --color-card-hover: #F3F4F6;       /* عند المرور على الكروت */
-
-  /* ------------------------------------------------------
-     Text — النصوص
-     ------------------------------------------------------ */
-
-  --color-foreground: #374151;       /* النص الأساسي */
-  --color-ink: var(--color-foreground);
-  --color-text: var(--color-foreground);
-  --color-text-muted: #6B7280;       /* النص الثانوي */
-  --color-muted: var(--color-text-muted);
-
-  /* ------------------------------------------------------
-     Primary & Secondary — الألوان الأساسية والثانوية
-     ------------------------------------------------------ */
-
-  --color-primary: #612D3B;          /* الأزرار الرئيسية */
-  --color-primary-hover: #47202B;    /* عند المرور */
-  --color-primary-text: #FFFFFF;     /* النص فوق الزر الأساسي */
-
-  --color-secondary: #E5E7EB;        /* الأزرار الثانوية */
-  --color-secondary-hover: #D1D5DB;
-  --color-secondary-text: #374151;
-
-  /* ------------------------------------------------------
-     Accent — هوية البراند
-     ------------------------------------------------------ */
-
-  --color-accent: #612D3B;           /* النبيتي الأساسي */
-  --color-accent-hover: #47202B;
-  --color-accent-soft: #F5EAED;      /* خلفية نبيتي خفيفة */
-  --color-accent-text: #FFFFFF;
-
-  /* ------------------------------------------------------
-     Legacy aliases — توافق مع الكود القديم
-     لا تحذفها قبل مراجعة استخداماتها
-     ------------------------------------------------------ */
-
-  --color-plum: var(--color-accent);
-  --color-plum-deep: var(--color-accent-hover);
-  --color-plum-soft: var(--color-muted);
-  --color-plum-tint: #D9BFC4;
-
-  /* ------------------------------------------------------
-     Borders & Inputs — الحدود وحقول الإدخال
-     ------------------------------------------------------ */
-
-  --color-border: #E5E7EB;
-  --color-line: var(--color-border);
-  --color-line-dark: rgba(55, 65, 81, 0.16);
-  --color-input: #FFFFFF;
-  --color-overlay: rgba(17, 24, 39, 0.50);
-
-  /* ------------------------------------------------------
-     Shadows — الظلال
-     ------------------------------------------------------ */
-
-  --shadow-card: 0 1px 3px rgba(17, 24, 39, 0.06);
-  --shadow-pop: 0 8px 24px rgba(17, 24, 39, 0.12);
-
-  /* ------------------------------------------------------
-     Success — نجاح العمليات
-     ------------------------------------------------------ */
-
-  --status-success: #1E6B47;
-  --status-success-bg: #E8F6EF;
-  --status-success-border: #B9E3CF;
-  --status-success-text: #17553A;
-  --status-success-on: #FFFFFF;
-
-  /* ------------------------------------------------------
-     Error — الأخطاء
-     ------------------------------------------------------ */
-
-  --status-error: #DC2626;
-  --status-error-bg: #FEE2E2;
-  --status-error-border: #F9B4B4;
-  --status-error-text: #B91C1C;
-  --status-error-on: #FFFFFF;
-
-  /* ------------------------------------------------------
-     Warning — التحذيرات
-     ------------------------------------------------------ */
-
-  --status-warning: #D97706;
-  --status-warning-bg: #FEF3C7;
-  --status-warning-border: #F3D27A;
-  --status-warning-text: #92400E;
-  --status-warning-on: #2A1A00;
-
-  /* ------------------------------------------------------
-     Info — المعلومات
-     ------------------------------------------------------ */
-
-  --status-info: #2563EB;
-  --status-info-bg: #DBEAFE;
-  --status-info-border: #A9C8F5;
-  --status-info-text: #1D4ED8;
-  --status-info-on: #FFFFFF;
-
-  /* ------------------------------------------------------
-     Clay — لون الطين
-     ------------------------------------------------------ */
-
-  --status-clay: #B5563D;
-  --status-clay-bg: #F6E4DD;
-  --color-clay: var(--status-clay);
-  --color-clay-bg: var(--status-clay-bg);
-
-  /* ------------------------------------------------------
-     Order Statuses — حالات الطلبات
-     ------------------------------------------------------ */
-
-  --status-pending: #64748B;
-  --status-pending-bg: #F1F5F9;
-
-  --status-confirmed: #2563EB;
-  --status-confirmed-bg: #DBEAFE;
-
-  --status-preparing: #7C3AED;
-  --status-preparing-bg: #EDE9FE;
-
-  --status-shipping: #D97706;
-  --status-shipping-bg: #FEF3C7;
-
-  --status-delivered: #16A34A;
-  --status-delivered-bg: #DCFCE7;
-
-  --status-return: #0891B2;
-  --status-return-bg: #CFFAFE;
-
-  --status-cancelled: #DC2626;
-  --status-cancelled-bg: #FEE2E2;
-
-  /* ------------------------------------------------------
-     Dashboard Metrics — ألوان الإحصائيات
-     ------------------------------------------------------ */
-
-  --status-revenue: #5A9BD5;
-  --status-total: #2563EB;
-
-  /* ------------------------------------------------------
-     Button Variants — ألوان الأزرار الخاصة
-     ------------------------------------------------------ */
-
-  --btn-download: #7CB9E8;
-  --btn-download-hover: #5A9BD5;
-
-  /* ------------------------------------------------------
-     Typography — الخطوط
-     ------------------------------------------------------ */
-
+:root {
+  /* Typography */
   --font-display: "Aref Ruqaa", serif;
   --font-body: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, sans-serif;
-
-  /* ------------------------------------------------------
-     Font Sizes — أحجام الخطوط
-     ------------------------------------------------------ */
 
   --text-xs: 12px;
   --text-sm: 13px;
@@ -191,10 +18,7 @@
   --text-2xl: 26px;
   --text-display: 36px;
 
-  /* ------------------------------------------------------
-     Spacing — المسافات
-     ------------------------------------------------------ */
-
+  /* Spacing (4px grid) */
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -204,222 +28,324 @@
   --space-8: 32px;
   --space-10: 40px;
 
-  /* ------------------------------------------------------
-     Radius — استدارة الحواف
-     ------------------------------------------------------ */
-
+  /* Radius */
   --radius-sm: 2px;
   --radius-md: 6px;
   --radius-lg: 12px;
   --radius-xl: 18px;
   --radius-full: 999px;
 
-  /* ------------------------------------------------------
-     Motion — الحركة
-     ------------------------------------------------------ */
-
+  /* Motion */
   --dur-fast: 150ms;
   --dur-base: 250ms;
   --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
 
-  /* ------------------------------------------------------
-     Layers — ترتيب العناصر
-     ------------------------------------------------------ */
-
-  --z-dropdown: 30;
+  /* Layers */
   --z-sticky: 20;
+  --z-dropdown: 30;
   --z-modal: 1000;
   --z-toast: 1100;
+
+  /* Legacy names, now aliases of the semantic ones (they follow theme + palette) */
+  --color-plum: var(--color-accent);
+  --color-plum-deep: var(--color-accent-hover);
+  --color-plum-soft: var(--color-muted);
+  --color-plum-tint: var(--color-accent-tint);
+  --color-primary: var(--color-ink);
+  --color-secondary: var(--color-sand-deep);
+  --color-sage: var(--status-success);
+  --color-sage-bg: var(--status-success-bg);
+  --color-clay: var(--status-clay);
+  --color-clay-bg: var(--status-clay-bg);
 }
 
+/* ======================================================
+   2. Light theme (default palette: plum)
+   ====================================================== */
+
+:root,
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Surfaces */
+  --color-page-bg: #f7f4f6;
+  --color-paper: #ffffff;
+  --color-sand: #ffffff;
+  --color-sand-deep: #f1ecf0;
+  --color-card: #ffffff;
+  --color-card-hover: #faf6f9;
+
+  /* Text */
+  --color-ink: #241a22;
+  --color-muted: #6f5f6b;
+  --color-faint: #9b8c97;
+
+  /* Lines + overlay */
+  --color-line: #e9e2e7;
+  --color-line-dark: rgba(36, 26, 34, 0.16);
+  --color-overlay: rgba(24, 16, 22, 0.5);
+
+  /* Accent */
+  --color-accent: #6b2d5c;
+  --color-accent-hover: #55224a;
+  --color-accent-soft: #f5eaf2;
+  --color-accent-tint: #d9b7cf;
+  --color-on-accent: #ffffff;
+
+  /* Shadows */
+  --shadow-card: 0 1px 2px rgba(36, 26, 34, 0.05), 0 1px 3px rgba(36, 26, 34, 0.06);
+  --shadow-pop: 0 12px 32px rgba(36, 26, 34, 0.16);
+
+  /* ---- Semantic statuses: main / bg / border / text (AA on bg) / on (text on main) ---- */
+  --status-success: #1e6b47;
+  --status-success-bg: #e8f6ef;
+  --status-success-border: #b9e3cf;
+  --status-success-text: #17553a;
+  --status-success-on: #ffffff;
+
+  --status-error: #dc2626;
+  --status-error-bg: #fee2e2;
+  --status-error-border: #f9b4b4;
+  --status-error-text: #b91c1c;
+  --status-error-on: #ffffff;
+
+  --status-warning: #d97706;
+  --status-warning-bg: #fef3c7;
+  --status-warning-border: #f3d27a;
+  --status-warning-text: #92400e;
+  --status-warning-on: #2a1a00;
+
+  --status-info: #2563eb;
+  --status-info-bg: #dbeafe;
+  --status-info-border: #a9c8f5;
+  --status-info-text: #1d4ed8;
+  --status-info-on: #ffffff;
+
+  --status-clay: #b5563d;
+  --status-clay-bg: #f6e4dd;
+
+  /* ---- Order statuses: main / bg / text ---- */
+  --status-pending: #64748b;
+  --status-pending-bg: #f1f5f9;
+  --status-pending-text: #475569;
+
+  --status-confirmed: #2563eb;
+  --status-confirmed-bg: #dbeafe;
+  --status-confirmed-text: #1d4ed8;
+
+  --status-preparing: #7c3aed;
+  --status-preparing-bg: #ede9fe;
+  --status-preparing-text: #6d28d9;
+
+  --status-shipping: #d97706;
+  --status-shipping-bg: #fef3c7;
+  --status-shipping-text: #92400e;
+
+  --status-delivered: #16a34a;
+  --status-delivered-bg: #dcfce7;
+  --status-delivered-text: #15803d;
+
+  --status-returned: #0891b2;
+  --status-returned-bg: #cffafe;
+  --status-returned-text: #0e7490;
+
+  --status-cancelled: #dc2626;
+  --status-cancelled-bg: #fee2e2;
+  --status-cancelled-text: #b91c1c;
+
+  /* Misc */
+  --status-revenue: #5a9bd5;
+  --status-total: #2563eb;
+  --btn-download: #7cb9e8;
+  --btn-download-hover: #5a9bd5;
+}
 
 /* ======================================================
-   2. DARK THEME — الوضع الداكن
-   Navy + Light Text + Soft Burgundy
+   3. Dark theme (default palette: plum)
    ====================================================== */
 
 [data-theme="dark"] {
   color-scheme: dark;
 
-  /* ------------------------------------------------------
-     Backgrounds — خلفيات كحلية هادئة
-     ------------------------------------------------------ */
+  --color-page-bg: #151016;
+  --color-paper: #1c161b;
+  --color-sand: #1c161b;
+  --color-sand-deep: #2a222a;
+  --color-card: #211a20;
+  --color-card-hover: #2a2229;
 
-  --color-background: #111827;
-  --color-page-bg: var(--color-background);
-  --color-paper: #111827;
-  --color-sand: #1F2937;
-  --color-sand-deep: #374151;
-  --color-surface: #1F2937;
-  --color-card: #1F2937;
-  --color-card-hover: #374151;
+  --color-ink: #f2ecf0;
+  --color-muted: #b9abb5;
+  --color-faint: #8a7b86;
 
-  /* ------------------------------------------------------
-     Text — النصوص الفاتحة
-     ------------------------------------------------------ */
+  --color-line: rgba(242, 236, 240, 0.1);
+  --color-line-dark: rgba(255, 255, 255, 0.16);
+  --color-overlay: rgba(0, 0, 0, 0.7);
 
-  --color-foreground: #F9FAFB;
-  --color-ink: var(--color-foreground);
-  --color-text: var(--color-foreground);
-  --color-text-muted: #9CA3AF;
-  --color-muted: var(--color-text-muted);
+  --color-accent: #dfaed3;
+  --color-accent-hover: #f0c6e5;
+  --color-accent-soft: #3a2536;
+  --color-accent-tint: #7d5671;
+  --color-on-accent: #2a0f24;
 
-  /* ------------------------------------------------------
-     Primary & Secondary — الأزرار
-     ------------------------------------------------------ */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-pop: 0 10px 30px rgba(0, 0, 0, 0.5);
 
-  --color-primary: #D9AEB8;
-  --color-primary-hover: #E8CDD2;
-  --color-primary-text: #24171C;
+  --status-success: #4cc38a;
+  --status-success-bg: #1c3328;
+  --status-success-border: #2f6b4d;
+  --status-success-text: #8fe0b4;
+  --status-success-on: #0b1f16;
 
-  --color-secondary: #374151;
-  --color-secondary-hover: #4B5563;
-  --color-secondary-text: #F9FAFB;
+  --status-error: #f26b6b;
+  --status-error-bg: #3a2224;
+  --status-error-border: #7a3a3d;
+  --status-error-text: #ffb4b4;
+  --status-error-on: #2a0d0d;
 
-  /* ------------------------------------------------------
-     Accent — هوية البراند في الوضع الداكن
-     ------------------------------------------------------ */
+  --status-warning: #f0b340;
+  --status-warning-bg: #3a301a;
+  --status-warning-border: #735a22;
+  --status-warning-text: #f7d98a;
+  --status-warning-on: #2a1a00;
 
-  --color-accent: #D9AEB8;
-  --color-accent-hover: #E8CDD2;
-  --color-accent-soft: #392A30;
-  --color-accent-text: #24171C;
+  --status-info: #6ea8fe;
+  --status-info-bg: #1f2f4a;
+  --status-info-border: #355a94;
+  --status-info-text: #a9cbff;
+  --status-info-on: #0b1a33;
 
-  /* ------------------------------------------------------
-     Legacy aliases — توافق مع الكود القديم
-     ------------------------------------------------------ */
-
-  --color-plum: var(--color-accent);
-  --color-plum-deep: var(--color-accent-hover);
-  --color-plum-soft: var(--color-muted);
-  --color-plum-tint: #A97D88;
-
-  /* ------------------------------------------------------
-     Borders & Inputs — الحدود وحقول الإدخال
-     ------------------------------------------------------ */
-
-  --color-border: rgba(249, 250, 251, 0.12);
-  --color-line: var(--color-border);
-  --color-line-dark: rgba(249, 250, 251, 0.16);
-  --color-input: #1F2937;
-  --color-overlay: rgba(0, 0, 0, 0.65);
-
-  /* ------------------------------------------------------
-     Shadows — الظلال
-     ------------------------------------------------------ */
-
-  --shadow-card: 0 2px 6px rgba(0, 0, 0, 0.16);
-  --shadow-pop: 0 8px 24px rgba(0, 0, 0, 0.30);
-
-  /* ------------------------------------------------------
-     Success — نجاح العمليات
-     ------------------------------------------------------ */
-
-  --status-success: #4CC38A;
-  --status-success-bg: #1C3328;
-  --status-success-border: #2F6B4D;
-  --status-success-text: #8FE0B4;
-  --status-success-on: #0B1F16;
-
-  /* ------------------------------------------------------
-     Error — الأخطاء
-     ------------------------------------------------------ */
-
-  --status-error: #F26B6B;
-  --status-error-bg: #3A2224;
-  --status-error-border: #7A3A3D;
-  --status-error-text: #FFB4B4;
-  --status-error-on: #2A0D0D;
-
-  /* ------------------------------------------------------
-     Warning — التحذيرات
-     ------------------------------------------------------ */
-
-  --status-warning: #F0B340;
-  --status-warning-bg: #3A301A;
-  --status-warning-border: #735A22;
-  --status-warning-text: #F7D98A;
-  --status-warning-on: #2A1A00;
-
-  /* ------------------------------------------------------
-     Info — المعلومات
-     ------------------------------------------------------ */
-
-  --status-info: #6EA8FE;
-  --status-info-bg: #1F2F4A;
-  --status-info-border: #355A94;
-  --status-info-text: #A9CBFF;
-  --status-info-on: #0B1A33;
-
-  /* ------------------------------------------------------
-     Clay — لون الطين
-     ------------------------------------------------------ */
-
-  --status-clay: #D8897C;
+  --status-clay: #d8897c;
   --status-clay-bg: #382725;
-  --color-clay: var(--status-clay);
-  --color-clay-bg: var(--status-clay-bg);
 
-  /* ------------------------------------------------------
-     Order Statuses — حالات الطلبات
-     ------------------------------------------------------ */
-
-  --status-pending: #94A3B8;
+  --status-pending: #94a3b8;
   --status-pending-bg: #263241;
+  --status-pending-text: #cbd5e1;
 
-  --status-confirmed: #6EA8FE;
-  --status-confirmed-bg: #1F2F4A;
+  --status-confirmed: #6ea8fe;
+  --status-confirmed-bg: #1f2f4a;
+  --status-confirmed-text: #a9cbff;
 
-  --status-preparing: #A78BFA;
-  --status-preparing-bg: #2C2547;
+  --status-preparing: #a78bfa;
+  --status-preparing-bg: #2c2547;
+  --status-preparing-text: #c4b5fd;
 
-  --status-shipping: #F0B340;
-  --status-shipping-bg: #3A301A;
+  --status-shipping: #f0b340;
+  --status-shipping-bg: #3a301a;
+  --status-shipping-text: #f7d98a;
 
-  --status-delivered: #4CC38A;
-  --status-delivered-bg: #1C3328;
+  --status-delivered: #4cc38a;
+  --status-delivered-bg: #1c3328;
+  --status-delivered-text: #8fe0b4;
 
-  --status-return: #38BDF8;
-  --status-return-bg: #17323F;
+  --status-return: #38bdf8;
+  --status-return-bg: #17323f;
+  --status-return-text: #7dd3fc;
 
-  --status-cancelled: #F26B6B;
-  --status-cancelled-bg: #3A2224;
-
-  /* Dashboard metrics and download buttons stay unchanged */
+  --status-cancelled: #f26b6b;
+  --status-cancelled-bg: #3a2224;
+  --status-cancelled-text: #ffb4b4;
 }
 
+/* ======================================================
+   4. Palette: teal  (calm, clean)
+   ====================================================== */
+
+[data-palette="teal"]:not([data-theme="dark"]) {
+  --color-page-bg: #f2f6f6;
+  --color-sand-deep: #e8f0ef;
+  --color-card-hover: #f7fafa;
+  --color-ink: #14282a;
+  --color-muted: #536a6c;
+  --color-faint: #8aa0a2;
+  --color-line: #dce6e5;
+  --color-line-dark: rgba(20, 40, 42, 0.16);
+  --color-accent: #0f766e;
+  --color-accent-hover: #0b5d57;
+  --color-accent-soft: #def3f0;
+  --color-accent-tint: #9fd6cf;
+  --color-on-accent: #ffffff;
+}
+
+[data-theme="dark"][data-palette="teal"] {
+  --color-page-bg: #0e1617;
+  --color-paper: #131d1e;
+  --color-sand: #131d1e;
+  --color-sand-deep: #1e2c2d;
+  --color-card: #172224;
+  --color-card-hover: #1f2d2f;
+  --color-ink: #e8f1f0;
+  --color-muted: #9fb6b4;
+  --color-faint: #6f8786;
+  --color-line: rgba(232, 241, 240, 0.1);
+  --color-accent: #4fd1c0;
+  --color-accent-hover: #7ee3d5;
+  --color-accent-soft: #173633;
+  --color-accent-tint: #2e6b64;
+  --color-on-accent: #052724;
+}
 
 /* ======================================================
-   3. GLOBAL APPLICATION — التطبيق بالكامل
+   5. Palette: rose  (warm, boutique)
+   ====================================================== */
+
+[data-palette="rose"]:not([data-theme="dark"]) {
+  --color-page-bg: #faf5f4;
+  --color-sand-deep: #f4ebe9;
+  --color-card-hover: #fdf8f7;
+  --color-ink: #2a1c1f;
+  --color-muted: #735a5f;
+  --color-faint: #a08a8e;
+  --color-line: #ede1df;
+  --color-line-dark: rgba(42, 28, 31, 0.16);
+  --color-accent: #a8405a;
+  --color-accent-hover: #8f3249;
+  --color-accent-soft: #fbe9ed;
+  --color-accent-tint: #e9b4c0;
+  --color-on-accent: #ffffff;
+}
+
+[data-theme="dark"][data-palette="rose"] {
+  --color-page-bg: #171112;
+  --color-paper: #1e1618;
+  --color-sand: #1e1618;
+  --color-sand-deep: #2d2023;
+  --color-card: #251b1e;
+  --color-card-hover: #2e2226;
+  --color-ink: #f5eded;
+  --color-muted: #c0a8ad;
+  --color-faint: #8f777c;
+  --color-line: rgba(245, 237, 237, 0.1);
+  --color-accent: #f2a3b6;
+  --color-accent-hover: #f8c0cd;
+  --color-accent-soft: #3b2128;
+  --color-accent-tint: #7a3d4c;
+  --color-on-accent: #2e0f17;
+}
+
+/* ======================================================
+   6. Global application
    ====================================================== */
 
 html {
   min-height: 100%;
-  background: var(--color-background);
-  color: var(--color-foreground);
+  background: var(--color-page-bg);
+  color: var(--color-ink);
   font-family: var(--font-body);
-}
-
-html[data-theme="light"] {
-  color-scheme: light;
-}
-
-html[data-theme="dark"] {
-  color-scheme: dark;
 }
 
 body {
   min-height: 100vh;
   margin: 0;
-  background: var(--color-background);
-  color: var(--color-foreground);
+  background: var(--color-page-bg);
+  color: var(--color-ink);
   font-family: var(--font-body);
 }
 
 #root {
   min-height: 100vh;
-  background: var(--color-background);
-  color: var(--color-foreground);
+  background: var(--color-page-bg);
+  color: var(--color-ink);
 }
 
 button,
@@ -433,19 +359,14 @@ button {
   color: inherit;
 }
 
-
-/* ======================================================
-   4. GLOBAL LINKS — الروابط
-   ====================================================== */
-
 a,
 a:link,
 a:visited {
   color: var(--color-accent);
   text-decoration-color: transparent;
   transition:
-    color var(--dur-base) var(--ease-out),
-    text-decoration-color var(--dur-base) var(--ease-out);
+    color var(--dur-fast) ease,
+    text-decoration-color var(--dur-fast) ease;
 }
 
 a:hover,
@@ -454,19 +375,14 @@ a:focus-visible {
   text-decoration-color: currentColor;
 }
 
-a:active {
-  color: var(--color-accent);
-}
-
-/* Navigation — روابط القوائم */
-
+/* Navigation links stay neutral */
 .sb-aside a,
 .sb-aside a:link,
 .sb-aside a:visited,
 .sb-topbar a,
 .sb-topbar a:link,
 .sb-topbar a:visited {
-  color: var(--color-foreground);
+  color: var(--color-ink);
 }
 
 .sb-aside a:hover,
@@ -474,36 +390,28 @@ a:active {
   color: var(--color-accent);
 }
 
-
-/* ======================================================
-   5. PAGE CONTAINERS — الحاويات الرئيسية
-   ====================================================== */
-
 .dashboard-layout,
 .dashboard-content,
 .page-container,
 .page-content,
 .orders-page {
-  color: var(--color-foreground);
+  color: var(--color-ink);
 }
 
-
-/* ======================================================
-   6. INPUTS — حقول الإدخال
-   ====================================================== */
+/* Inputs */
 
 input,
 select,
 textarea {
-  color: var(--color-foreground);
-  background-color: var(--color-input);
-  border: 1px solid var(--color-border);
+  color: var(--color-ink);
+  background-color: var(--color-paper);
+  border: 1px solid var(--color-line);
 }
 
 input::placeholder,
 textarea::placeholder {
-  color: var(--color-muted);
-  opacity: 0.8;
+  color: var(--color-faint);
+  opacity: 1;
 }
 
 input:focus,
@@ -520,75 +428,26 @@ textarea:focus-visible {
   outline-offset: 1px;
 }
 
-
-/* ======================================================
-   7. TABLES — الجداول
-   ====================================================== */
+/* Tables */
 
 table {
-  color: var(--color-foreground);
-  border-color: var(--color-border);
+  color: var(--color-ink);
+  border-color: var(--color-line);
 }
 
 th,
 td {
-  border-color: var(--color-border);
+  border-color: var(--color-line);
 }
 
+/* Common cards (tokens already switch with the theme, no dark-only overrides needed) */
 
-
-/* ======================================================
-   9. DARK THEME — مكونات الوضع الداكن
-   ====================================================== */
-
-[data-theme="dark"] .card,
-[data-theme="dark"] .stat-card,
-[data-theme="dark"] .dashboard-card,
-[data-theme="dark"] .product-card,
-[data-theme="dark"] .stock-card {
-  background: var(--color-card);
-  color: var(--color-foreground);
-  border-color: var(--color-border);
-}
-
-[data-theme="dark"] input,
-[data-theme="dark"] select,
-[data-theme="dark"] textarea,
 [data-theme="dark"] option {
-  background-color: var(--color-input);
-  color: var(--color-foreground);
-  border-color: var(--color-border);
+  background-color: var(--color-paper);
+  color: var(--color-ink);
 }
 
-[data-theme="dark"] a,
-[data-theme="dark"] a:link,
-[data-theme="dark"] a:visited {
-  color: var(--color-accent);
-}
-
-[data-theme="dark"] a:hover,
-[data-theme="dark"] a:focus-visible {
-  color: var(--color-accent-hover);
-}
-
-[data-theme="dark"] .sb-aside a,
-[data-theme="dark"] .sb-aside a:link,
-[data-theme="dark"] .sb-aside a:visited,
-[data-theme="dark"] .sb-topbar a,
-[data-theme="dark"] .sb-topbar a:link,
-[data-theme="dark"] .sb-topbar a:visited {
-  color: var(--color-foreground);
-}
-
-[data-theme="dark"] .sb-aside a:hover,
-[data-theme="dark"] .sb-topbar a:hover {
-  color: var(--color-accent);
-}
-
-
-/* ======================================================
-   10. SMOOTH TRANSITIONS — انتقالات الألوان
-   ====================================================== */
+/* Smooth theme switching */
 
 body,
 #root,
@@ -596,7 +455,6 @@ body,
 .dashboard-content,
 .sb-aside,
 .sb-topbar,
-.card,
 .stat-card,
 .dashboard-card,
 .product-card,
@@ -609,15 +467,12 @@ table,
 th,
 td {
   transition:
-    background-color var(--dur-base) ease,
-    color var(--dur-base) ease,
-    border-color var(--dur-base) ease;
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
 }
 
-
-/* ======================================================
-   11. ACCESSIBILITY — إمكانية الوصول
-   ====================================================== */
+/* Accessibility */
 
 @media (prefers-reduced-motion: reduce) {
   *,

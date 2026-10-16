@@ -68,6 +68,12 @@
   color: var(--color-plum);
 }
 
+/* Close  */
+.btn-close {
+  color: var(--status-error);
+  background-color: inherit;
+}
+
 /* Icon buttons hover */
 .btn-edit:hover:not(:disabled),
 .btn-delete:hover:not(:disabled),
@@ -75,9 +81,3 @@
   background-color: var(--color-secondary);
 }
 
-/* Icons */
-.btn svg {
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-}

@@ -4,18 +4,20 @@
    Reset أساسي
    ====================================================== */
 
-*, *::before, *::after { box-sizing: border-box; }
+*, *::before, *::after { 
+  box-sizing: 
+  border-box; 
+  padding: 0;
+  margin: 0;
+}
 
 body {
-  margin: 0;
   background: var(--color-sand);
   color: var(--color-ink);
   font-family: var(--font-body);
   font-size: var(--text-base);
   line-height: 1.6;
 }
-
-h1, h2, h3 { margin: 0; }
 
 .num { font-variant-numeric: tabular-nums; }
 
@@ -126,4 +128,8 @@ a {
 
 p {
   margin: 0;
+}
+
+ul {
+  list-style: none;
 }

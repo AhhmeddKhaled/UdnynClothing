@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState , useEffect } from "react";
 import "./OrderDetailsModal.css";
 import OrderItemImage from "./OrderItemImage.jsx";
 import OrderStatus from "../OrderStatus/OrderStatus.jsx";
@@ -10,36 +10,20 @@ import { BsTelephone } from "react-icons/bs";
 import { RiGovernmentLine } from "react-icons/ri";
 import { SiNamecheap } from "react-icons/si";
 import { FaRegAddressCard } from "react-icons/fa";
-import { changeOrderStatus } from "../../services/changeOrderStatus.js";
+import ChangeOrderStatus from "./ChangeOrderStatus/ChangeOrderStatus.jsx";
 
-const API_URL = import.meta.env.VITE_API_URL;
-
-const STATUSES = [
-  "pending",
-  "confirmed",
-  "preparing",
-  "shipped",
-  "delivered",
-  "cancelled",
-];
-
-function StatusBadge({ status, statuses = [] }) {
-  const normalizedStatus = statuses.includes(status) ? status : "unknown";
-
-  return (
-    <span className={`orders-status orders-status-${normalizedStatus}`}>
-      <span className="orders-status-dot" />
-      {status || "Unknown"}
-    </span>
-  );
-}
+import Button from "../Button/Button";
 
 export default function OrderDetailsModal({ order, logic }) {
+  const [orderStatus, setOrderStatus] = useState(order?.status);
 
-  const [orderStatus,setOrderStatus] = useState(false);
+  useEffect(() => {
+    setOrderStatus(order?.status);
+  }, [order?._id, order?.status]);
 
   if (!order) return null;
 
+  console.log(order)
   const {
     setSelectedOrder,
     getCustomerName,
@@ -69,7 +53,7 @@ export default function OrderDetailsModal({ order, logic }) {
           <div className="orders-modal-header-top">
             <span className="orders-eyebrow">ORDER DETAILS</span>
 
-            <span>X</span>
+            <Button variant="close"></Button>
           </div>
 
           <div className="orders-modal-header-bottom">
@@ -78,13 +62,13 @@ export default function OrderDetailsModal({ order, logic }) {
             </h2>
 
             <div className="orders-modal-header-status">
-              <OrderStatus status={order.status} />
-              
-              <ul className="order-status">
-                {STATUSES.map((status, i) => (
-                  <li key={i}>{status}</li>
-                ))}
-              </ul>
+              <OrderStatus status={orderStatus} change/>
+
+              <ChangeOrderStatus
+                status={orderStatus}
+                id={order._id}
+                onStatusUpdated={setOrderStatus}
+              />
             </div>
 
             <div className="orders-modal-header-date">

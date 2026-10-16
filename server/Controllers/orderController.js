@@ -11,9 +11,10 @@ const VALID_STATUSES = [
   "pending",
   "confirmed",
   "preparing",
-  "shipped",
+  "shipping",
   "delivered",
   "cancelled",
+  "returned"
 ];
 
 const EGYPTIAN_GOVERNORATES = [
@@ -44,14 +45,17 @@ const EGYPTIAN_GOVERNORATES = [
   "بحر الاحمر",
 ];
 
+
 const ALLOWED_TRANSITIONS = {
   pending: ["confirmed", "cancelled"],
-  confirmed: ["processing", "cancelled"],
-  processing: ["shipped", "cancelled"],
-  shipped: ["delivered"],
-  delivered: [],
+  confirmed: ["preparing", "cancelled"],
+  preparing: ["shipping", "cancelled"],
+  shipping: ["delivered","returned"],
+  delivered: ["returned"],
   cancelled: [],
+  returned: []
 };
+
 
 function isAdmin(req) {
   const role = req.user?.role?.name;
@@ -525,14 +529,6 @@ async function updateOrderStatus(req, res, next) {
   let session;
 
   try {
-    if (!isAdmin(req)) {
-      return sendError(
-        res,
-        403,
-        "Only admins can update order status"
-      );
-    }
-
     const { id } = req.params;
     const { status } = req.body || {};
 

@@ -56,7 +56,6 @@ export default function Sidebar({ user, onLogout }) {
 
   const {orders} = useOrdersLogic();
 
-  console.log(orders)
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
 

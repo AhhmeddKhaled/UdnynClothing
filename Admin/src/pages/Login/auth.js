@@ -88,6 +88,19 @@ export function getLoginTime() {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
+export function getToken() {
+
+  const token = localStorage.getItem("token");
+
+  if(!token) return;
+
+  try {
+    return token
+  } catch {
+    return null
+  }
+}
+
 export function logout() {
   localStorage.removeItem("token");
   localStorage.removeItem("user");

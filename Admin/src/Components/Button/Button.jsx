@@ -2,6 +2,7 @@ import "./Button.css";
 import { FiEdit2 } from "react-icons/fi";
 import { MdDeleteOutline } from "react-icons/md";
 import { CgDetailsMore } from "react-icons/cg";
+import { IoIosCloseCircleOutline } from "react-icons/io";
 
 export default function Button({
   children,
@@ -21,6 +22,7 @@ export default function Button({
     edit: <FiEdit2 />,
     delete: <MdDeleteOutline />,
     details: <CgDetailsMore />,
+    close: <IoIosCloseCircleOutline size={28}/>
   };
 
   return (
