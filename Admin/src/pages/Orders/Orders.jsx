@@ -54,6 +54,7 @@ export default function Orders() {
     deletingOrderId,
   } = logic;
 
+  console.log(filteredOrders)
   const statCards = [
     {
       title: "Revenue",

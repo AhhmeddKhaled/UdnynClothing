@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const GOVERNORATES = [
@@ -40,11 +39,29 @@ const orderItemSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    unitPrice: {
+
+     unitPrice: {
       type: Number,
       required: true,
       min: 0,
     },
+
+
+    offerPrice: {
+      type: Number,
+      min: 0,
+    },
+
+    wholesalePrice: {
+      type: Number,
+      min: 0,
+    },
+
+    retailPrice: {
+      type: Number,
+      min: 0,
+    },
+
     quantity: {
       type: Number,
       required: true,
@@ -66,7 +83,7 @@ const orderItemSchema = new mongoose.Schema(
       trim: true,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const orderSchema = new mongoose.Schema(
@@ -103,8 +120,7 @@ const orderSchema = new mongoose.Schema(
       type: [orderItemSchema],
       required: true,
       validate: {
-        validator: (items) =>
-          Array.isArray(items) && items.length > 0,
+        validator: (items) => Array.isArray(items) && items.length > 0,
         message: "Order must contain at least one item",
       },
     },
@@ -139,7 +155,7 @@ const orderSchema = new mongoose.Schema(
         "shipping",
         "delivered",
         "cancelled",
-        "returned"
+        "returned",
       ],
       default: "pending",
       index: true,
@@ -186,11 +202,10 @@ const orderSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 orderSchema.index({ customer: 1, createdAt: -1 });
 orderSchema.index({ status: 1, createdAt: -1 });
 
-module.exports =
-  mongoose.models.Order || mongoose.model("Order", orderSchema);
+module.exports = mongoose.models.Order || mongoose.model("Order", orderSchema);

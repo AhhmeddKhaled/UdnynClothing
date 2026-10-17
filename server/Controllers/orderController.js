@@ -103,14 +103,6 @@ async function createOrder(req, res, next) {
   try {
     const body = req.body || {};
 
-    console.log("[CREATE ORDER DIAGNOSTIC]", {
-      contentType: req.headers["content-type"],
-      bodyKeys: Object.keys(body),
-      customerName: body.customerName,
-      customerNameType: typeof body.customerName,
-      filesCount: uploadedFiles.length,
-    });
-
     const {
       customerName,
       customerPhone,
@@ -320,24 +312,27 @@ async function createOrder(req, res, next) {
         }
 
         const offerPrice = Number(stockItem.offerPrice) || 0;
+        const wholesalePrice = Number(stockItem.wholesalePrice) || 0;
         const retailPrice = Number(stockItem.retailPrice) || 0;
         const unitPrice = offerPrice > 0 ? offerPrice : retailPrice;
 
-        if (!Number.isFinite(unitPrice) || unitPrice < 0) {
-          const error = new Error(
-            `Invalid price configured for item ${itemId}`
-          );
-          error.statusCode = 500;
-          throw error;
-        }
+        // if (!Number.isFinite(unitPrice) || unitPrice < 0) {
+        //   const error = new Error(
+        //     `Invalid price configured for item ${itemId}`
+        //   );
+        //   error.statusCode = 500;
+        //   throw error;
+        // }
 
-        const lineTotal = Number((unitPrice * quantity).toFixed(2));
+        const lineTotal = Number(((offerPrice || wholesalePrice || retailPrice) * quantity).toFixed(2));
         subtotal = Number((subtotal + lineTotal).toFixed(2));
 
         orderItems.push({
           itemId: stockItem.itemId,
           name: stockItem.name,
-          unitPrice,
+          retailPrice,
+          offerPrice,
+          wholesalePrice,
           quantity,
           lineTotal,
           realImagePath: imagePathByItemId.get(itemId) || null,

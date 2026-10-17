@@ -1,0 +1,23 @@
+.tabs {
+    background-color: var(--color-paper);
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    width: fit-content;
+    border-radius: var(--radius-md);
+    box-sizing: border-box;
+    .tab {
+        font-size: var(--text-md);
+        font-weight: 500;
+        cursor: pointer;
+        padding: var(--space-1) var(--space-2);
+        transition: 150ms ease-in color;
+        border-radius: inherit;
+        color: var(--color-muted);
+    }
+
+    .isActive {
+        color: var(--color-plum);
+        background-color: hsl(from var(--color-plum) h s l / .1);
+    }
+}

@@ -12,10 +12,11 @@ import {
 import "./AddOrder.css";
 import "./RealImagePicker.css";
 
-import { useOrdersLogic } from "../../../UI_Logic/OrdersLogic.jsx";
 import ContentHeader from "../../../Components/ContentHeader/ContentHeader.jsx";
 import Button from "../../../Components/Button/Button";
+import Tabs from "../../../Components/Tabs/Tabs.jsx";
 
+import { useOrdersLogic } from "../../../UI_Logic/OrdersLogic.jsx";
 import BarcodeScanner from "./BarcodeScanner.jsx";
 import RealImagePicker from "./RealImagePicker.jsx";
 
@@ -101,6 +102,8 @@ function useToast() {
 
   return { toast, showToast };
 }
+
+const tabs = ["Retail","Wholesale","Offer"];
 
 export default function AddOrder() {
   const logic = useOrdersLogic();
@@ -521,7 +524,7 @@ export default function AddOrder() {
   // -------------------------------------------------
 
   return (
-    <section className="orders-page add-order-page">
+    <section className="add-order-page">
       <ContentHeader
         title="Add New Order"
         subTitle="Paste the customer's message, check the details, and add products."
@@ -535,6 +538,8 @@ export default function AddOrder() {
           </Button>
         }
       />
+
+      <Tabs tabs={tabs} />
 
       <form
         className="orders-panel add-order-form"
