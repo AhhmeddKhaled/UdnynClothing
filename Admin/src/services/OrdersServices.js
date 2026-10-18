@@ -48,3 +48,9 @@ export function StatusTransitions({status, currentStatus}) {
 
   return {canTransitions, isCurrentStatus};
 }
+
+export function PriceType(price_type) {
+
+  return price_type;
+
+}

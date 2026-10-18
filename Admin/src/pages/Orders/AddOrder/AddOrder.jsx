@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,6 +10,8 @@ import {
 
 import "./AddOrder.css";
 import "./RealImagePicker.css";
+
+import { PriceType } from "../../../services/OrdersServices.js";
 
 import { useOrdersLogic } from "../../../UI_Logic/OrdersLogic.jsx";
 import ContentHeader from "../../../Components/ContentHeader/ContentHeader.jsx";
@@ -26,14 +27,11 @@ import {
   isValidPhone,
 } from "./parseCustomerMessage.js";
 
-import {
-  findGovernorateOption,
-  getShippingFeeFor,
-} from "./governorates.js";
+import { findGovernorateOption, getShippingFeeFor } from "./governorates.js";
 
 const CODE_FIELDS = ["barcode", "sku", "code", "itemId"];
 
-const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api/orders`
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api/orders`;
 
 // Build the product image URL.
 function getProductImageUrl(imagePath) {
@@ -59,9 +57,7 @@ function ProductImage({ imagePath, name, itemId }) {
 
   if (!imageUrl || imageFailed) {
     return (
-      <span className="ao-product-image ao-product-image-empty">
-        No image
-      </span>
+      <span className="ao-product-image ao-product-image-empty">No image</span>
     );
   }
 
@@ -106,6 +102,9 @@ export default function AddOrder() {
   const logic = useOrdersLogic();
   const navigate = useNavigate();
 
+  // For Testing
+  console.log(PriceType("retail Price")) 
+  
   const {
     products = [],
     productsLoading,
@@ -140,16 +139,12 @@ export default function AddOrder() {
   const pasteRef = useRef(null);
   const { toast, showToast } = useToast();
 
-  const canEditShipping =
-    logic.canEditShipping ?? logic.isAdmin ?? true;
+  const canEditShipping = logic.canEditShipping ?? logic.isAdmin ?? true;
 
   const getFee = (governorate) =>
-    logic.getShippingFee?.(governorate) ??
-    getShippingFeeFor(governorate);
+    logic.getShippingFee?.(governorate) ?? getShippingFeeFor(governorate);
 
-  const defaultFee = form.governorate
-    ? getFee(form.governorate)
-    : null;
+  const defaultFee = form.governorate ? getFee(form.governorate) : null;
 
   // -------------------------------------------------
   // Helpers
@@ -157,9 +152,7 @@ export default function AddOrder() {
 
   const clearMark = (field) =>
     setAutofill((prev) =>
-      prev[field]
-        ? { ...prev, [field]: undefined }
-        : prev
+      prev[field] ? { ...prev, [field]: undefined } : prev,
     );
 
   const userEdit = (field, value) => {
@@ -217,10 +210,7 @@ export default function AddOrder() {
     fill("customerPhone", r.phones[0], "phone");
     fill("shippingAddress", r.address, "address");
 
-    const option = findGovernorateOption(
-      r.govIndex,
-      governorates
-    );
+    const option = findGovernorateOption(r.govIndex, governorates);
 
     if (option) {
       applyGovernorate(option);
@@ -261,14 +251,9 @@ export default function AddOrder() {
     });
 
     if (missing.length || multipleNames) {
-      showToast(
-        "Extracted. Please check the highlighted fields.",
-        "warning"
-      );
+      showToast("Extracted. Please check the highlighted fields.", "warning");
     } else {
-      showToast(
-        "Details extracted. Review them before saving."
-      );
+      showToast("Details extracted. Review them before saving.");
     }
   };
 
@@ -281,10 +266,7 @@ export default function AddOrder() {
     } catch {
       pasteRef.current?.focus();
 
-      showToast(
-        "Long-press the box and paste the message.",
-        "warning"
-      );
+      showToast("Long-press the box and paste the message.", "warning");
     }
   };
 
@@ -307,9 +289,8 @@ export default function AddOrder() {
     const product = products.find((p) =>
       CODE_FIELDS.some(
         (field) =>
-          p[field] != null &&
-          String(p[field]).trim().toLowerCase() === lower
-      )
+          p[field] != null && String(p[field]).trim().toLowerCase() === lower,
+      ),
     );
 
     if (!product) {
@@ -324,8 +305,7 @@ export default function AddOrder() {
     const stock = getStockForProduct(product);
 
     const existing = form.items.find(
-      (item) =>
-        String(item.itemId) === String(product.itemId)
+      (item) => String(item.itemId) === String(product.itemId),
     );
 
     if (existing) {
@@ -339,10 +319,7 @@ export default function AddOrder() {
         };
       }
 
-      changeItemQuantity(
-        existing.itemId,
-        String(next)
-      );
+      changeItemQuantity(existing.itemId, String(next));
 
       return {
         ok: true,
@@ -370,10 +347,7 @@ export default function AddOrder() {
   useEffect(() => {
     if (!pendingScan) return;
 
-    if (
-      form.productId === pendingScan &&
-      String(form.quantity) === "1"
-    ) {
+    if (form.productId === pendingScan && String(form.quantity) === "1") {
       handleAddItem?.({ preventDefault() {} });
       updateFormField("productSearch", "");
       setPendingScan(null);
@@ -438,38 +412,26 @@ export default function AddOrder() {
     };
 
     if (!form.customerName?.trim()) {
-      return fail(
-        "ao-name",
-        "Please enter the customer's name."
-      );
+      return fail("ao-name", "Please enter the customer's name.");
     }
 
     if (!isValidPhone(form.customerPhone)) {
-      return fail(
-        "ao-phone",
-        "Phone must be 11 digits and start with 01."
-      );
+      return fail("ao-phone", "Phone must be 11 digits and start with 01.");
     }
 
     if (!form.items?.length) {
       return fail(
         "add-order-product-search",
-        "Please add at least one product."
+        "Please add at least one product.",
       );
     }
 
     if (!form.governorate) {
-      return fail(
-        "ao-governorate",
-        "Please select a governorate."
-      );
+      return fail("ao-governorate", "Please select a governorate.");
     }
 
     if (!form.shippingAddress?.trim()) {
-      return fail(
-        "ao-address",
-        "Please enter the shipping address."
-      );
+      return fail("ao-address", "Please enter the shipping address.");
     }
 
     if (
@@ -477,23 +439,20 @@ export default function AddOrder() {
       !Number.isFinite(Number(form.shippingCost)) ||
       Number(form.shippingCost) < 0
     ) {
-      return fail(
-        "ao-shipping",
-        "Please enter a valid shipping cost."
-      );
+      return fail("ao-shipping", "Please enter a valid shipping cost.");
     }
 
     const invalidItem = form.items.some(
       (item) =>
         !Number.isInteger(Number(item.quantity)) ||
         Number(item.quantity) < 1 ||
-        Number(item.quantity) > Number(item.availableStock)
+        Number(item.quantity) > Number(item.availableStock),
     );
 
     if (invalidItem) {
       showToast(
         "Please check product quantities and available stock.",
-        "error"
+        "error",
       );
 
       return;
@@ -508,8 +467,7 @@ export default function AddOrder() {
   };
 
   const phoneInvalid =
-    Boolean(form.customerPhone) &&
-    !isValidPhone(form.customerPhone);
+    Boolean(form.customerPhone) && !isValidPhone(form.customerPhone);
 
   const totalDiff =
     parseInfo?.statedTotal != null && form.items.length > 0
@@ -526,40 +484,29 @@ export default function AddOrder() {
         title="Add New Order"
         subTitle="Paste the customer's message, check the details, and add products."
         action={
-          <Button
-            variant="text"
-            onClick={() => navigate("/orders")}
-          >
+          <Button variant="text" onClick={() => navigate("/orders")}>
             <HiOutlineArrowLeft />
             Back to Orders
           </Button>
         }
       />
 
-      <form
-        className="orders-panel add-order-form"
-        onSubmit={handleSubmit}
-      >
+      <form className="orders-panel add-order-form" onSubmit={handleSubmit}>
         <div className="orders-modal-content">
           {/* 1. Customer message */}
 
-          <h3 className="orders-detail-section-title">
-            Customer Message
-          </h3>
+          <h3 className="orders-detail-section-title">Customer Message</h3>
 
           <div className="ao-paste">
             <textarea
               ref={pasteRef}
               rows="4"
               value={rawMessage}
-              onChange={(event) =>
-                setRawMessage(event.target.value)
-              }
+              onChange={(event) => setRawMessage(event.target.value)}
               onPaste={(event) => {
                 event.preventDefault();
 
-                const text =
-                  event.clipboardData.getData("text");
+                const text = event.clipboardData.getData("text");
 
                 setRawMessage(text);
                 runExtraction(text);
@@ -584,9 +531,7 @@ export default function AddOrder() {
                 type="button"
                 className="orders-details-button"
                 onClick={() => runExtraction()}
-                disabled={
-                  addingOrder || !rawMessage.trim()
-                }
+                disabled={addingOrder || !rawMessage.trim()}
               >
                 Extract details
               </button>
@@ -596,9 +541,8 @@ export default function AddOrder() {
               <div className="ao-paste-notes">
                 {parseInfo.missing.length > 0 ? (
                   <p className="ao-paste-note is-warning">
-                    Couldn't find:{" "}
-                    {parseInfo.missing.join(", ")}.
-                    Please fill in the highlighted fields.
+                    Couldn't find: {parseInfo.missing.join(", ")}. Please fill
+                    in the highlighted fields.
                   </p>
                 ) : (
                   <p className="ao-paste-note is-ok">
@@ -608,8 +552,8 @@ export default function AddOrder() {
 
                 {parseInfo.multipleNames && (
                   <p className="ao-paste-note is-warning">
-                    The message contains more than one name.
-                    Check who the customer is.
+                    The message contains more than one name. Check who the
+                    customer is.
                   </p>
                 )}
 
@@ -628,25 +572,18 @@ export default function AddOrder() {
 
           {/* 2. Customer details */}
 
-          <h3 className="orders-detail-section-title">
-            Customer Details
-          </h3>
+          <h3 className="orders-detail-section-title">Customer Details</h3>
 
           <div className="orders-form-grid">
             <label className={fieldClass("customerName")}>
-              <span>
-                Customer Name * {badge("customerName")}
-              </span>
+              <span>Customer Name * {badge("customerName")}</span>
 
               <input
                 id="ao-name"
                 type="text"
                 value={form.customerName}
                 onChange={(event) =>
-                  userEdit(
-                    "customerName",
-                    event.target.value
-                  )
+                  userEdit("customerName", event.target.value)
                 }
                 maxLength={120}
                 autoComplete="name"
@@ -657,9 +594,7 @@ export default function AddOrder() {
             </label>
 
             <label className={fieldClass("customerPhone")}>
-              <span>
-                Phone Number * {badge("customerPhone")}
-              </span>
+              <span>Phone Number * {badge("customerPhone")}</span>
 
               <input
                 id="ao-phone"
@@ -667,10 +602,7 @@ export default function AddOrder() {
                 inputMode="tel"
                 value={form.customerPhone}
                 onChange={(event) =>
-                  userEdit(
-                    "customerPhone",
-                    normalizePhone(event.target.value)
-                  )
+                  userEdit("customerPhone", normalizePhone(event.target.value))
                 }
                 maxLength={30}
                 autoComplete="tel"
@@ -690,9 +622,7 @@ export default function AddOrder() {
 
           {/* 3. Products */}
 
-          <h3 className="orders-detail-section-title">
-            Products
-          </h3>
+          <h3 className="orders-detail-section-title">Products</h3>
 
           {productsLoading ? (
             <p>Loading products...</p>
@@ -716,24 +646,18 @@ export default function AddOrder() {
                       type="search"
                       value={form.productSearch || ""}
                       onChange={(event) => {
-                        updateFormField(
-                          "productSearch",
-                          event.target.value
-                        );
+                        updateFormField("productSearch", event.target.value);
 
                         updateFormField("productId", "");
                         setShowProductResults(true);
                       }}
-                      onFocus={() =>
-                        setShowProductResults(true)
-                      }
+                      onFocus={() => setShowProductResults(true)}
                       onKeyDown={(event) => {
                         if (event.key !== "Enter") return;
 
                         event.preventDefault();
 
-                        const code =
-                          event.currentTarget.value.trim();
+                        const code = event.currentTarget.value.trim();
 
                         if (!code) return;
 
@@ -748,7 +672,7 @@ export default function AddOrder() {
 
                         showToast(
                           result.message,
-                          result.ok ? "success" : "error"
+                          result.ok ? "success" : "error",
                         );
 
                         if (result.ok) {
@@ -776,27 +700,23 @@ export default function AddOrder() {
                     <div className="orders-product-results">
                       {filteredProducts.length > 0 ? (
                         filteredProducts.map((product) => {
-                          const stock =
-                            getStockForProduct(product);
+                          const stock = getStockForProduct(product);
 
                           return (
                             <button
                               type="button"
                               key={product.itemId}
                               className="orders-product-result"
-                              disabled={
-                                addingOrder || stock < 1
-                              }
+                              disabled={addingOrder || stock < 1}
                               onClick={() => {
                                 updateFormField(
                                   "productId",
-                                  String(product.itemId)
+                                  String(product.itemId),
                                 );
 
                                 updateFormField(
                                   "productSearch",
-                                  product.name ||
-                                    `Item ${product.itemId}`
+                                  product.name || `Item ${product.itemId}`,
                                 );
 
                                 setShowProductResults(false);
@@ -811,22 +731,17 @@ export default function AddOrder() {
 
                                 <span className="ao-product-text">
                                   <strong>
-                                    {product.name ||
-                                      `Item ${product.itemId}`}
+                                    {product.name || `Item ${product.itemId}`}
                                   </strong>
 
                                   <small>
-                                    {formatMoney(
-                                      getProductPrice(product)
-                                    )}
+                                    {formatMoney(getProductPrice(product))}
                                   </small>
                                 </span>
                               </span>
 
                               <small className="ao-product-stock">
-                                {stock > 0
-                                  ? `Stock: ${stock}`
-                                  : "Out of stock"}
+                                {stock > 0 ? `Stock: ${stock}` : "Out of stock"}
                               </small>
                             </button>
                           );
@@ -850,10 +765,7 @@ export default function AddOrder() {
                     step="1"
                     value={form.quantity}
                     onChange={(event) =>
-                      updateFormField(
-                        "quantity",
-                        event.target.value
-                      )
+                      updateFormField("quantity", event.target.value)
                     }
                     required
                     disabled={addingOrder}
@@ -892,10 +804,7 @@ export default function AddOrder() {
                   const max = Number(item.availableStock);
 
                   return (
-                    <div
-                      className="orders-detail-item"
-                      key={item.itemId}
-                    >
+                    <div className="orders-detail-item" key={item.itemId}>
                       <div className="ao-selected-product">
                         <ProductImage
                           imagePath={item.imagePath}
@@ -906,23 +815,15 @@ export default function AddOrder() {
                         <div className="ao-selected-product-details">
                           <strong>{item.name}</strong>
 
-                          <span>
-                            Unit Price:{" "}
-                            {formatMoney(item.unitPrice)}
-                          </span>
+                          <span>Unit Price: {formatMoney(item.unitPrice)}</span>
 
                           <div className="ao-stepper">
                             <button
                               type="button"
                               aria-label="Decrease quantity"
-                              disabled={
-                                addingOrder || qty <= 1
-                              }
+                              disabled={addingOrder || qty <= 1}
                               onClick={() =>
-                                changeItemQuantity(
-                                  item.itemId,
-                                  String(qty - 1)
-                                )
+                                changeItemQuantity(item.itemId, String(qty - 1))
                               }
                             >
                               −
@@ -941,7 +842,7 @@ export default function AddOrder() {
                               onChange={(event) =>
                                 changeItemQuantity(
                                   item.itemId,
-                                  event.target.value
+                                  event.target.value,
                                 )
                               }
                             />
@@ -949,14 +850,9 @@ export default function AddOrder() {
                             <button
                               type="button"
                               aria-label="Increase quantity"
-                              disabled={
-                                addingOrder || qty >= max
-                              }
+                              disabled={addingOrder || qty >= max}
                               onClick={() =>
-                                changeItemQuantity(
-                                  item.itemId,
-                                  String(qty + 1)
-                                )
+                                changeItemQuantity(item.itemId, String(qty + 1))
                               }
                             >
                               +
@@ -975,28 +871,21 @@ export default function AddOrder() {
                       <RealImagePicker
                         file={item.realImageFile || null}
                         onChange={(file) => {
-                          setItemRealImage(
-                            item.itemId,
-                            file
-                          );
+                          setItemRealImage(item.itemId, file);
                         }}
                         disabled={addingOrder}
                       />
 
                       <div className="ao-selected-product-actions">
                         <strong>
-                          {formatMoney(
-                            Number(item.unitPrice) * qty
-                          )}
+                          {formatMoney(Number(item.unitPrice) * qty)}
                         </strong>
 
                         <button
                           type="button"
                           className="orders-details-button"
                           disabled={addingOrder}
-                          onClick={() =>
-                            removeItem(item.itemId)
-                          }
+                          onClick={() => removeItem(item.itemId)}
                         >
                           Remove
                         </button>
@@ -1010,14 +899,10 @@ export default function AddOrder() {
 
           {/* 4. Delivery details */}
 
-          <h3 className="orders-detail-section-title">
-            Delivery Details
-          </h3>
+          <h3 className="orders-detail-section-title">Delivery Details</h3>
 
           <label className={fieldClass("governorate")}>
-            <span>
-              Governorate * {badge("governorate")}
-            </span>
+            <span>Governorate * {badge("governorate")}</span>
 
             <select
               id="ao-governorate"
@@ -1032,10 +917,7 @@ export default function AddOrder() {
               <option value="">Select a governorate</option>
 
               {governorates.map((governorate) => (
-                <option
-                  key={governorate}
-                  value={governorate}
-                >
+                <option key={governorate} value={governorate}>
                   {governorate}
                 </option>
               ))}
@@ -1043,19 +925,14 @@ export default function AddOrder() {
           </label>
 
           <label className={fieldClass("shippingAddress")}>
-            <span>
-              Shipping Address * {badge("shippingAddress")}
-            </span>
+            <span>Shipping Address * {badge("shippingAddress")}</span>
 
             <textarea
               id="ao-address"
               rows="3"
               value={form.shippingAddress}
               onChange={(event) =>
-                userEdit(
-                  "shippingAddress",
-                  event.target.value
-                )
+                userEdit("shippingAddress", event.target.value)
               }
               maxLength={1000}
               required
@@ -1069,9 +946,7 @@ export default function AddOrder() {
             <label htmlFor="ao-shipping">
               Shipping Cost (EGP) *{" "}
               {shippingOverridden && (
-                <em className="ao-badge ao-badge-review">
-                  Manual
-                </em>
+                <em className="ao-badge ao-badge-review">Manual</em>
               )}
             </label>
 
@@ -1084,10 +959,7 @@ export default function AddOrder() {
               value={form.shippingCost}
               readOnly={!canEditShipping}
               onChange={(event) => {
-                updateFormField(
-                  "shippingCost",
-                  event.target.value
-                );
+                updateFormField("shippingCost", event.target.value);
 
                 setShippingOverridden(true);
               }}
@@ -1105,9 +977,7 @@ export default function AddOrder() {
                 <button
                   type="button"
                   className="ao-link"
-                  onClick={() =>
-                    applyGovernorate(form.governorate)
-                  }
+                  onClick={() => applyGovernorate(form.governorate)}
                 >
                   Reset to default ({formatMoney(defaultFee)})
                 </button>
@@ -1116,19 +986,12 @@ export default function AddOrder() {
           </div>
 
           <label className={fieldClass("customerNote")}>
-            <span>
-              Customer Notes (Optional) {badge("customerNote")}
-            </span>
+            <span>Customer Notes (Optional) {badge("customerNote")}</span>
 
             <textarea
               rows="3"
               value={form.customerNote}
-              onChange={(event) =>
-                userEdit(
-                  "customerNote",
-                  event.target.value
-                )
-              }
+              onChange={(event) => userEdit("customerNote", event.target.value)}
               maxLength={2000}
               disabled={addingOrder}
               placeholder="Enter any additional instructions"
@@ -1137,9 +1000,7 @@ export default function AddOrder() {
 
           {/* 5. Order summary */}
 
-          <h3 className="orders-detail-section-title">
-            Order Summary
-          </h3>
+          <h3 className="orders-detail-section-title">Order Summary</h3>
 
           <div className="orders-detail-total">
             <span>Products Subtotal</span>
@@ -1164,11 +1025,10 @@ export default function AddOrder() {
               </p>
             ) : (
               <p className="ao-chip is-warning">
-                ⚠ The message says{" "}
-                {formatMoney(parseInfo.statedTotal)} but this order
-                is {formatMoney(estimatedTotal)} (difference{" "}
-                {formatMoney(Math.abs(totalDiff))}). Check the
-                products and shipping.
+                ⚠ The message says {formatMoney(parseInfo.statedTotal)} but this
+                order is {formatMoney(estimatedTotal)} (difference{" "}
+                {formatMoney(Math.abs(totalDiff))}). Check the products and
+                shipping.
               </p>
             ))}
 
@@ -1213,7 +1073,7 @@ export default function AddOrder() {
           onScan={handleScannedCode}
           onClose={() => setShowScanner(false)}
           summary={`${form.items.length} products · ${formatMoney(
-            estimatedTotal
+            estimatedTotal,
           )}`}
         />
       )}
