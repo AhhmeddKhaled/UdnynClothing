@@ -17,7 +17,7 @@
 .lo-content {
   color: var(--color-ink);
   padding: var(--space-6);
-  background: var(--color-paper);
+  background: var(--color-page-bg);
   padding-top: calc(var(--space-6) + env(safe-area-inset-top, 0px));
   font-family: var(--font-body);
   width: calc(100% - 240px);

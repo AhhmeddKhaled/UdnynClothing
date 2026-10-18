@@ -4,6 +4,7 @@
 ========================================= */
 
 .add-order-page {
+  background-color: var(--color-page-bg);
   --ao-text: var(--color-text, #252332);
   --ao-muted: var(--color-text-muted, #777487);
   --ao-bg: var(--color-surface, #fff);
