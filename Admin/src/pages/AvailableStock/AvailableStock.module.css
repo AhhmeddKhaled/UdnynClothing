@@ -1,0 +1,30 @@
+.table {
+  background-color: #eee;
+  padding: var(--space-2) var(--space-4);
+  min-width: 100%;
+  thead {
+    th {
+      font-size: var(--text-md);
+      font-weight: 500;
+      text-transform: capitalize;
+      min-width: 120px;
+      max-width: 300px;
+      text-align: left;
+    }
+  }
+
+  tbody {
+    td {
+      font-size: var(--text-xm);
+      font-weight: 400;
+      text-align: left;
+    }
+
+    .availableStockImage img {
+      width: 80px;
+      height: 80px;
+      border: px solid var(--color-line);
+      border-radius: var(--radius-md);
+    }
+  }
+}

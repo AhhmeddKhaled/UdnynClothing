@@ -1,57 +1,12 @@
-
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { authFetch } from "../pages/Login/auth.js";
-import { Audio } from '../services/audio.js';
+import { Audio } from "../services/audio.js";
 
-const STATUSES = [
-  "pending",
-  "confirmed",
-  "preparing",
-  "shipped",
-  "delivered",
-  "cancelled",
-];
-
-const GOVERNORATES = [
-  "قاهره",
-  "جيزة",
-  "اسكندريه",
-  "قليوبية",
-  "البحيرة",
-  "مطروح",
-  "دمياط",
-  "دقهلية",
-  "كفر الشيخ",
-  "غربيه",
-  "المنوفية",
-  "شرقيه",
-  "بورسعيد",
-  "اسماعيلية",
-  "سويس",
-  "شرم الشيخ",
-  "فيوم",
-  "بني سويف",
-  "منيا",
-  "اسيوط",
-  "سوهاج",
-  "قنا",
-  "اقصر",
-  "اسوان",
-  "بحر الاحمر",
-];
-
-const EMPTY_FORM = {
-  customerName: "",
-  customerPhone: "",
-  productId: "",
-  productSearch: "",
-  quantity: "1",
-  items: [],
-  shippingAddress: "",
-  governorate: "",
-  shippingCost: "0",
-  customerNote: "",
-};
+import {
+  STATUSES,
+  GOVERNORATES,
+  EMPTY_FORM,
+} from "../services/OrdersServices.js";
 
 async function readResponse(response) {
   const data = await response.json().catch(() => ({}));
@@ -143,7 +98,19 @@ function getOrderSubtotal(order) {
   );
 }
 
-function getItemUnitPrice(item) {
+function getItemUnitPrice(item, price_type) {
+  if (price_type === "offerPrice") {
+    item.unitPrice = "offerPrice";
+
+  } else if (price_type === "retailPrice") {
+    item.unitPrice = "retailPrice";
+  
+  } else if (price_type === "wholesalePrice") {
+    item.unitPrice = "wholesalePrice";
+  } else {
+    return "type price Invalid"
+  }
+  
   if (item?.unitPrice != null) return Number(item.unitPrice);
   if (item?.price != null) return Number(item.price);
 
@@ -155,8 +122,7 @@ function getItemUnitPrice(item) {
 function getItemLineTotal(item) {
   return Number(
     item?.lineTotal ??
-      Number(item?.unitPrice ?? item?.price ?? 0) *
-        Number(item?.quantity || 0),
+      Number(item?.unitPrice ?? item?.price ?? 0) * Number(item?.quantity || 0),
   );
 }
 
@@ -230,17 +196,11 @@ function validateOrderForm(form) {
       return `Only ${item.availableStock} unit(s) of ${item.name} are available.`;
     }
 
-    if (
-      item.realImageFile &&
-      !(item.realImageFile instanceof File)
-    ) {
+    if (item.realImageFile && !(item.realImageFile instanceof File)) {
       return `Invalid actual photo for ${item.name}.`;
     }
 
-    if (
-      item.realImageFile &&
-      !item.realImageFile.type.startsWith("image/")
-    ) {
+    if (item.realImageFile && !item.realImageFile.type.startsWith("image/")) {
       return `The file selected for ${item.name} is not an image.`;
     }
   }
@@ -248,9 +208,7 @@ function validateOrderForm(form) {
   return "";
 }
 
-function changeOrderStatus(id,status) {
-  
-}
+function changeOrderStatus(id, status) {}
 export function useOrdersLogic() {
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
@@ -292,10 +250,10 @@ export function useOrdersLogic() {
   }, []);
 
   setTimeout(() => {
-    setSuccessMessage("")
+    setSuccessMessage("");
   }, 10000);
 
- const refreshOrders = useCallback(async () => {
+  const refreshOrders = useCallback(async () => {
     const response = await authFetch("/api/orders");
     const data = await readResponse(response);
     const fetchedOrders = Array.isArray(data.orders) ? data.orders : [];
@@ -429,9 +387,7 @@ export function useOrdersLogic() {
     const counts = { all: orders.length };
 
     for (const status of STATUSES) {
-      counts[status] = orders.filter(
-        (order) => order.status === status,
-      ).length;
+      counts[status] = orders.filter((order) => order.status === status).length;
     }
 
     return counts;
@@ -452,10 +408,7 @@ export function useOrdersLogic() {
       cancelled: countByStatus("cancelled"),
       revenue: orders
         .filter((order) => order.status !== "cancelled")
-        .reduce(
-          (total, order) => total + Number(order.totalAmount || 0),
-          0,
-        ),
+        .reduce((total, order) => total + Number(order.totalAmount || 0), 0),
     };
   }, [orders]);
 
@@ -499,25 +452,27 @@ export function useOrdersLogic() {
       if (!query) return true;
 
       return (
-        String(product.name || "").toLowerCase().includes(query) ||
-        String(product.itemId ?? "").toLowerCase().includes(query)
+        String(product.name || "")
+          .toLowerCase()
+          .includes(query) ||
+        String(product.itemId ?? "")
+          .toLowerCase()
+          .includes(query)
       );
     });
   }, [products, form.productSearch]);
 
   const selectedProduct = useMemo(
     () =>
-      products.find(
-        (product) => String(product.itemId) === form.productId,
-      ) || null,
+      products.find((product) => String(product.itemId) === form.productId) ||
+      null,
     [products, form.productId],
   );
 
   const estimatedSubtotal = useMemo(
     () =>
       form.items.reduce(
-        (total, item) =>
-          total + Number(item.unitPrice) * Number(item.quantity),
+        (total, item) => total + Number(item.unitPrice) * Number(item.quantity),
         0,
       ),
     [form.items],
@@ -558,10 +513,7 @@ export function useOrdersLogic() {
     const requestedQuantity = Number(form.quantity);
     const stock = getStockForProduct(selectedProduct);
 
-    if (
-      !Number.isSafeInteger(requestedQuantity) ||
-      requestedQuantity < 1
-    ) {
+    if (!Number.isSafeInteger(requestedQuantity) || requestedQuantity < 1) {
       setFormError("Quantity must be a positive whole number.");
       return;
     }
@@ -705,8 +657,7 @@ export function useOrdersLogic() {
     setStatusFilter("all");
   }, []);
 
-  const hasActiveFilters =
-    Boolean(search.trim()) || statusFilter !== "all";
+  const hasActiveFilters = Boolean(search.trim()) || statusFilter !== "all";
 
   const [exportingOrders, setExportingOrders] = useState(false);
 
@@ -746,8 +697,7 @@ export function useOrdersLogic() {
       }, 1000);
 
       setSuccessMessage("The data has been successfully exported.");
-      Audio('/audio/success.mp3');
-
+      Audio("/audio/success.mp3");
     } catch (err) {
       setError(err.message || "فشل تصدير الأوردرات");
     } finally {

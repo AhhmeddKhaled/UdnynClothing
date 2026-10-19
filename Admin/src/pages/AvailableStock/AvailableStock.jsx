@@ -1,11 +1,16 @@
-
 import React from "react";
-import "./AvailableStock.css";
+import styles from "./AvailableStock.module.css";
 
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner";
 import { useAvailableStockLogic } from "../../UI_Logic/AvailableStockLogic.jsx";
-import ContentHeader from "../../Components/ContentHeader/ContentHeader";
-// import Tost from "../../Components/Tost/Tost";
+
+import ContentHeader from "../../Components/ContentHeader/ContentHeader.jsx";
+import {
+  Form,
+  FieldInputGroup,
+  FieldSelectGroup,
+} from "../../Components/Form/Form";
+import Button from "../../Components/Button/Button";
 
 export default function AvailableStock() {
   const {
@@ -36,7 +41,7 @@ export default function AvailableStock() {
     handleImport,
     clearFilters,
 
-    successMessage
+    successMessage,
   } = useAvailableStockLogic();
 
   function renderImageControls(product, view) {
@@ -76,12 +81,10 @@ export default function AvailableStock() {
   }
 
   function renderProductImage(product) {
-    const imageUrl = getImageUrl(
-      product.imagePath || product.image
-    );
+    const imageUrl = getImageUrl(product.imagePath || product.image);
 
     return (
-      <div className="available-stock-image">
+      <div className={styles.availableStockImage}>
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -122,16 +125,37 @@ export default function AvailableStock() {
   }
 
   return (
-    <main className="page available-stock-page" dir="ltr">
-
+    <section className={styles.availableStockPage}>
       {/* {successMessage && <Tost status="success" description={successMessage}/>} */}
 
       {/* Page Header */}
-      <section className="ds-page-head">
+      <section>
+        <ContentHeader
+          title="Available Stock"
+          subTitle="Manage your products and available inventory"
+          action={canImport && (
+          <Button
+          variant="primary"
+          radius="radius-md"
+          >
+            <label
+              className={`${importing ? "is-disabled" : ""}`}
+              htmlFor="stock-import"
+            >
+              {importing ? "Importing..." : "Import Excel"}
 
-        <ContentHeader title="Available Stock" subTitle="Manage your products and available inventory" />
-
-       
+              <input
+                id="stock-import"
+                type="file"
+                accept=".xlsx,.xls"
+                onChange={handleImport}
+                disabled={importing}
+                hidden
+              />
+            </label>
+          </Button>
+        )}
+        />
       </section>
 
       {/* Error State */}
@@ -149,124 +173,74 @@ export default function AvailableStock() {
       )}
 
       {/* Search and Filters */}
-      <section className="available-stock-toolbar">
-        <div className="available-stock-filters">
-          <div className="field-group">
-            <label className="field-label" htmlFor="stock-search">
-              Search
-            </label>
+      <section className={styles.availableStockToolbar}>
+        <Form>
+          <FieldInputGroup
+            label={{
+              id: "stock-search",
+              name: "Search",
+            }}
+            inputOptions={{
+              id: "stock-search",
+              type: "search",
+              value: search,
+              readOnly: false,
+              onChange: (event) => setSearch(event.target.value),
+              placeholder: "Search by product ID, name, or manufacturer...",
+            }}
+          />
 
-            <input
-              id="stock-search"
-              className="field"
-              type="search"
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search by product ID, name, or manufacturer..."
-            />
-          </div>
+          <FieldSelectGroup
+            label={{
+              name: "category",
+            }}
+            selectOptions={{
+              id: "stock-category",
+              selectList: categories,
+              value: categoryFilter,
+              onChange: (event) => setCategoryFilter(event.target.value),
+            }}
+          />
 
-          <div className="field-group">
-            <label className="field-label" htmlFor="stock-category">
-              Category
-            </label>
+          <FieldSelectGroup
+            label={{
+              name: "manufacturer",
+            }}
+            selectOptions={{
+              id: "stock-manufacturer",
+              selectList: manufacturers,
+              value: manufacturerFilter,
+              onChange: (event) => setManufacturerFilter(event.target.value),
+            }}
+          />
 
-            <select
-              id="stock-category"
-              className="field"
-              value={categoryFilter}
-              onChange={(event) => setCategoryFilter(event.target.value)}
-            >
-              <option value="">All Categories</option>
-
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="field-group">
-            <label className="field-label" htmlFor="stock-manufacturer">
-              Manufacturer
-            </label>
-
-            <select
-              id="stock-manufacturer"
-              className="field"
-              value={manufacturerFilter}
-              onChange={(event) =>
-                setManufacturerFilter(event.target.value)
-              }
-            >
-              <option value="">All Manufacturers</option>
-
-              {manufacturers.map((manufacturer) => (
-                <option key={manufacturer} value={manufacturer}>
-                  {manufacturer}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="available-stock-filter-actions">
-            <button
+          <div>
+            <Button
               type="button"
-              className="btn btn-secondary"
+              variant="text"
               onClick={clearFilters}
-              disabled={
-                !search && !categoryFilter && !manufacturerFilter
-              }
+              disabled={!search && !categoryFilter && !manufacturerFilter}
+              radius="radius-md"
             >
               Clear Filters
-            </button>
+            </Button>
           </div>
-
-          {canImport && (
-            <div className="field-group available-stock-import">
-              <label className="field-label" htmlFor="stock-import">
-                Import Products
-              </label>
-
-              <label
-                className={`btn btn-primary ${
-                  importing ? "is-disabled" : ""
-                }`}
-                htmlFor="stock-import"
-              >
-                {importing ? "Importing..." : "Import Excel"}
-
-                <input
-                  id="stock-import"
-                  type="file"
-                  accept=".xlsx,.xls"
-                  onChange={handleImport}
-                  disabled={importing}
-                  hidden
-                />
-              </label>
-            </div>
-          )}
-        </div>
+        </Form>
       </section>
 
       {/* Desktop Table */}
-      <section className="card available-stock-table-section">
-        <div className="table-wrapper">
-          <table className="table">
+      <section className={styles.availableStockTableSection}>
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
             <thead>
               <tr>
                 <th>Image</th>
-                <th>Product ID</th>
+                <th>ID</th>
                 <th>Product Name</th>
                 <th>Quantity</th>
-                <th>Purchase Price</th>
-                <th>Wholesale Price</th>
-                <th>Retail Price</th>
-                <th>Offer Price</th>
-                <th>Category</th>
-                <th>Manufacturer</th>
+                <th>Purchase Pr</th>
+                <th>Wholesale Pr</th>
+                <th>Retail Pr</th>
                 {canManageImages && <th>Image Actions</th>}
               </tr>
             </thead>
@@ -296,14 +270,15 @@ export default function AvailableStock() {
                     <td>{product.purchasePrice ?? 0}</td>
                     <td>{product.wholesalePrice ?? 0}</td>
                     <td>{product.retailPrice ?? 0}</td>
-                    <td>{product.offerPrice ?? 0}</td>
-                    <td>{product.category || "-"}</td>
-                    <td>{product.manufacturer || "-"}</td>
 
                     {canManageImages && (
                       <td>
+                        <Button
+                        variant="text"
+                        >
                         {renderImageControls(product, "desktop")}
-                      </td>
+                        </Button>
+                        </td>
                     )}
                   </tr>
                 ))
@@ -315,45 +290,41 @@ export default function AvailableStock() {
 
       {/* Responsive Product Cards */}
       <section
-        className="available-stock-cards"
+        className={styles.availableStockCards}
         aria-label="Available products"
       >
         {filteredProducts.length === 0 ? (
-          <div className="state">
-            {error
-              ? "Products could not be loaded."
-              : "No products found."}
+          <div className={styles.state}>
+            {error ? "Products could not be loaded." : "No products found."}
           </div>
         ) : (
           filteredProducts.map((product) => (
             <article
-              className="available-stock-card"
+              className={styles.availableStockCard}
               key={`mobile-${product.itemId}`}
             >
-              <div className="available-stock-card__header">
+              <div className={styles.availableStockCardHeader}>
                 {renderProductImage(product)}
 
-                <div className="available-stock-card__identity">
+                <div className={styles.availableStockCardIdentit}>
                   <h2>{product.name || "Unnamed Product"}</h2>
 
                   <p>
-                    Product ID:{" "}
-                    <strong>{product.itemId ?? "-"}</strong>
+                    Product ID: <strong>{product.itemId ?? "-"}</strong>
                   </p>
 
                   <p>
-                    Quantity:{" "}
-                    <strong>{product.qty ?? 0}</strong>
+                    Quantity: <strong>{product.qty ?? 0}</strong>
                   </p>
                 </div>
               </div>
 
-              <div className="available-stock-card__details">
+              <div className={styles.availableStockCardDetails}>
                 {renderProductDetails(product)}
               </div>
 
               {canManageImages && (
-                <div className="available-stock-card__actions">
+                <div className={styles.availableStockCardActions}>
                   {renderImageControls(product, "mobile")}
                 </div>
               )}
@@ -361,6 +332,6 @@ export default function AvailableStock() {
           ))
         )}
       </section>
-    </main>
+    </section>
   );
 }

@@ -1,14 +1,22 @@
 @import "./tokens.css";
 
 /* ======================================================
-   Reset أساسي
+   Reset
    ====================================================== */
 
-*, *::before, *::after { 
-  box-sizing: 
-  border-box; 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
   padding: 0;
   margin: 0;
+}
+
+html {
+  min-height: 100%;
+  background: var(--color-page-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
 }
 
 body {
@@ -19,117 +27,128 @@ body {
   line-height: 1.6;
 }
 
-.num { font-variant-numeric: tabular-nums; }
-
 /* ======================================================
-   العناوين
+   6. Global application
    ====================================================== */
 
-.ds-display {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: var(--text-display);
-  color: var(--color-plum);
-}
-
-.ds-page-title {
-  font-size: var(--text-xl);
-  font-weight: 600;
-  color: var(--color-plum);
-  margin: 0 0 var(--space-1);
-}
-
-.ds-page-sub {
-  font-size: var(--text-sm);
-  color: var(--color-plum-soft);
-  margin: 0 0 var(--space-6);
-}
-
-/* ======================================================
-   حقول الإدخال
-   ====================================================== */
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  font-size: var(--text-sm);
-  color: var(--color-plum-soft);
-}
-
-.field input,
-.field select,
-.field textarea {
-  font: inherit;
-  font-size: var(--text-base);
+#root {
+  min-height: 100vh;
+  background: var(--color-page-bg);
   color: var(--color-ink);
-  background: var(--color-paper);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-sm);
-  padding: 10px 12px;
-  min-height: 42px;
 }
 
-.field input:focus-visible,
-.field select:focus-visible,
-.field textarea:focus-visible {
-  outline: 2px solid var(--color-gold);
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a,
+a:link,
+a:visited {
+  color: var(--color-accent);
+  text-decoration: none;
+  transition:
+    color var(--dur-fast) ease,
+    text-decoration-color var(--dur-fast) ease;
+}
+
+a:hover,
+a:focus-visible {
+  color: var(--color-accent-hover);
+  text-decoration-color: currentColor;
+}
+
+/* Inputs */
+
+input,
+select,
+textarea {
+  border: 1px solid var(--color-line);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  opacity: 1;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-accent);
+  outline-color: var(--color-accent);
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-accent);
   outline-offset: 1px;
 }
 
-/* ======================================================
-   بادجات (حالة، دور، تنبيه)
-   ====================================================== */
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  font-size: var(--text-xs);
-  padding: 2px 10px;
-  border-radius: var(--radius-full);
-  white-space: nowrap;
-}
-.badge-neutral { background: var(--color-sand-deep); color: var(--color-plum-soft); }
-.badge-gold    { background: #F1E4D8; color: var(--color-gold-deep); }
-.badge-success { background: var(--color-sage-bg); color: var(--color-sage); }
-.badge-danger  { background: var(--color-clay-bg); color: var(--color-clay); }
-
-/* ======================================================
-   جداول
-   ====================================================== */
-
-.table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
-.table th {
-  text-align: right;
-  color: var(--color-plum-soft);
-  font-weight: 500;
-  padding: var(--space-2);
-  border-bottom: 1px solid var(--color-line);
-}
-.table td {
-  padding: var(--space-2);
-  border-bottom: 1px solid var(--color-line);
+input,
+select {
+  min-height: 40px;
+  background-color: inherit;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
 }
 
-/* ======================================================
-   رسائل حالة (فاضي / تحميل / خطأ)
-   ====================================================== */
-
-.state {
-  padding: var(--space-10) var(--space-5);
-  text-align: center;
-  color: var(--color-plum-soft);
-}
-.state b { display: block; color: var(--color-clay); font-size: var(--text-lg); margin-bottom: var(--space-2); }
-
-a {
-  text-decoration: none;
+select {
+  min-width: 220px;
 }
 
-p {
-  margin: 0;
+input,
+label {
+  cursor: pointer;
+}
+/* Tables */
+
+table {
+  color: var(--color-ink);
+  border-color: var(--color-line);
 }
 
-ul {
-  list-style: none;
+th,
+td {
+  border-color: var(--color-line);
+}
+
+/* Common cards (tokens already switch with the theme, no dark-only overrides needed) */
+
+[data-theme="dark"] option {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+}
+
+/* Smooth theme switching */
+body,
+#root,
+input,
+select,
+textarea,
+button,
+table,
+th,
+td {
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -5,57 +5,13 @@ const Order = require("../Models/Order");
 const AvailableStock = require("../Models/AvailableStock");
 const XLSX = require("xlsx");
 
-const role = require('../seeds/roles');
+const role = require("../seeds/roles");
 
-const VALID_STATUSES = [
-  "pending",
-  "confirmed",
-  "preparing",
-  "shipping",
-  "delivered",
-  "cancelled",
-  "returned"
-];
-
-const EGYPTIAN_GOVERNORATES = [
-  "قاهره",
-  "جيزة",
-  "اسكندريه",
-  "قليوبية",
-  "البحيرة",
-  "مطروح",
-  "دمياط",
-  "دقهلية",
-  "كفر الشيخ",
-  "غربيه",
-  "المنوفية",
-  "شرقيه",
-  "بورسعيد",
-  "اسماعيلية",
-  "سويس",
-  "شرم الشيخ",
-  "فيوم",
-  "بني سويف",
-  "منيا",
-  "اسيوط",
-  "سوهاج",
-  "قنا",
-  "اقصر",
-  "اسوان",
-  "بحر الاحمر",
-];
-
-
-const ALLOWED_TRANSITIONS = {
-  pending: ["confirmed", "cancelled"],
-  confirmed: ["preparing", "cancelled"],
-  preparing: ["shipping", "cancelled"],
-  shipping: ["delivered","returned"],
-  delivered: ["returned"],
-  cancelled: [],
-  returned: []
-};
-
+const {
+  VALID_STATUSES,
+  EGYPTIAN_GOVERNORATES,
+  ALLOWED_TRANSITIONS,
+} = require("../Data/OrdersData");
 
 function isAdmin(req) {
   const role = req.user?.role?.name;
@@ -84,13 +40,10 @@ async function removeUploadedFiles(files = []) {
         await fs.unlink(file.path);
       } catch (error) {
         if (error.code !== "ENOENT") {
-          console.error(
-            "Unable to remove unused order image:",
-            error.message
-          );
+          console.error("Unable to remove unused order image:", error.message);
         }
       }
-    })
+    }),
   );
 }
 
@@ -99,7 +52,6 @@ async function createOrder(req, res, next) {
   let orderCreated = false;
   const uploadedFiles = Array.isArray(req.files) ? req.files : [];
 
-  
   try {
     const body = req.body || {};
 
@@ -153,10 +105,7 @@ async function createOrder(req, res, next) {
       return sendError(res, 400, "Valid shipping address is required");
     }
 
-    if (
-      typeof customerNote !== "string" ||
-      customerNote.length > 2000
-    ) {
+    if (typeof customerNote !== "string" || customerNote.length > 2000) {
       return sendError(res, 400, "Invalid customer note");
     }
 
@@ -171,11 +120,7 @@ async function createOrder(req, res, next) {
     }
 
     if (!Array.isArray(items) || items.length === 0) {
-      return sendError(
-        res,
-        400,
-        "Order must contain at least one item"
-      );
+      return sendError(res, 400, "Order must contain at least one item");
     }
 
     if (items.length > 100) {
@@ -191,7 +136,7 @@ async function createOrder(req, res, next) {
         return sendError(
           res,
           400,
-          "An uploaded image has an invalid field name"
+          "An uploaded image has an invalid field name",
         );
       }
 
@@ -201,7 +146,7 @@ async function createOrder(req, res, next) {
         return sendError(
           res,
           400,
-          "An uploaded image has an invalid product ID"
+          "An uploaded image has an invalid product ID",
         );
       }
 
@@ -209,13 +154,13 @@ async function createOrder(req, res, next) {
         return sendError(
           res,
           400,
-          `More than one image was uploaded for item ${itemId}`
+          `More than one image was uploaded for item ${itemId}`,
         );
       }
 
       imagePathByItemId.set(
         itemId,
-        `/uploads/order-items/${path.basename(file.filename)}`
+        `/uploads/order-items/${path.basename(file.filename)}`,
       );
     }
 
@@ -226,30 +171,17 @@ async function createOrder(req, res, next) {
       const quantity = Number(item?.quantity);
 
       if (!Number.isSafeInteger(itemId) || itemId <= 0) {
-        return sendError(
-          res,
-          400,
-          "Each item must have a valid itemId"
-        );
+        return sendError(res, 400, "Each item must have a valid itemId");
       }
 
       if (!Number.isSafeInteger(quantity) || quantity <= 0) {
-        return sendError(
-          res,
-          400,
-          "Each quantity must be a positive integer"
-        );
+        return sendError(res, 400, "Each quantity must be a positive integer");
       }
 
-      const combinedQuantity =
-        (quantitiesByItemId.get(itemId) || 0) + quantity;
+      const combinedQuantity = (quantitiesByItemId.get(itemId) || 0) + quantity;
 
       if (!Number.isSafeInteger(combinedQuantity)) {
-        return sendError(
-          res,
-          400,
-          "Invalid combined item quantity"
-        );
+        return sendError(res, 400, "Invalid combined item quantity");
       }
 
       quantitiesByItemId.set(itemId, combinedQuantity);
@@ -260,13 +192,13 @@ async function createOrder(req, res, next) {
         return sendError(
           res,
           400,
-          `An image was uploaded for item ${itemId}, which is not in the order`
+          `An image was uploaded for item ${itemId}, which is not in the order`,
         );
       }
     }
 
     const requestedItems = [...quantitiesByItemId.entries()].sort(
-      ([a], [b]) => a - b
+      ([a], [b]) => a - b,
     );
 
     session = await mongoose.startSession();
@@ -290,7 +222,7 @@ async function createOrder(req, res, next) {
           {
             new: true,
             session,
-          }
+          },
         );
 
         if (!stockItem) {
@@ -304,9 +236,7 @@ async function createOrder(req, res, next) {
             throw error;
           }
 
-          const error = new Error(
-            `Insufficient stock for item ${itemId}`
-          );
+          const error = new Error(`Insufficient stock for item ${itemId}`);
           error.statusCode = 409;
           throw error;
         }
@@ -316,32 +246,32 @@ async function createOrder(req, res, next) {
         const retailPrice = Number(stockItem.retailPrice) || 0;
         const unitPrice = offerPrice > 0 ? offerPrice : retailPrice;
 
-        // if (!Number.isFinite(unitPrice) || unitPrice < 0) {
-        //   const error = new Error(
-        //     `Invalid price configured for item ${itemId}`
-        //   );
-        //   error.statusCode = 500;
-        //   throw error;
-        // }
+        if (unitPrice === "retailPrice") {
+          unitPrice = retailPrice;
+        } else if (unitPrice === "wholesalePrice") {
+          unitPrice = wholesalePrice;
+        } else if (unitPrice === "offerPrice") {
+          unitPrice = offerPrice;
+        } else {
+          return sendError(res, 400, "Price Type Invalid");
+        }
 
-        const lineTotal = Number(((offerPrice || wholesalePrice || retailPrice) * quantity).toFixed(2));
+        const lineTotal = Number(
+          ((offerPrice || wholesalePrice || retailPrice) * quantity).toFixed(2),
+        );
         subtotal = Number((subtotal + lineTotal).toFixed(2));
 
         orderItems.push({
           itemId: stockItem.itemId,
           name: stockItem.name,
-          retailPrice,
-          offerPrice,
-          wholesalePrice,
+          unitPrice,
           quantity,
           lineTotal,
           realImagePath: imagePathByItemId.get(itemId) || null,
         });
       }
 
-      const totalAmount = Number(
-        (subtotal + parsedShippingCost).toFixed(2)
-      );
+      const totalAmount = Number((subtotal + parsedShippingCost).toFixed(2));
 
       const [createdOrder] = await Order.create(
         [
@@ -363,7 +293,7 @@ async function createOrder(req, res, next) {
             status: "pending",
           },
         ],
-        { session }
+        { session },
       );
 
       responseOrder = createdOrder;
@@ -382,11 +312,7 @@ async function createOrder(req, res, next) {
     }
 
     if (error.code === 11000) {
-      return sendError(
-        res,
-        409,
-        "Order number conflict. Please try again."
-      );
+      return sendError(res, 409, "Order number conflict. Please try again.");
     }
 
     return next(error);
@@ -406,7 +332,7 @@ async function getMyOrders(req, res, next) {
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
     const limit = Math.min(
       100,
-      Math.max(1, parseInt(req.query.limit, 10) || 10)
+      Math.max(1, parseInt(req.query.limit, 10) || 10),
     );
 
     const filter = { customer: req.user._id };
@@ -430,7 +356,6 @@ async function getMyOrders(req, res, next) {
         pages: Math.ceil(total / limit),
       },
     });
-
   } catch (error) {
     return next(error);
   }
@@ -441,7 +366,7 @@ async function getAllOrders(req, res, next) {
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
     const limit = Math.min(
       100,
-      Math.max(1, parseInt(req.query.limit, 10) || 20)
+      Math.max(1, parseInt(req.query.limit, 10) || 20),
     );
 
     const filter = {};
@@ -500,12 +425,10 @@ async function getOrderById(req, res, next) {
     }
 
     const customerId =
-      order.customer?._id?.toString() ||
-      order.customer?.toString();
+      order.customer?._id?.toString() || order.customer?.toString();
 
     const ownsOrder =
-      Boolean(customerId) &&
-      customerId === req.user._id.toString();
+      Boolean(customerId) && customerId === req.user._id.toString();
 
     if (!isAdmin(req) && !ownsOrder) {
       return sendError(res, 403, "You cannot access this order");
@@ -557,7 +480,7 @@ async function updateOrderStatus(req, res, next) {
 
       if (!allowedNextStatuses.includes(status)) {
         const error = new Error(
-          `Cannot change order status from ${order.status} to ${status}`
+          `Cannot change order status from ${order.status} to ${status}`,
         );
         error.statusCode = 409;
         throw error;
@@ -575,12 +498,12 @@ async function updateOrderStatus(req, res, next) {
           const result = await AvailableStock.updateOne(
             { itemId: item.itemId },
             { $inc: { qty: item.quantity } },
-            { session }
+            { session },
           );
 
           if (result.matchedCount !== 1) {
             const error = new Error(
-              `Cannot restore stock for item ${item.itemId}`
+              `Cannot restore stock for item ${item.itemId}`,
             );
             error.statusCode = 409;
             throw error;
@@ -654,12 +577,12 @@ async function deleteOrder(req, res, next) {
           const result = await AvailableStock.updateOne(
             { itemId: item.itemId },
             { $inc: { qty: item.quantity } },
-            { session }
+            { session },
           );
 
           if (result.matchedCount !== 1) {
             const error = new Error(
-              `Cannot restore stock for item ${item.itemId}`
+              `Cannot restore stock for item ${item.itemId}`,
             );
             error.statusCode = 409;
             throw error;
@@ -667,10 +590,7 @@ async function deleteOrder(req, res, next) {
         }
       }
 
-      const result = await Order.deleteOne(
-        { _id: order._id },
-        { session }
-      );
+      const result = await Order.deleteOne({ _id: order._id }, { session });
 
       if (result.deletedCount !== 1) {
         const error = new Error("Order could not be deleted");
@@ -767,11 +687,7 @@ async function exportQPExpresse(req, res, next) {
 
     const workbook = XLSX.utils.book_new();
 
-    XLSX.utils.book_append_sheet(
-      workbook,
-      worksheet,
-      "QP Expresse"
-    );
+    XLSX.utils.book_append_sheet(workbook, worksheet, "QP Expresse");
 
     const buffer = XLSX.write(workbook, {
       type: "buffer",
@@ -780,12 +696,12 @@ async function exportQPExpresse(req, res, next) {
 
     res.setHeader(
       "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
 
     res.setHeader(
       "Content-Disposition",
-      'attachment; filename="qp-expresse-orders.xlsx"'
+      'attachment; filename="qp-expresse-orders.xlsx"',
     );
 
     res.setHeader("Content-Length", buffer.length);

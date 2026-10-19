@@ -1,38 +1,23 @@
-import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  HiOutlineSearch,
-  HiOutlinePlus,
-  HiOutlineArrowLeft,
-  HiOutlineCamera,
-  HiOutlineClipboard,
-} from "react-icons/hi";
-
 import "./AddOrder.css";
 import "./RealImagePicker.css";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { HiOutlineSearch,HiOutlinePlus,HiOutlineArrowLeft,HiOutlineCamera,HiOutlineClipboard,} from "react-icons/hi";
 
-<<<<<<< HEAD
-import { PriceType } from "../../../services/OrdersServices.js";
 
+// Import Services
+import { parseCustomerMessage, normalizePhone, normalizeDigits, isValidPhone,} from "./parseCustomerMessage.js";
+import { findGovernorateOption, getShippingFeeFor } from "./governorates.js";
 import { useOrdersLogic } from "../../../UI_Logic/OrdersLogic.jsx";
-=======
->>>>>>> aa53793419258261284bfbcc62dfe636bc129620
+import { PriceType } from "../../../services/OrdersServices.js";
+import RealImagePicker from "./RealImagePicker.jsx";
+import BarcodeScanner from "./BarcodeScanner.jsx";
+
+// Import Components 
 import ContentHeader from "../../../Components/ContentHeader/ContentHeader.jsx";
 import Button from "../../../Components/Button/Button";
 import Tabs from "../../../Components/Tabs/Tabs.jsx";
-
-import { useOrdersLogic } from "../../../UI_Logic/OrdersLogic.jsx";
-import BarcodeScanner from "./BarcodeScanner.jsx";
-import RealImagePicker from "./RealImagePicker.jsx";
-
-import {
-  parseCustomerMessage,
-  normalizePhone,
-  normalizeDigits,
-  isValidPhone,
-} from "./parseCustomerMessage.js";
-
-import { findGovernorateOption, getShippingFeeFor } from "./governorates.js";
+import { Form  } from "../../../Components/Form/Form";
 
 const CODE_FIELDS = ["barcode", "sku", "code", "itemId"];
 
@@ -103,15 +88,12 @@ function useToast() {
   return { toast, showToast };
 }
 
-const tabs = ["Retail","Wholesale","Offer"];
+const tabs = ["Retail", "Wholesale", "Offer"];
 
 export default function AddOrder() {
   const logic = useOrdersLogic();
   const navigate = useNavigate();
 
-  // For Testing
-  console.log(PriceType("retail Price")) 
-  
   const {
     products = [],
     productsLoading,
@@ -498,16 +480,9 @@ export default function AddOrder() {
         }
       />
 
-<<<<<<< HEAD
-      <form className="orders-panel add-order-form" onSubmit={handleSubmit}>
-=======
       <Tabs tabs={tabs} />
 
-      <form
-        className="orders-panel add-order-form"
-        onSubmit={handleSubmit}
-      >
->>>>>>> aa53793419258261284bfbcc62dfe636bc129620
+      <Form className="orders-panel add-order-form" onSubmit={handleSubmit}>
         <div className="orders-modal-content">
           {/* 1. Customer message */}
 
@@ -594,7 +569,7 @@ export default function AddOrder() {
             <label className={fieldClass("customerName")}>
               <span>Customer Name * {badge("customerName")}</span>
 
-              <input
+              {/* <InputFild
                 id="ao-name"
                 type="text"
                 value={form.customerName}
@@ -606,7 +581,7 @@ export default function AddOrder() {
                 required
                 disabled={addingOrder}
                 placeholder="Enter customer's full name"
-              />
+              /> */}
             </label>
 
             <label className={fieldClass("customerPhone")}>
@@ -1082,7 +1057,7 @@ export default function AddOrder() {
             {addingOrder ? "Creating Order..." : "Save Order"}
           </Button>
         </footer>
-      </form>
+      </Form>
 
       {showScanner && (
         <BarcodeScanner

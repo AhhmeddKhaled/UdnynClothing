@@ -1,5 +1,7 @@
 const API_URL = import.meta.env.VITE_API_URL;
 
+
+// Orders Data 
 export const STATUSES = [
   "pending",
   "confirmed",
@@ -9,7 +11,47 @@ export const STATUSES = [
   "cancelled",
   "returned"
 ];
+export const GOVERNORATES = [
+  "قاهره",
+  "جيزة",
+  "اسكندريه",
+  "قليوبية",
+  "البحيرة",
+  "مطروح",
+  "دمياط",
+  "دقهلية",
+  "كفر الشيخ",
+  "غربيه",
+  "المنوفية",
+  "شرقيه",
+  "بورسعيد",
+  "اسماعيلية",
+  "سويس",
+  "شرم الشيخ",
+  "فيوم",
+  "بني سويف",
+  "منيا",
+  "اسيوط",
+  "سوهاج",
+  "قنا",
+  "اقصر",
+  "اسوان",
+  "بحر الاحمر",
+];
+export const EMPTY_FORM = {
+  customerName: "",
+  customerPhone: "",
+  productId: "",
+  productSearch: "",
+  quantity: "1",
+  items: [],
+  shippingAddress: "",
+  governorate: "",
+  shippingCost: "0",
+  customerNote: "",
+};
 
+// Logic Methods 
 export function getImageUrl(imagePath) {
   if (!imagePath || typeof imagePath !== "string") {
     return "";
@@ -29,7 +71,6 @@ export function getImageUrl(imagePath) {
 
   return `/${path}`;
 }
-
 export const statusTransitions = {
   pending: ["confirmed", "cancelled"],
   confirmed: ["preparing", "cancelled"],
@@ -39,7 +80,6 @@ export const statusTransitions = {
   cancelled: [],
   returned: [],
 };
-
 export function StatusTransitions({status, currentStatus}) {
   const canTransitions = statusTransitions[status].includes(currentStatus);
 
@@ -48,7 +88,6 @@ export function StatusTransitions({status, currentStatus}) {
 
   return {canTransitions, isCurrentStatus};
 }
-
 export function PriceType(price_type) {
 
   return price_type;

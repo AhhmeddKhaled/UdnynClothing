@@ -2,7 +2,6 @@
     background-color: var(--color-paper);
     display: flex;
     align-items: center;
-    gap: var(--space-4);
     width: fit-content;
     border-radius: var(--radius-md);
     box-sizing: border-box;
@@ -11,9 +10,13 @@
         font-weight: 500;
         cursor: pointer;
         padding: var(--space-1) var(--space-2);
-        transition: 150ms ease-in color;
+        transition: 150ms ease-in color, 150ms ease-in-out background-color;
         border-radius: inherit;
         color: var(--color-muted);
+        text-transform: capitalize;
+        outline: none;
+        width: 120px;
+        text-align: center;
     }
 
     .isActive {

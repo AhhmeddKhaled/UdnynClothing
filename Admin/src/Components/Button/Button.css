@@ -10,8 +10,6 @@
   min-height: 36px;
   padding: var(--space-2) var(--space-4);
   border: none;
-  border-radius: var(--radius-xl);
-  background: var(--color-paper);
   font-size: var(--text-lg);
   font-weight: bold;
   cursor: pointer;
@@ -53,6 +51,16 @@
   background-color: var(--btn-download-hover);
 }
 
+.btn-text {
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  background-color: transparent;
+}
+
+.btn-text:hover:not(:disabled) {
+  background-color: hsl(from var(--color-accent) h s l / .1);
+}
+
 /* Edit */
 .btn-edit {
   color: var(--status-warning);
@@ -81,3 +89,19 @@
   background-color: var(--color-secondary);
 }
 
+/* Radius  */
+.btn-radius-sm {
+  border-radius: var(--radius-sm);
+}
+
+.btn-radius-md {
+  border-radius: var(--radius-md);
+}
+
+.btn-radius-lg {
+  border-radius: var(--radius-lg); 
+}
+
+.btn-radius-full {
+  border-radius: var(--radius-xl); 
+}

@@ -124,7 +124,7 @@ export default function OrderDetailsModal({ order, logic }) {
 
                   <span className="orders-detail-item-info-unitPrice">
                     <TbBrandCashapp size={16} />{" "}
-                    {formatMoney(getItemUnitPrice(item))}
+                    {formatMoney(getItemUnitPrice(item,"wholesalePrice"))}
                   </span>
                 </div>
 

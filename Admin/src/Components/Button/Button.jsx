@@ -13,6 +13,7 @@ export default function Button({
   disabled = false,
   loading = false,
   variant = "primary",
+  radius  = "radius-sm",
   ...props
 }) {
   const handleClick = onClick ?? load;
@@ -29,7 +30,7 @@ export default function Button({
     <button
       {...props}
       type={type}
-      className={`btn btn-${variant} ${className}`.trim()}
+      className={`btn btn-${variant} btn-${radius}`.trim()}
       onClick={handleClick}
       disabled={isDisabled}
       aria-busy={loading || undefined}

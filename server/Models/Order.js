@@ -1,32 +1,5 @@
 const mongoose = require("mongoose");
-
-const GOVERNORATES = [
-  "قاهره",
-  "جيزة",
-  "اسكندريه",
-  "قليوبية",
-  "البحيرة",
-  "مطروح",
-  "دمياط",
-  "دقهلية",
-  "كفر الشيخ",
-  "غربيه",
-  "المنوفية",
-  "شرقيه",
-  "بورسعيد",
-  "اسماعيلية",
-  "سويس",
-  "شرم الشيخ",
-  "فيوم",
-  "بني سويف",
-  "منيا",
-  "اسيوط",
-  "سوهاج",
-  "قنا",
-  "اقصر",
-  "اسوان",
-  "بحر الاحمر",
-];
+const { EGYPTIAN_GOVERNORATES, VALID_STATUSES } = require("../Data/OrdersData");
 
 const orderItemSchema = new mongoose.Schema(
   {
@@ -41,7 +14,7 @@ const orderItemSchema = new mongoose.Schema(
     },
 
      unitPrice: {
-      type: Number,
+      type: String,
       required: true,
       min: 0,
     },
@@ -148,15 +121,7 @@ const orderSchema = new mongoose.Schema(
 
     status: {
       type: String,
-      enum: [
-        "pending",
-        "confirmed",
-        "preparing",
-        "shipping",
-        "delivered",
-        "cancelled",
-        "returned",
-      ],
+      enum: VALID_STATUSES,
       default: "pending",
       index: true,
     },
@@ -167,7 +132,7 @@ const orderSchema = new mongoose.Schema(
       required: [true, "Governorate is required"],
       trim: true,
       enum: {
-        values: GOVERNORATES,
+        values: EGYPTIAN_GOVERNORATES,
         message: "Please select a valid Egyptian governorate",
       },
     },

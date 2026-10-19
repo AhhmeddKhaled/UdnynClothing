@@ -8,13 +8,14 @@ export default function Tabs({ tabs }) {
     return (
         <ul className="tabs">
             {tabs.map((tab, i) => (
-                <li
+                <input
                     className={`tab ${activeTab === i ? "isActive" : ""}`}
                     onClick={() => setActiveTab(i)}
                     key={i}
-                >
-                    {tab}
-                </li>
+                    placeholder={tab}
+                    readOnly
+                    value={tab.toLowerCase()}
+                />
             ))}
         </ul>
     );
