@@ -64,16 +64,28 @@
 /* Edit */
 .btn-edit {
   color: var(--status-warning);
+  background-color: inherit;
 }
 
 /* Delete */
 .btn-delete {
   color: var(--status-error);
+  background-color: inherit;
 }
 
 /* Details */
 .btn-details {
   color: var(--color-plum);
+  background-color: inherit;
+}
+
+.btn-edit,
+.btn-delete,
+.btn-details,
+.btn-change {
+  display: inline-flex;
+  padding: 0;
+  background-color: inherit;
 }
 
 /* Close  */

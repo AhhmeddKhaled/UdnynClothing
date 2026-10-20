@@ -35,6 +35,7 @@
   --radius-lg: 12px;
   --radius-xl: 18px;
   --radius-full: 999px;
+  --radius-circle: 50%;
 
   /* Motion */
   --dur-fast: 150ms;

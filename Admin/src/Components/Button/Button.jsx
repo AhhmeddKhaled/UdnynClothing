@@ -1,6 +1,6 @@
 import "./Button.css";
 import { FiEdit2 } from "react-icons/fi";
-import { MdDeleteOutline } from "react-icons/md";
+import { MdDeleteOutline , MdPublishedWithChanges } from "react-icons/md";
 import { CgDetailsMore } from "react-icons/cg";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 
@@ -20,10 +20,11 @@ export default function Button({
   const isDisabled = disabled || loading;
 
   const icons = {
-    edit: <FiEdit2 />,
-    delete: <MdDeleteOutline />,
-    details: <CgDetailsMore />,
-    close: <IoIosCloseCircleOutline size={28}/>
+    edit: <FiEdit2 size={16}/>,
+    delete: <MdDeleteOutline size={16}/>,
+    details: <CgDetailsMore size={24}/>,
+    close: <IoIosCloseCircleOutline size={28}/>,
+    change: <MdPublishedWithChanges size={16}/>
   };
 
   return (

@@ -7,7 +7,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: red;
 }
 
 .order-status-pending {
@@ -43,5 +42,4 @@
 .order-status-returned {
   color: var(--status-returned);
   background: var(--status-returned-bg);
-  background-color: green;
 }
