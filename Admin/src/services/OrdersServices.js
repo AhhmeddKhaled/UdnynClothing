@@ -1,7 +1,6 @@
 const API_URL = import.meta.env.VITE_API_URL;
 
-
-// Orders Data 
+// Orders Data
 export const STATUSES = [
   "pending",
   "confirmed",
@@ -9,8 +8,9 @@ export const STATUSES = [
   "shipping",
   "delivered",
   "cancelled",
-  "returned"
+  "returned",
 ];
+
 export const GOVERNORATES = [
   "قاهره",
   "جيزة",
@@ -38,6 +38,7 @@ export const GOVERNORATES = [
   "اسوان",
   "بحر الاحمر",
 ];
+
 export const EMPTY_FORM = {
   customerName: "",
   customerPhone: "",
@@ -51,7 +52,34 @@ export const EMPTY_FORM = {
   customerNote: "",
 };
 
-// Logic Methods 
+export const ORDERS_TABLE_DATA = [
+  {
+    label: "Order",
+    key: "_id",
+  },
+  {
+    label: "Customer",
+    key: "customerName",
+  },
+  {
+    label: "Status",
+    key: "status",
+  },
+  {
+    label: "Items",
+    key: "items.length",
+  },
+  {
+    label: "Total",
+    key: "totalAmount",
+  },
+  {
+    label: "Date",
+    key: "createdAt",
+  },
+];
+
+// Logic Methods
 export function getImageUrl(imagePath) {
   if (!imagePath || typeof imagePath !== "string") {
     return "";
@@ -80,16 +108,13 @@ export const statusTransitions = {
   cancelled: [],
   returned: [],
 };
-export function StatusTransitions({status, currentStatus}) {
+export function StatusTransitions({ status, currentStatus }) {
   const canTransitions = statusTransitions[status].includes(currentStatus);
 
   const isCurrentStatus = status === currentStatus;
 
-
-  return {canTransitions, isCurrentStatus};
+  return { canTransitions, isCurrentStatus };
 }
 export function PriceType(price_type) {
-
   return price_type;
-
 }

@@ -1,0 +1,105 @@
+.table {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+
+  th,
+  td {
+    width: 1px;
+    border-bottom: 1px solid var(--color-line);
+    padding: var(--space-2);
+    white-space: nowrap;
+  }
+
+  thead {
+    position: sticky;
+    background-color: var(--color-paper);
+    z-index: 100;
+    top: 0;
+
+    th {
+      font-size: var(--text-md);
+      font-weight: 600;
+      text-transform: capitalize;
+      text-align: left;
+      border-top: 1px solid var(--color-line);
+    }
+  }
+
+  tbody {
+    tr:has(span.OutOfStock) {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    td {
+      font-size: var(--text-xm);
+      font-weight: 400;
+      text-align: left;
+      border-bottom: 1px solid var(--color-line);
+    }
+
+    th:last-child,
+    td:last-child {
+      text-align: center;
+    }
+
+    .tableActions {
+      white-space: nowrap;
+
+      svg {
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        padding: var(--space-2);
+        transition: 150ms ease-in-out transform;
+      }
+    }
+
+    
+
+    .productStatus span,
+    .qtyStatus span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-md);
+      text-transform: capitalize;
+      width: fit-content;
+      font-size: var(--text-sm);
+      font-weight: 500;
+
+      > span {
+        display: inline-flex;
+      }
+    }
+
+    .productStatus span.active {
+      background-color: var(--status-success-bg);
+      color: var(--status-success-text);
+    }
+
+    .qtyStatus span.OutOfStock {
+      background-color: var(--status-error-bg);
+      color: var(--status-error-text);
+    }
+
+    .availableStockImage img {
+      display: block;
+      width: 52px;
+      height: 52px;
+      object-fit: cover;
+      border: 1px solid var(--color-line);
+      border-radius: var(--radius-circle);
+      box-shadow: var(--shadow-card);
+      cursor: pointer;
+    }
+  }
+
+  th.productSelect {
+    text-align: center;
+    display: flex;
+  }
+}

@@ -1,4 +1,3 @@
-
 import { memo, useCallback, useState } from "react";
 
 import styles from "./AvailableStock.module.css";
@@ -129,11 +128,7 @@ const ProductRow = memo(function ProductRow({
       <td>{product.name || "-"}</td>
 
       <td className={styles.productStatus}>
-        <span
-          className={
-            product.active ? styles.active : styles.Inactive
-          }
-        >
+        <span className={product.active ? styles.active : styles.Inactive}>
           <span className={styles.productStatusDot}>
             <GoDotFill />
           </span>
@@ -143,16 +138,14 @@ const ProductRow = memo(function ProductRow({
       </td>
 
       <td className={styles.qtyStatus}>
-        <span
-          className={
-            product.qty <= 0 ? styles.OutOfStock : ""
-          }
-        >
-          {product.qty <= 0 ? 
-          <span className={styles.productStatusDot}>
-            <GoDotFill />
-          </span>
-          : ''}
+        <span className={product.qty <= 0 ? styles.OutOfStock : ""}>
+          {product.qty <= 0 ? (
+            <span className={styles.productStatusDot}>
+              <GoDotFill />
+            </span>
+          ) : (
+            ""
+          )}
 
           {product.qty <= 0 ? "Out of stock" : product.qty}
         </span>
@@ -222,7 +215,7 @@ export default function AvailableStock() {
   const handleSelectAll = useCallback(
     (event) => {
       const visibleIds = filteredProducts.map((product) =>
-        String(product.itemId)
+        String(product.itemId),
       );
 
       if (event.target.checked) {
@@ -233,32 +226,26 @@ export default function AvailableStock() {
         const visibleSet = new Set(visibleIds);
 
         setSelectedProducts((previous) =>
-          previous.filter((id) => !visibleSet.has(id))
+          previous.filter((id) => !visibleSet.has(id)),
         );
       }
     },
-    [filteredProducts]
+    [filteredProducts],
   );
 
-  const handleSelectProduct = useCallback(
-    (productId, checked) => {
-      const id = String(productId);
+  const handleSelectProduct = useCallback((productId, checked) => {
+    const id = String(productId);
 
-      setSelectedProducts((previous) =>
-        checked
-          ? previous.includes(id)
-            ? previous
-            : [...previous, id]
-          : previous.filter((selectedId) => selectedId !== id)
-      );
-    },
-    []
-  );
-
-  const handleOpenImage = useCallback((product) => {
-    setSelectedImage(
-      product.imagePath || product.image || null
+    setSelectedProducts((previous) =>
+      checked
+        ? previous.includes(id)
+          ? previous
+          : [...previous, id]
+        : previous.filter((selectedId) => selectedId !== id),
     );
+  }, []);
+  const handleOpenImage = useCallback((product) => {
+    setSelectedImage(product.imagePath || product.image || null);
   }, []);
 
   const handleCloseImage = useCallback(() => {
@@ -281,10 +268,7 @@ export default function AvailableStock() {
     ];
 
     return details.map(([label, value]) => (
-      <div
-        className="available-stock-card__field"
-        key={label}
-      >
+      <div className="available-stock-card__field" key={label}>
         <span>{label}</span>
         <strong>{value}</strong>
       </div>
@@ -298,7 +282,7 @@ export default function AvailableStock() {
   const allVisibleSelected =
     filteredProducts.length > 0 &&
     filteredProducts.every((product) =>
-      selectedProducts.includes(String(product.itemId))
+      selectedProducts.includes(String(product.itemId)),
     );
 
   return (
@@ -311,10 +295,7 @@ export default function AvailableStock() {
           subTitle="Manage your products and available inventory"
           action={
             canImport && (
-              <Button
-                variant="primary"
-                radius="radius-md"
-              >
+              <Button variant="primary" radius="radius-md">
                 <label
                   className={importing ? "is-disabled" : ""}
                   htmlFor="stock-import"
@@ -339,10 +320,7 @@ export default function AvailableStock() {
       {/* Error State */}
 
       {error && (
-        <section
-          className="available-stock-error"
-          role="alert"
-        >
+        <section className="available-stock-error" role="alert">
           <p>{error}</p>
 
           <button
@@ -369,10 +347,8 @@ export default function AvailableStock() {
               type: "search",
               value: search,
               readOnly: false,
-              onChange: (event) =>
-                setSearch(event.target.value),
-              placeholder:
-                "Search by product ID, name, or manufacturer...",
+              onChange: (event) => setSearch(event.target.value),
+              placeholder: "Search by product ID, name, or manufacturer...",
             }}
           />
 
@@ -384,8 +360,7 @@ export default function AvailableStock() {
               id: "stock-category",
               selectList: categories,
               value: categoryFilter,
-              onChange: (event) =>
-                setCategoryFilter(event.target.value),
+              onChange: (event) => setCategoryFilter(event.target.value),
             }}
           />
 
@@ -397,8 +372,7 @@ export default function AvailableStock() {
               id: "stock-manufacturer",
               selectList: manufacturers,
               value: manufacturerFilter,
-              onChange: (event) =>
-                setManufacturerFilter(event.target.value),
+              onChange: (event) => setManufacturerFilter(event.target.value),
             }}
           />
 
@@ -407,11 +381,7 @@ export default function AvailableStock() {
               type="button"
               variant="text"
               onClick={clearFilters}
-              disabled={
-                !search &&
-                !categoryFilter &&
-                !manufacturerFilter
-              }
+              disabled={!search && !categoryFilter && !manufacturerFilter}
               radius="radius-md"
             >
               Clear Filters
@@ -464,9 +434,7 @@ export default function AvailableStock() {
                   <ProductRow
                     key={product.itemId}
                     product={product}
-                    selected={selectedProducts.includes(
-                      String(product.itemId)
-                    )}
+                    selected={selectedProducts.includes(String(product.itemId))}
                     onSelectProduct={handleSelectProduct}
                     getImageUrl={getImageUrl}
                     onOpenImage={handleOpenImage}
@@ -491,9 +459,7 @@ export default function AvailableStock() {
       >
         {filteredProducts.length === 0 ? (
           <div className={styles.state}>
-            {error
-              ? "Products could not be loaded."
-              : "No products found."}
+            {error ? "Products could not be loaded." : "No products found."}
           </div>
         ) : (
           filteredProducts.map((product) => (
@@ -512,13 +478,11 @@ export default function AvailableStock() {
                   <h2>{product.name || "Unnamed Product"}</h2>
 
                   <p>
-                    Product ID:{" "}
-                    <strong>{product.itemId ?? "-"}</strong>
+                    Product ID: <strong>{product.itemId ?? "-"}</strong>
                   </p>
 
                   <p>
-                    Quantity:{" "}
-                    <strong>{product.qty ?? 0}</strong>
+                    Quantity: <strong>{product.qty ?? 0}</strong>
                   </p>
                 </div>
               </div>

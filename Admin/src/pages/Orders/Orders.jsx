@@ -10,20 +10,21 @@ import { SiVirustotal } from "react-icons/si";
 import { CiDeliveryTruck } from "react-icons/ci";
 import { HiOutlinePlus } from "react-icons/hi";
 
+// Import Services
 import { useOrdersLogic } from "../../UI_Logic/OrdersLogic.jsx";
+import { ORDERS_TABLE_DATA } from "../../services/OrdersServices.js";
 
+// import Components
 import ContentHeader from "../../Components/ContentHeader/ContentHeader.jsx";
 import Button from "../../Components/Button/Button";
 import StatsContainer from "../../Components/StatCard/StatsContainer";
 import StatCard from "../../Components/StatCard/StatCard";
 import OrderStatus from "../../Components/OrderStatus/OrderStatus";
+import Table from "../../Components/Table/Table.jsx";
 
-import OrderDetailsModal from
-  "../../Components/OrderDetailsModal/OrderDetailsModal";
+import OrderDetailsModal from "../../Components/OrderDetailsModal/OrderDetailsModal";
 
 export default function Orders() {
-
-
   const navigate = useNavigate();
   const logic = useOrdersLogic();
 
@@ -54,7 +55,8 @@ export default function Orders() {
     deletingOrderId,
   } = logic;
 
-  console.log(filteredOrders)
+  console.log(filteredOrders);
+
   const statCards = [
     {
       title: "Revenue",
@@ -112,6 +114,29 @@ export default function Orders() {
       icon: <ImCancelCircle />,
       rate: "-22%",
       status: "cancelled",
+    },
+  ];
+
+  const actions = [
+    {
+      element: (order) => (
+        <Button
+          variant="details"
+          disabled={Boolean(deletingOrderId)}
+          onClick={() => setSelectedOrder(order)}
+        ></Button>
+      ),
+    },
+    {
+      element: (order) => (
+        <Button
+          variant="delete"
+          onClick={() => deleteOrder(order)}
+          disabled={Boolean(deletingOrderId)}
+          // loading={deletingOrderId === orderId}
+          aria-label={`Delete order ${order.orderNumber || ""}`}
+        ></Button>
+      ),
     },
   ];
 
@@ -180,17 +205,7 @@ export default function Orders() {
       </StatsContainer>
 
       <section className="orders-panel">
-        <header className="orders-panel-header">
-          <div>
-            <h2>All orders</h2>
-            <p>Review orders from the connected database.</p>
-          </div>
-
-          <span className="orders-stat-caption">
-            {filteredOrders.length} result
-            {filteredOrders.length === 1 ? "" : "s"}
-          </span>
-        </header>
+      
 
         <div className="orders-toolbar">
           <label className="orders-search">
@@ -203,13 +218,14 @@ export default function Orders() {
             />
           </label>
 
-          <button
+          <Button
             type="button"
-            className="orders-reset-button"
+            variant="text"
+            radius="radius-md"
             onClick={clearFilters}
           >
             Clear filters
-          </button>
+          </Button>
         </div>
 
         <div className="orders-status-tabs" aria-label="Filter by status">
@@ -268,9 +284,7 @@ export default function Orders() {
           <div className="orders-empty">
             <span className="orders-empty-icon" />
 
-            <h3>
-              {hasActiveFilters ? "No matching orders" : "No orders yet"}
-            </h3>
+            <h3>{hasActiveFilters ? "No matching orders" : "No orders yet"}</h3>
 
             <p>
               {hasActiveFilters
@@ -290,97 +304,14 @@ export default function Orders() {
           </div>
         ) : (
           <div className="orders-table-wrap">
-            <table className="orders-table">
-              <thead>
-                <tr>
-                  <th scope="col">
-                    <input type="checkbox" aria-label="Select all orders" />
-                  </th>
-                  <th scope="col">Order</th>
-                  <th scope="col">Customer</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Items</th>
-                  <th scope="col">Total</th>
-                  <th scope="col">Date</th>
-                  <th scope="col">Actions</th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {filteredOrders.map((order, index) => {
-                  const orderId = order._id || order.id;
-                  const isDeleting = deletingOrderId === orderId;
-
-                  return (
-                    <tr key={orderId || order.orderNumber || index}>
-                      <td>
-                        <input
-                          type="checkbox"
-                          aria-label={`Select order ${order.orderNumber || orderId || index + 1}`}
-                        />
-                      </td>
-
-                      <td data-label="Order">
-                        <span className="orders-number">
-                          {String(
-                            order._id || order.id || order.orderNumber || ""
-                          ).slice(0, 6)}
-                        </span>
-                      </td>
-
-                      <td data-label="Customer">
-                        <div className="orders-customer">
-                          <span className="orders-customer-name">
-                            {getCustomerName(order)}
-                          </span>
-                        </div>
-                      </td>
-
-                      <td data-label="Status">
-                        <OrderStatus status={order.status} />
-                      </td>
-
-                      <td data-label="Items">
-                        <span className="orders-items-count">
-                          {getItemCount(order)}
-                        </span>
-                      </td>
-
-                      <td data-label="Total" className="orders-total">
-                        {formatMoney(order.totalAmount)}
-                      </td>
-
-                      <td data-label="Date">
-                        {formatDate(order.createdAt)}
-                      </td>
-
-                      <td
-                        data-label="Actions"
-                        className="orders-actions-cell"
-                      >
-                        <div className="orders-row-actions">
-                          <Button
-                            variant="details"
-                            onClick={() => setSelectedOrder(order)}
-                            aria-label={`View order ${order.orderNumber || ""}`}
-                          />
-
-                          <Button
-                            variant="delete"
-                            onClick={() => deleteOrder(order)}
-                            disabled={Boolean(deletingOrderId)}
-                            loading={isDeleting}
-                            aria-label={`Delete order ${order.orderNumber || ""}`}
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <Table
+              tableHeader={ORDERS_TABLE_DATA}
+              tableBody={filteredOrders}
+              actions={actions}
+            />
           </div>
         )}
+
 
         <footer className="orders-panel-footer">
           <span>Live data from the Orders API</span>
@@ -396,10 +327,7 @@ export default function Orders() {
       </section>
 
       {selectedOrder && (
-        <OrderDetailsModal
-          order={selectedOrder}
-          logic={logic}
-        />
+        <OrderDetailsModal order={selectedOrder} logic={logic} />
       )}
     </section>
   );
