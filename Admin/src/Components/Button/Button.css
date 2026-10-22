@@ -13,6 +13,7 @@
   font-size: var(--text-lg);
   font-weight: bold;
   cursor: pointer;
+  text-transform: capitalize;
   transition:
     background 0.15s ease,
     border-color 0.15s ease,

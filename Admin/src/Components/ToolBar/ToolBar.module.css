@@ -1,0 +1,76 @@
+.toolBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-8);
+}
+
+.toolBarUser {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+
+  > div {
+    display: flex;
+  }
+  .toolBarActions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+
+    .toolBarActionsMood {
+
+        svg {
+            margin: 0 var(--space-1);
+        }
+        svg.active {
+            color: var(--color-accent);
+        }
+
+
+    }
+
+    .toolBarActionsNot {
+      position: relative;
+
+      &::before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        background-color: red;
+        border-radius: var(--radius-circle);
+        right: 0;
+        position: absolute;
+      }
+    }
+  }
+  .toolBarUserInfo {
+    display: flex;
+    flex-direction: column;
+    .toolBarUserInfoName {
+      font-size: var(--text-sm);
+      text-transform: capitalize;
+      font-weight: 500;
+    }
+
+    .toolBarUserInfoEmail {
+      font-size: var(--text-xs);
+      font-weight: 400;
+      color: var(--color-muted);
+      margin-top: -5;
+      opacity: .7;
+    }
+  }
+
+  .toolBarUserInfoAvatar {
+    display: flex;
+    align-items: center;
+    img {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-circle);
+      border: 1px solid var(--color-line-dark);
+      box-shadow: var(--shadow-pop);
+    }
+  }
+}

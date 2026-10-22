@@ -1,5 +1,7 @@
 import styles from "./Form.module.css";
 
+import { IoIosSearch } from "react-icons/io";
+
 export function Form({ children, onSubmit }) {
   return (
     <form onSubmit={onSubmit} className={styles.form}>
@@ -12,7 +14,9 @@ export function FieldInputGroup({ label = {}, inputOptions = {}, note = "" }) {
   return (
     <div className={styles.fieldInputGroup}>
       <div className={styles.fieldInputGroupTop}>
-        <label htmlFor={inputOptions.id}>{label.name}</label>
+        {Object.keys(label).length > 0 && (
+          <label htmlFor={inputOptions.id}>{label.name}</label>
+        )}
 
         {note && <span>{note}</span>}
       </div>
@@ -30,6 +34,14 @@ export function FieldInputGroup({ label = {}, inputOptions = {}, note = "" }) {
           maxLength={inputOptions.maxLength}
           onChange={inputOptions.onChange}
         />
+
+        {inputOptions.type === "search" ? (
+          <span className={styles.iconSearch}>
+            <IoIosSearch size={24} />
+          </span>
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );
@@ -43,10 +55,10 @@ export function FieldSelectGroup({ label = {}, selectOptions = {} }) {
       </div>
 
       <div className={styles.fieldSelectGroupDown}>
-        <select 
-        id={selectOptions.id}
-        value={selectOptions.value}
-        onChange={selectOptions.onChange}
+        <select
+          id={selectOptions.id}
+          value={selectOptions.value}
+          onChange={selectOptions.onChange}
         >
           {selectOptions.selectList.map((option, i) => (
             <option value={option} key={i}>

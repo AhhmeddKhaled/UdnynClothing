@@ -67,6 +67,11 @@ input,
 select,
 textarea {
   border: 1px solid var(--color-line);
+  transition: background-color var(--dur-fast) ease;
+  background-color: transparent;
+  &:hover {
+    border-color: var(--color-line-dark);
+  }
 }
 
 input::placeholder,
@@ -91,7 +96,8 @@ textarea:focus-visible {
 }
 
 input,
-select {
+select,
+textarea {
   min-height: 40px;
   background-color: inherit;
   padding: var(--space-2) var(--space-4);
@@ -105,6 +111,12 @@ select {
 input,
 label {
   cursor: pointer;
+}
+
+svg {
+  font-size: var(--text-base);
+  border-radius: var(--radius-circle);
+  transition: background-color var(--dur-fast) ease;
 }
 /* Tables */
 

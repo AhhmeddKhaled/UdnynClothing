@@ -41,7 +41,7 @@ function formatValue(value, key, formatMoney) {
   return value;
 }
 
-export default function Table({ tableHeader, tableBody, actions }) {
+export default function Table({ tableHeader, tableBody, actions = null }) {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const selectAllRef = useRef(null);
   const { formatMoney } = useOrdersLogic();
@@ -151,15 +151,17 @@ export default function Table({ tableHeader, tableBody, actions }) {
                 );
               })}
 
-              <td className={styles.tableActions}>
-                {actions.map((action, i) => (
-                  <span key={action.label ?? i}>
-                    {typeof action.element === "function"
-                      ? action.element(item)
-                      : action.element}
-                  </span>
-                ))}
-              </td>
+              {actions && (
+                <td className={styles.tableActions}>
+                  {actions.map((action, i) => (
+                    <span key={action.label ?? i}>
+                      {typeof action.element === "function"
+                        ? action.element(item)
+                        : action.element}
+                    </span>
+                  ))}
+                </td>
+              )}
             </tr>
           );
         })}

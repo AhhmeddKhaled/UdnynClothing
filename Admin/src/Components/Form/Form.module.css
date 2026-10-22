@@ -1,6 +1,5 @@
 .form {
     display: grid;
-    grid-template-columns: repeat(auto-fill,minmax(250px,1fr));
     align-items: flex-end;
     gap: var(--space-6);
     margin-bottom: var(--space-10);
@@ -10,12 +9,21 @@
 .fieldSelectGroup {
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
     text-transform: capitalize;
+    position: relative;
 }
 
 .fieldInputGroup label,
 .fieldSelectGroup label {
     font-size: var(--text-md);
     font-weight: 500;
+}
+
+
+.iconSearch {
+    position: absolute;
+    right: 2%;
+    top: 50%;
+    transform: translateY(-50%);
+    display: inline-flex;
 }

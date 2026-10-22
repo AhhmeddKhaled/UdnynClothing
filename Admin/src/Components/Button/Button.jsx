@@ -3,6 +3,7 @@ import { FiEdit2 } from "react-icons/fi";
 import { MdDeleteOutline , MdPublishedWithChanges } from "react-icons/md";
 import { CgDetailsMore } from "react-icons/cg";
 import { IoIosCloseCircleOutline } from "react-icons/io";
+import { CiExport } from "react-icons/ci";
 
 export default function Button({
   children,
@@ -13,7 +14,7 @@ export default function Button({
   disabled = false,
   loading = false,
   variant = "primary",
-  radius  = "radius-sm",
+  radius  = "radius-md",
   ...props
 }) {
   const handleClick = onClick ?? load;
@@ -24,7 +25,8 @@ export default function Button({
     delete: <MdDeleteOutline size={16}/>,
     details: <CgDetailsMore size={24}/>,
     close: <IoIosCloseCircleOutline size={28}/>,
-    change: <MdPublishedWithChanges size={16}/>
+    change: <MdPublishedWithChanges size={16}/>,
+    export: <CiExport />
   };
 
   return (

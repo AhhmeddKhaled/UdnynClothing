@@ -1,5 +1,7 @@
 /* ======================================================
-   Udnyn — Global Design Tokens (v2)
+   Udnyn — Global Design Tokens
+   Palette: Sky + White + Slate
+   ====================================================== */
 
 /* ======================================================
    1. Shared (does not change with theme or palette)
@@ -48,7 +50,7 @@
   --z-modal: 1000;
   --z-toast: 1100;
 
-  /* Legacy names, now aliases of the semantic ones (they follow theme + palette) */
+  /* Legacy aliases — keep existing component names */
   --color-plum: var(--color-accent);
   --color-plum-deep: var(--color-accent-hover);
   --color-plum-soft: var(--color-muted);
@@ -62,7 +64,7 @@
 }
 
 /* ======================================================
-   2. Light theme (default palette: plum)
+   2. Light Theme — Sky + White + Slate
    ====================================================== */
 
 :root,
@@ -70,257 +72,203 @@
   color-scheme: light;
 
   /* Surfaces */
-  --color-page-bg: #f7f7f7;
-  --color-paper: #ffffff;
-  --color-sand: #ffffff;
-  --color-sand-deep: #f1ecf0;
-  --color-card: #ffffff;
-  --color-card-hover: #faf6f9;
+  --color-page-bg: #F8FAFC;
+  --color-paper: #FFFFFF;
+  --color-sand: #FFFFFF;
+  --color-sand-deep: #F1F5F9;
+  --color-card: #FFFFFF;
+  --color-card-hover: #F8FAFC;
 
   /* Text */
-  --color-ink: #241a22;
-  --color-muted: #6f5f6b;
-  --color-faint: #9b8c97;
+  --color-ink: #0F172A;
+  --color-muted: #475569;
+  --color-faint: #94A3B8;
 
   /* Lines + overlay */
-  --color-line: #e9e2e7;
-  --color-line-dark: rgba(36, 26, 34, 0.16);
-  --color-overlay: rgba(24, 16, 22, 0.5);
+  --color-line: #E2E8F0;
+  --color-line-dark: rgba(15, 23, 42, 0.16);
+  --color-overlay: rgba(15, 23, 42, 0.5);
 
-  /* Accent */
-  --color-accent: #6b2d5c;
-  --color-accent-hover: #55224a;
-  --color-accent-soft: #f5eaf2;
-  --color-accent-tint: #d9b7cf;
-  --color-on-accent: #ffffff;
+  /* Accent — Sky Blue */
+  --color-accent: #0284C7;
+  --color-accent-hover: #0369A1;
+  --color-accent-soft: #E0F2FE;
+  --color-accent-tint: #7DD3FC;
+  --color-on-accent: #FFFFFF;
 
   /* Shadows */
-  --shadow-card: 0 1px 2px rgba(36, 26, 34, 0.05), 0 1px 3px rgba(36, 26, 34, 0.06);
-  --shadow-pop: 0 12px 32px rgba(36, 26, 34, 0.16);
+  --shadow-card:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 1px 3px rgba(15, 23, 42, 0.06);
 
-  /* ---- Semantic statuses: main / bg / border / text (AA on bg) / on (text on main) ---- */
-  --status-success: #1e6b47;
-  --status-success-bg: #e8f6ef;
-  --status-success-border: #b9e3cf;
-  --status-success-text: #17553a;
-  --status-success-on: #ffffff;
+  --shadow-pop: 0 12px 32px rgba(15, 23, 42, 0.14);
 
-  --status-error: #dc2626;
-  --status-error-bg: #fee2e2;
-  --status-error-border: #f9b4b4;
-  --status-error-text: #b91c1c;
-  --status-error-on: #ffffff;
+  /* Semantic statuses: main / bg / border / text / on */
 
-  --status-warning: #d97706;
-  --status-warning-bg: #fef3c7;
-  --status-warning-border: #f3d27a;
-  --status-warning-text: #92400e;
-  --status-warning-on: #2a1a00;
+  --status-success: #15803D;
+  --status-success-bg: #DCFCE7;
+  --status-success-border: #BBF7D0;
+  --status-success-text: #166534;
+  --status-success-on: #FFFFFF;
 
-  --status-info: #2563eb;
-  --status-info-bg: #dbeafe;
-  --status-info-border: #a9c8f5;
-  --status-info-text: #1d4ed8;
-  --status-info-on: #ffffff;
+  --status-error: #DC2626;
+  --status-error-bg: #FEE2E2;
+  --status-error-border: #FECACA;
+  --status-error-text: #B91C1C;
+  --status-error-on: #FFFFFF;
 
-  --status-clay: #b5563d;
-  --status-clay-bg: #f6e4dd;
+  --status-warning: #D97706;
+  --status-warning-bg: #FEF3C7;
+  --status-warning-border: #FDE68A;
+  --status-warning-text: #92400E;
+  --status-warning-on: #2A1A00;
 
-  /* ---- Order statuses: main / bg / text ---- */
-  --status-pending: #64748b;
-  --status-pending-bg: #f1f5f9;
+  --status-info: #2563EB;
+  --status-info-bg: #DBEAFE;
+  --status-info-border: #BFDBFE;
+  --status-info-text: #1D4ED8;
+  --status-info-on: #FFFFFF;
+
+  /* Legacy clay status */
+  --status-clay: #B5563D;
+  --status-clay-bg: #F6E4DD;
+
+  /* Order statuses: main / bg / text */
+
+  --status-pending: #64748B;
+  --status-pending-bg: #F1F5F9;
   --status-pending-text: #475569;
 
-  --status-confirmed: #2563eb;
-  --status-confirmed-bg: #dbeafe;
-  --status-confirmed-text: #1d4ed8;
+  --status-confirmed: #2563EB;
+  --status-confirmed-bg: #DBEAFE;
+  --status-confirmed-text: #1D4ED8;
 
-  --status-preparing: #7c3aed;
-  --status-preparing-bg: #ede9fe;
-  --status-preparing-text: #6d28d9;
+  --status-preparing: #7C3AED;
+  --status-preparing-bg: #EDE9FE;
+  --status-preparing-text: #6D28D9;
 
-  --status-shipping: #d97706;
-  --status-shipping-bg: #fef3c7;
-  --status-shipping-text: #92400e;
+  --status-shipping: #D97706;
+  --status-shipping-bg: #FEF3C7;
+  --status-shipping-text: #92400E;
 
-  --status-delivered: #16a34a;
-  --status-delivered-bg: #dcfce7;
-  --status-delivered-text: #15803d;
+  --status-delivered: #16A34A;
+  --status-delivered-bg: #DCFCE7;
+  --status-delivered-text: #15803D;
 
-  --status-returned: #0891b2;
-  --status-returned-bg: #cffafe;
-  --status-returned-text: #0e7490;
+  --status-returned: #0891B2;
+  --status-returned-bg: #CFFAFE;
+  --status-returned-text: #0E7490;
 
-  --status-cancelled: #dc2626;
-  --status-cancelled-bg: #fee2e2;
-  --status-cancelled-text: #b91c1c;
+  --status-cancelled: #DC2626;
+  --status-cancelled-bg: #FEE2E2;
+  --status-cancelled-text: #B91C1C;
 
-  /* Misc */
-  --status-revenue: #5a9bd5;
-  --status-total: #2563eb;
-  --btn-download: #7cb9e8;
-  --btn-download-hover: #5a9bd5;
+  /* Dashboard data colors */
+  --status-revenue: #5A9BD5;
+  --status-total: #2563EB;
+  --btn-download: #7CB9E8;
+  --btn-download-hover: #5A9BD5;
 }
 
 /* ======================================================
-   3. Dark theme (default palette: plum)
+   3. Dark Theme — Sky + Slate
    ====================================================== */
 
 [data-theme="dark"] {
   color-scheme: dark;
 
-  --color-page-bg: #151016;
-  --color-paper: #1c161b;
-  --color-sand: #1c161b;
-  --color-sand-deep: #2a222a;
-  --color-card: #211a20;
-  --color-card-hover: #2a2229;
+  /* Surfaces */
+  --color-page-bg: #0B1220;
+  --color-paper: #111827;
+  --color-sand: #111827;
+  --color-sand-deep: #1E293B;
+  --color-card: #111827;
+  --color-card-hover: #1E293B;
 
-  --color-ink: #f2ecf0;
-  --color-muted: #b9abb5;
-  --color-faint: #8a7b86;
+  /* Text */
+  --color-ink: #F1F5F9;
+  --color-muted: #CBD5E1;
+  --color-faint: #94A3B8;
 
-  --color-line: rgba(242, 236, 240, 0.1);
+  /* Lines + overlay */
+  --color-line: rgba(226, 232, 240, 0.10);
   --color-line-dark: rgba(255, 255, 255, 0.16);
   --color-overlay: rgba(0, 0, 0, 0.7);
 
-  --color-accent: #dfaed3;
-  --color-accent-hover: #f0c6e5;
-  --color-accent-soft: #3a2536;
-  --color-accent-tint: #7d5671;
-  --color-on-accent: #2a0f24;
+  /* Accent — Sky Blue */
+  --color-accent: #38BDF8;
+  --color-accent-hover: #7DD3FC;
+  --color-accent-soft: #172F45;
+  --color-accent-tint: #075985;
+  --color-on-accent: #082F49;
 
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.35);
-  --shadow-pop: 0 10px 30px rgba(0, 0, 0, 0.5);
+  /* Shadows */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-pop: 0 10px 30px rgba(0, 0, 0, 0.45);
 
-  --status-success: #4cc38a;
-  --status-success-bg: #1c3328;
-  --status-success-border: #2f6b4d;
-  --status-success-text: #8fe0b4;
-  --status-success-on: #0b1f16;
+  /* Semantic statuses */
 
-  --status-error: #f26b6b;
-  --status-error-bg: #3a2224;
-  --status-error-border: #7a3a3d;
-  --status-error-text: #ffb4b4;
-  --status-error-on: #2a0d0d;
+  --status-success: #4CC38A;
+  --status-success-bg: #1C3328;
+  --status-success-border: #2F6B4D;
+  --status-success-text: #8FE0B4;
+  --status-success-on: #0B1F16;
 
-  --status-warning: #f0b340;
-  --status-warning-bg: #3a301a;
-  --status-warning-border: #735a22;
-  --status-warning-text: #f7d98a;
-  --status-warning-on: #2a1a00;
+  --status-error: #F26B6B;
+  --status-error-bg: #3A2224;
+  --status-error-border: #7A3A3D;
+  --status-error-text: #FFB4B4;
+  --status-error-on: #2A0D0D;
 
-  --status-info: #6ea8fe;
-  --status-info-bg: #1f2f4a;
-  --status-info-border: #355a94;
-  --status-info-text: #a9cbff;
-  --status-info-on: #0b1a33;
+  --status-warning: #F0B340;
+  --status-warning-bg: #3A301A;
+  --status-warning-border: #735A22;
+  --status-warning-text: #F7D98A;
+  --status-warning-on: #2A1A00;
 
-  --status-clay: #d8897c;
+  --status-info: #6EA8FE;
+  --status-info-bg: #1F2F4A;
+  --status-info-border: #355A94;
+  --status-info-text: #A9CBFF;
+  --status-info-on: #0B1A33;
+
+  /* Legacy clay status */
+  --status-clay: #D8897C;
   --status-clay-bg: #382725;
 
-  --status-pending: #94a3b8;
+  /* Order statuses */
+
+  --status-pending: #94A3B8;
   --status-pending-bg: #263241;
-  --status-pending-text: #cbd5e1;
+  --status-pending-text: #CBD5E1;
 
-  --status-confirmed: #6ea8fe;
-  --status-confirmed-bg: #1f2f4a;
-  --status-confirmed-text: #a9cbff;
+  --status-confirmed: #6EA8FE;
+  --status-confirmed-bg: #1F2F4A;
+  --status-confirmed-text: #A9CBFF;
 
-  --status-preparing: #a78bfa;
-  --status-preparing-bg: #2c2547;
-  --status-preparing-text: #c4b5fd;
+  --status-preparing: #A78BFA;
+  --status-preparing-bg: #2C2547;
+  --status-preparing-text: #C4B5FD;
 
-  --status-shipping: #f0b340;
-  --status-shipping-bg: #3a301a;
-  --status-shipping-text: #f7d98a;
+  --status-shipping: #F0B340;
+  --status-shipping-bg: #3A301A;
+  --status-shipping-text: #F7D98A;
 
-  --status-delivered: #4cc38a;
-  --status-delivered-bg: #1c3328;
-  --status-delivered-text: #8fe0b4;
+  --status-delivered: #4CC38A;
+  --status-delivered-bg: #1C3328;
+  --status-delivered-text: #8FE0B4;
 
-  --status-return: #38bdf8;
-  --status-return-bg: #17323f;
-  --status-return-text: #7dd3fc;
+  --status-returned: #38BDF8;
+  --status-returned-bg: #17323F;
+  --status-returned-text: #7DD3FC;
 
-  --status-cancelled: #f26b6b;
-  --status-cancelled-bg: #3a2224;
-  --status-cancelled-text: #ffb4b4;
-}
+  --status-cancelled: #F26B6B;
+  --status-cancelled-bg: #3A2224;
+  --status-cancelled-text: #FFB4B4;
 
-/* ======================================================
-   4. Palette: teal  (calm, clean)
-   ====================================================== */
-
-[data-palette="teal"]:not([data-theme="dark"]) {
-  --color-page-bg: #f2f6f6;
-  --color-sand-deep: #e8f0ef;
-  --color-card-hover: #f7fafa;
-  --color-ink: #14282a;
-  --color-muted: #536a6c;
-  --color-faint: #8aa0a2;
-  --color-line: #dce6e5;
-  --color-line-dark: rgba(20, 40, 42, 0.16);
-  --color-accent: #0f766e;
-  --color-accent-hover: #0b5d57;
-  --color-accent-soft: #def3f0;
-  --color-accent-tint: #9fd6cf;
-  --color-on-accent: #ffffff;
-}
-
-[data-theme="dark"][data-palette="teal"] {
-  --color-page-bg: #0e1617;
-  --color-paper: #131d1e;
-  --color-sand: #131d1e;
-  --color-sand-deep: #1e2c2d;
-  --color-card: #172224;
-  --color-card-hover: #1f2d2f;
-  --color-ink: #e8f1f0;
-  --color-muted: #9fb6b4;
-  --color-faint: #6f8786;
-  --color-line: rgba(232, 241, 240, 0.1);
-  --color-accent: #4fd1c0;
-  --color-accent-hover: #7ee3d5;
-  --color-accent-soft: #173633;
-  --color-accent-tint: #2e6b64;
-  --color-on-accent: #052724;
-}
-
-/* ======================================================
-   5. Palette: rose  (warm, boutique)
-   ====================================================== */
-
-[data-palette="rose"]:not([data-theme="dark"]) {
-  --color-page-bg: #faf5f4;
-  --color-sand-deep: #f4ebe9;
-  --color-card-hover: #fdf8f7;
-  --color-ink: #2a1c1f;
-  --color-muted: #735a5f;
-  --color-faint: #a08a8e;
-  --color-line: #ede1df;
-  --color-line-dark: rgba(42, 28, 31, 0.16);
-  --color-accent: #a8405a;
-  --color-accent-hover: #8f3249;
-  --color-accent-soft: #fbe9ed;
-  --color-accent-tint: #e9b4c0;
-  --color-on-accent: #ffffff;
-}
-
-[data-theme="dark"][data-palette="rose"] {
-  --color-page-bg: #171112;
-  --color-paper: #1e1618;
-  --color-sand: #1e1618;
-  --color-sand-deep: #2d2023;
-  --color-card: #251b1e;
-  --color-card-hover: #2e2226;
-  --color-ink: #f5eded;
-  --color-muted: #c0a8ad;
-  --color-faint: #8f777c;
-  --color-line: rgba(245, 237, 237, 0.1);
-  --color-accent: #f2a3b6;
-  --color-accent-hover: #f8c0cd;
-  --color-accent-soft: #3b2128;
-  --color-accent-tint: #7a3d4c;
-  --color-on-accent: #2e0f17;
+  /* Dashboard data colors */
+  --status-revenue: #7CB9E8;
+  --status-total: #6EA8FE;
+  --btn-download: #38BDF8;
+  --btn-download-hover: #7DD3FC;
 }

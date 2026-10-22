@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import Sidebar from "../Components/Sidebar/Sidebar.jsx";
 import { getUser, logout, getLoginTime , authFetch } from "../pages/Login/auth.js";
 import { useTheme } from "../context/ThemeContext.jsx";
 import { useDashboardLogic } from "../UI_Logic/DashboardLogic";
-import Button from '../Components/Button/Button';
 
+
+// Import Components
+import Sidebar from "../Components/Sidebar/Sidebar.jsx";
+import Button from '../Components/Button/Button';
+import ToolBar from "../Components/ToolBar/ToolBar";
 
 import "./Layout.css";
 
@@ -36,6 +39,9 @@ export default function Layout() {
       />
 
       <main className="lo-content">
+
+        <ToolBar />
+
         <Outlet
           context={{
             theme,

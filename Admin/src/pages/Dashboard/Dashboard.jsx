@@ -1,16 +1,25 @@
 import "./Dashboard.css";
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import ContentHeader from "../../Components/ContentHeader/ContentHeader.jsx";
 import { authFetch } from "../Login/auth.js";
 import { useDashboardLogic } from "../../UI_Logic/DashboardLogic.jsx";
+
+// Import Icons 
+import { CiExport } from "react-icons/ci";
+
+// Import Components 
+import Button from "../../Components/Button/Button";
+import ContentHeader from "../../Components/ContentHeader/ContentHeader.jsx";
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner.jsx";
 import StatCard from '../../Components/StatCard/StatCard';
+import StatsContainer from "../../Components/StatCard/StatsContainer";
+import RevenueChart from "../../Components/Charts/DashboardChart";
 
 export default function Dashboard() {
   const { user } = useOutletContext();
   const [sessionTime, setSessionTime] = useState("");
 
+ 
   useEffect(() => {
     const now = new Date();
 
@@ -41,6 +50,34 @@ export default function Dashboard() {
     missingDataTotal,
   } = useDashboardLogic(authFetch);
 
+   const statsData = [
+    {
+      title: "Total Products",
+      value: loading ? "..." : active.length,
+      description: "Products in inventory",
+      icon: <ProductsIcon size={32}/>
+    },
+    {
+      title: "Total Quantity",
+          value: loading ? "..." : totalQuantity ,
+          description:"Units across all products",
+          icon: <QuantityIcon /> 
+    },
+    {
+       title:"Low Stock",
+          value: loading ? "..." : low.length ,
+          description:"Products with 1–5 units",
+          icon: <WarningIcon /> 
+    },
+    {
+      title:"Negative Quantity",
+          value: loading ? "..." : negative.length ,
+          description:"Products below zero",
+          icon: <AlertIcon /> 
+    }
+
+  ]
+
   // Loading
   if (loading) return <LoadingSpinner />;
 
@@ -69,76 +106,31 @@ export default function Dashboard() {
         subTitle="View all statistics in one place."
         user={user}
         sessionTime={sessionTime}
+        action={
+          <Button
+          icon={<CiExport />}
+          >
+            export report 
+          </Button>
+        }
       />
 
-      <section className="dash-stats">
-        <StatCard
-          title="Total Products"
-          value={loading ? "..." : active.length}
-          description="Products in inventory"
-          icon={<ProductsIcon />}
-          iconStyle="accent"
-        />
+      <StatsContainer>
 
-        <StatCard
-          title="Total Quantity"
-          value={loading ? "..." : totalQuantity}
-          description="Units across all products"
-          icon={<QuantityIcon />}
-          iconStyle="success"
-        />
+        {statsData.map((state) => (
+          <StatCard
+          title={state.title}
+          value={state.value}
+          description={state.description}
+          icon={state.icon}
+          />
+        ))}
+      </StatsContainer>
 
-        <StatCard
-          title="Low Stock"
-          value={loading ? "..." : low.length}
-          description="Products with 1–5 units"
-          icon={<WarningIcon />}
-          iconStyle="gold"
-        />
-
-        <StatCard
-          title="Negative Quantity"
-          value={loading ? "..." : negative.length}
-          description="Products below zero"
-          icon={<AlertIcon />}
-          iconStyle="danger"
-        />
-      </section>
+      <RevenueChart />
 
       <section className="dash-cols">
-        <article className="dash-card">
-          <div className="dash-section-head">
-            <h2>Inventory by Category</h2>
-            <p>Product distribution across categories</p>
-          </div>
 
-          {loading ? (
-            <StateMessage message="Loading categories..." />
-          ) : categories.length === 0 ? (
-            <StateMessage message="No products available." />
-          ) : (
-            <div className="dash-swatches">
-              {categories.map(([category, count]) => (
-                <div className="dash-swatch-row" key={category}>
-                  <span className="dash-swatch-name" title={category}>
-                    {category}
-                  </span>
-
-                  <div className="dash-swatch-track">
-                    <div
-                      className="dash-swatch-fill"
-                      style={{
-                        width: `${(count / maxCategory) * 100}%`,
-                      }}
-                    />
-                  </div>
-
-                  <span className="dash-swatch-count">{count}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </article>
 
         <article className="dash-card">
           <div className="dash-section-head">

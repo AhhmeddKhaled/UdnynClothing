@@ -8,7 +8,6 @@ export default function StatCard({
   value,
   description,
   icon,
-  iconStyle = "accent",
   status,
   rate,
   rateStatus = true
@@ -20,7 +19,7 @@ export default function StatCard({
       <div className="top-card">
         <span className={`card-icon card-icon-${status}`}>{icon}</span>
         <span className={`card-title`}>{title}</span>
-        <span className={`card-rate`}>{rate} {rateStatus ? <GoArrowUpRight size={16} className="icon"/> : <GoArrowDownLeft size={16} className="icon"/>}</span>
+        <span className={`card-rate`}>{rate} {rateStatus ? <GoArrowUpRight size={28} className="icon"/> : <GoArrowDownLeft size={24} className="icon"/>}</span>
       </div>
 
       <h3 className="card-value">{value}</h3>
