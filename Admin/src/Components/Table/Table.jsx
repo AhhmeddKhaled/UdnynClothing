@@ -2,11 +2,13 @@ import { useState, useCallback, useEffect, useRef } from "react";
 import styles from "./Table.module.css";
 import { useOrdersLogic } from "../../UI_Logic/OrdersLogic.jsx";
 
+import { formatID, formatDate } from "../../services/OrdersServices.js";
+
 function getValue(obj, path) {
   return path.split(".").reduce((value, key) => value?.[key], obj);
 }
 
-function formatValue(value, key, formatMoney) {
+function formatValue(value, key) {
   if (value == null) return "--";
 
   const normalizedKey = key.toLowerCase();
@@ -38,13 +40,38 @@ function formatValue(value, key, formatMoney) {
 
   if (typeof value === "object") return JSON.stringify(value);
 
+  if (normalizedKey.includes("_id")) {
+    return formatID(value);
+  }
+
   return value;
 }
+
+
+// function formatTableItem(key, formattedValue) {
+//   switch (key) {
+//     case "status":
+//       return (
+//         <span
+//           className={`order-status order-status-${String(value ?? "")
+//             .toLowerCase()
+//             .replace(/\s+/g, "-")}`}
+//         >
+//           {formattedValue}
+//         </span>
+//       );
+//       break;
+//     case "_id":
+//       return <a href="#">{formattedValue}</a>;
+//       break;
+//     default:
+//       return <span>{formattedValue}</span>;
+//   }
+// }
 
 export default function Table({ tableHeader, tableBody, actions = null }) {
   const [selectedProducts, setSelectedProducts] = useState([]);
   const selectAllRef = useRef(null);
-  const { formatMoney } = useOrdersLogic();
 
   const visibleIds = tableBody.map((item) => String(item.itemId ?? item._id));
 
@@ -130,23 +157,11 @@ export default function Table({ tableHeader, tableBody, actions = null }) {
 
               {tableHeader.map((th) => {
                 const value = getValue(item, th.key);
-                const formattedValue = formatValue(value, th.key, formatMoney);
+                const formattedValue = formatValue(value, th.key);
 
                 return (
                   <td key={th.key}>
-                    {th.key === "status" ? (
-                      <span
-                        className={`order-status order-status-${String(
-                          value ?? "",
-                        )
-                          .toLowerCase()
-                          .replace(/\s+/g, "-")}`}
-                      >
-                        {formattedValue}
-                      </span>
-                    ) : (
-                      <span>{formattedValue}</span>
-                    )}
+                    {formatTableItem(th.key, formattedValue)}
                   </td>
                 );
               })}

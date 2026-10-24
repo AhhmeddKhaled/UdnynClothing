@@ -9,7 +9,7 @@ import { HiOutlineSearch,HiOutlinePlus,HiOutlineArrowLeft,HiOutlineCamera,HiOutl
 import { parseCustomerMessage, normalizePhone, normalizeDigits, isValidPhone,} from "./parseCustomerMessage.js";
 import { findGovernorateOption, getShippingFeeFor } from "./governorates.js";
 import { useOrdersLogic } from "../../../UI_Logic/OrdersLogic.jsx";
-import { PriceType } from "../../../services/OrdersServices.js";
+import { getPriceType, PriceTypesList  } from "../../../services/OrdersServices.js";
 import RealImagePicker from "./RealImagePicker.jsx";
 import BarcodeScanner from "./BarcodeScanner.jsx";
 
@@ -88,7 +88,6 @@ function useToast() {
   return { toast, showToast };
 }
 
-const tabs = ["Retail", "Wholesale", "Offer"];
 
 export default function AddOrder() {
   const logic = useOrdersLogic();
@@ -482,7 +481,7 @@ export default function AddOrder() {
         }
       />
 
-      <Tabs tabs={tabs} />
+      <Tabs tabs={PriceTypesList} />
 
       <Form className={styles['add-order-form']} onSubmit={handleSubmit}>
         <div className={styles['orders-modal-content']}>

@@ -3,210 +3,25 @@ import { authFetch } from "../pages/Login/auth.js";
 import { Audio } from "../services/audio.js";
 
 import {
+  validateOrderForm,
+  getCustomerName,
+  getCustomerPhone,
+  getCustomerEmail,
+  getItemCount,
+  getItemName,
+  getProductPrice,
+  getStockForProduct,
+  formatMoney,
+  formatDate,
+  getOrderSubtotal,
+  getItemLineTotal,
+  getOrderTotal,
+  readResponse,
   STATUSES,
   GOVERNORATES,
   EMPTY_FORM,
 } from "../services/OrdersServices.js";
 
-async function readResponse(response) {
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(
-      data.message || data.error || `Request failed (${response.status})`,
-    );
-  }
-
-  return data;
-}
-
-function getCustomerName(order) {
-  return (
-    order?.customerName ||
-    (order?.customer && typeof order.customer === "object"
-      ? order.customer.name || order.customer.fullName
-      : "") ||
-    "Unknown Customer"
-  );
-}
-
-function getCustomerPhone(order) {
-  return order?.customerPhone || "";
-}
-
-function getCustomerEmail(order) {
-  return order?.customer && typeof order.customer === "object"
-    ? order.customer.email || ""
-    : "";
-}
-
-function getItemCount(order) {
-  return (order?.items || []).reduce(
-    (total, item) => total + Number(item.quantity || 0),
-    0,
-  );
-}
-
-function getItemName(item) {
-  return item?.name || item?.productName || `Item ${item?.itemId || ""}`;
-}
-
-function getProductPrice(product) {
-  const offerPrice = Number(product?.offerPrice || 0);
-  return offerPrice > 0 ? offerPrice : Number(product?.retailPrice || 0);
-}
-
-function getStockForProduct(product) {
-  return Number(product?.qty || 0);
-}
-
-function formatMoney(amount) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "EGP",
-    maximumFractionDigits: 2,
-  }).format(Number(amount || 0));
-}
-
-function formatDate(date) {
-  if (!date) return "—";
-
-  const parsedDate = new Date(date);
-  if (Number.isNaN(parsedDate.getTime())) return "—";
-
-  return parsedDate.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-}
-
-function getOrderSubtotal(order) {
-  if (order?.subtotal != null) {
-    return Number(order.subtotal);
-  }
-
-  return (order?.items || []).reduce(
-    (total, item) =>
-      total +
-      Number(
-        item.lineTotal ??
-          Number(item.unitPrice ?? item.price ?? 0) *
-            Number(item.quantity || 0),
-      ),
-    0,
-  );
-}
-
-function getItemUnitPrice(item, price_type) {
-  if (price_type === "offerPrice") {
-    item.unitPrice = "offerPrice";
-
-  } else if (price_type === "retailPrice") {
-    item.unitPrice = "retailPrice";
-  
-  } else if (price_type === "wholesalePrice") {
-    item.unitPrice = "wholesalePrice";
-  } else {
-    return "type price Invalid"
-  }
-  
-  if (item?.unitPrice != null) return Number(item.unitPrice);
-  if (item?.price != null) return Number(item.price);
-
-  const quantity = Number(item?.quantity || 0);
-
-  return quantity > 0 ? Number(item?.lineTotal || 0) / quantity : 0;
-}
-
-function getItemLineTotal(item) {
-  return Number(
-    item?.lineTotal ??
-      Number(item?.unitPrice ?? item?.price ?? 0) * Number(item?.quantity || 0),
-  );
-}
-
-function getOrderTotal(order) {
-  if (order?.totalAmount != null) {
-    return Number(order.totalAmount);
-  }
-
-  return getOrderSubtotal(order) + Number(order?.shippingCost || 0);
-}
-
-function validateOrderForm(form) {
-  const customerName = form.customerName.trim();
-  const customerPhone = form.customerPhone.trim();
-  const shippingAddress = form.shippingAddress.trim();
-  const shippingCost = Number(form.shippingCost);
-
-  if (!form.governorate) {
-    return "Please select the governorate.";
-  }
-
-  if (!GOVERNORATES.includes(form.governorate)) {
-    return "Please select a valid governorate.";
-  }
-
-  if (!customerName) {
-    return "Please enter the customer's name.";
-  }
-
-  if (customerName.length > 120) {
-    return "Customer name must not exceed 120 characters.";
-  }
-
-  if (!customerPhone) {
-    return "Please enter the customer's phone number.";
-  }
-
-  if (customerPhone.length > 30) {
-    return "Phone number must not exceed 30 characters.";
-  }
-
-  if (!shippingAddress) {
-    return "Please enter the shipping address.";
-  }
-
-  if (shippingAddress.length > 1000) {
-    return "Shipping address must not exceed 1000 characters.";
-  }
-
-  if (!Array.isArray(form.items) || form.items.length === 0) {
-    return "Add at least one product to the order.";
-  }
-
-  if (!Number.isFinite(shippingCost) || shippingCost < 0) {
-    return "Shipping cost must be zero or greater.";
-  }
-
-  if (form.customerNote.trim().length > 2000) {
-    return "Customer note must not exceed 2000 characters.";
-  }
-
-  for (const item of form.items) {
-    if (
-      !Number.isSafeInteger(Number(item.quantity)) ||
-      Number(item.quantity) < 1
-    ) {
-      return `Enter a valid quantity for ${item.name}.`;
-    }
-
-    if (Number(item.quantity) > Number(item.availableStock)) {
-      return `Only ${item.availableStock} unit(s) of ${item.name} are available.`;
-    }
-
-    if (item.realImageFile && !(item.realImageFile instanceof File)) {
-      return `Invalid actual photo for ${item.name}.`;
-    }
-
-    if (item.realImageFile && !item.realImageFile.type.startsWith("image/")) {
-      return `The file selected for ${item.name} is not an image.`;
-    }
-  }
-
-  return "";
-}
 
 export function useOrdersLogic() {
   const [orders, setOrders] = useState([]);
@@ -800,7 +615,6 @@ export function useOrdersLogic() {
     getProductPrice,
     getStockForProduct,
     getOrderSubtotal,
-    getItemUnitPrice,
     getItemLineTotal,
     getOrderTotal,
     formatMoney,
