@@ -130,6 +130,43 @@ td {
   border-color: var(--color-line);
 }
 
+
+/* Order Status Background  */
+.pending {
+  color: var(--status-pending);
+  background: var(--status-pending-bg);
+}
+
+.confirmed {
+  color: var(--status-confirmed);
+  background: var(--status-confirmed-bg);
+}
+
+.preparing {
+  color: var(--status-preparing);
+  background: var(--status-preparing-bg);
+}
+
+.shipping {
+  color: var(--status-shipping);
+  background-color: var(--status-shipping-bg);
+}
+
+.delivered {
+  color: var(--status-delivered);
+  background: var(--status-delivered-bg);
+}
+
+.cancelled {
+  color: var(--status-cancelled);
+  background: var(--status-cancelled-bg);
+}
+
+.returned {
+  color: var(--status-returned);
+  background: var(--status-returned-bg);
+}
+
 /* Common cards (tokens already switch with the theme, no dark-only overrides needed) */
 
 [data-theme="dark"] option {

@@ -48,26 +48,26 @@ function formatValue(value, key) {
 }
 
 
-// function formatTableItem(key, formattedValue) {
-//   switch (key) {
-//     case "status":
-//       return (
-//         <span
-//           className={`order-status order-status-${String(value ?? "")
-//             .toLowerCase()
-//             .replace(/\s+/g, "-")}`}
-//         >
-//           {formattedValue}
-//         </span>
-//       );
-//       break;
-//     case "_id":
-//       return <a href="#">{formattedValue}</a>;
-//       break;
-//     default:
-//       return <span>{formattedValue}</span>;
-//   }
-// }
+function formatTableItem(key, formattedValue) {
+  switch (key) {
+    case "status":
+      return (
+        <span
+          className={`order-status order-status-${String(key ?? "")
+            .toLowerCase()
+            .replace(/\s+/g, "-")}`}
+        >
+          {formattedValue}
+        </span>
+      );
+      break;
+    case "_id":
+      return <a href="#">{formattedValue}</a>;
+      break;
+    default:
+      return <span>{formattedValue}</span>;
+  }
+}
 
 export default function Table({ tableHeader, tableBody, actions = null }) {
   const [selectedProducts, setSelectedProducts] = useState([]);

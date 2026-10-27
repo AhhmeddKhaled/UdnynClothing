@@ -85,7 +85,7 @@
 }
 
 .orders-modal-header .order-details-id {
-  color: var(--color-plum);
+  color: var(--color-ink);
   font-size: var(--text-xl);
   text-transform: capitalize;
 }

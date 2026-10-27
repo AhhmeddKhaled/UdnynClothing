@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { authFetch } from "../pages/Login/auth.js";
+import { authFetch } from "../services/UsersServices.js";
 
 export function useUsersLogic() {
   const [users, setUsers] = useState(null);

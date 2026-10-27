@@ -1,0 +1,101 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "search": "Search",
+    "loading": "Loading..."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "View all statistics in one place.",
+    "exportReport": "Export report",
+    "totalProducts": "Total Products",
+    "productsInInventory": "Products in inventory",
+    "totalQuantity": "Total Quantity",
+    "unitsAcrossProducts": "Units across all products",
+    "lowStock": "Low Stock",
+    "productsWithLowStock": "Products with 1–5 units",
+    "negativeQuantity": "Negative Quantity",
+    "productsBelowZero": "Products below zero",
+    "loadError": "Couldn't load dashboard data",
+    "tryAgain": "Try again",
+    "imageCoverage": "Product Image Coverage",
+    "productsWithImages": "Products with images in the catalog",
+    "coverage": "Coverage",
+    "withImages": "With images",
+    "missingImages": "Missing images",
+    "missingCategories": "Missing categories",
+    "manufacturers": "Manufacturers",
+    "productCountByManufacturer": "Product count by manufacturer",
+    "manufacturer": "Manufacturer",
+    "products": "Products",
+    "distribution": "Distribution",
+    "inventoryAlerts": "Inventory Alerts",
+    "attentionRequired": "Data that may need your attention",
+    "negativeQuantities": "Negative quantities",
+    "lowStockDescription": "Products with 1–5 units remaining",
+    "negativeQuantityDescription": "Products with quantity below zero",
+    "productsWithoutImage": "Products without an image",
+    "productsWithoutCategory": "Products without a category",
+    "loadingImageData": "Loading image data...",
+    "loadingManufacturers": "Loading manufacturers...",
+    "noManufacturerData": "No manufacturer information available.",
+    "checkingInventory": "Checking inventory..."
+  },
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "availableStock": "Available Stock",
+    "products": "Products",
+    "catalog": "Catalog",
+    "users": "Users",
+    "orders": "Orders",
+    "allOrders": "All Orders",
+    "addOrder": "Add Order",
+    "adminPanel": "Admin panel",
+    "switchToLightMode": "Switch to light mode",
+    "switchToDarkMode": "Switch to dark mode",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "closeNavigation": "Close navigation menu",
+    "mainNavigation": "Main navigation",
+    "user": "User",
+    "admin": "Admin",
+    "loggedInAt": "Logged in at",
+    "loginTimeUnavailable": "Login time unavailable",
+    "switchLanguage": "Switch language",
+    "settings": "Settings",
+    "logout": "Log out"
+  },
+  "products": {
+    "title": "Products",
+    "addProduct": "Add Product",
+    "productName": "Product Name",
+    "price": "Price",
+    "quantity": "Quantity"
+  },
+  "orders": {
+    "title": "Orders",
+    "addOrder": "Add Order",
+    "orderNumber": "Order Number",
+    "customerName": "Customer Name",
+    "total": "Total"
+  },
+  "users": {
+    "title": "Users",
+    "addUser": "Add User",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role"
+  },
+  "login": {
+    "title": "Login",
+    "subtitle": "Udnyn Dashboard",
+    "email": "Email address",
+    "password": "Password",
+    "loading": "Logging in...",
+    "submit": "Sign in"
+  },
+  "toolbar": {
+    "search": "Search for anything"
+  }
+}

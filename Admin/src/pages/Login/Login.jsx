@@ -1,21 +1,28 @@
+
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { login } from "./auth";
+import { login, HomeRedirect } from "../../services/UsersServices.js";
+import { useLanguage } from "../../context/LanguageContext";
+
 import "./Login.css";
 
-// onSuccess: دالة بتتنفذ بعد نجاح الدخول (مثلاً تحويل المستخدم للوحة الأدمن)
-export default function Login({ onSuccess }) {
+export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const navigate = useNavigate();
+  const { t, language } = useLanguage();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
+
     try {
-      const user = await login(email, password);
-      onSuccess?.(user);
+      await login(email, password);
+      navigate(HomeRedirect(), { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -24,13 +31,19 @@ export default function Login({ onSuccess }) {
   };
 
   return (
-    <div className="login-wrap" dir="rtl">
+    <div
+      className="login-wrap"
+      dir={language === "ar" ? "rtl" : "ltr"}
+    >
       <form className="login-card" onSubmit={handleSubmit}>
-        <h1>تسجيل الدخول</h1>
-        <p className="login-sub">لوحة تحكم أدنين</p>
+        <h1>{t("login", "title")}</h1>
+
+        <p className="login-sub">
+          {t("login", "subtitle")}
+        </p>
 
         <label>
-          البريد الإلكتروني
+          {t("login", "email")}
           <input
             type="email"
             value={email}
@@ -41,7 +54,7 @@ export default function Login({ onSuccess }) {
         </label>
 
         <label>
-          كلمة المرور
+          {t("login", "password")}
           <input
             type="password"
             value={password}
@@ -53,7 +66,9 @@ export default function Login({ onSuccess }) {
         {error && <p className="login-error">{error}</p>}
 
         <button type="submit" disabled={loading}>
-          {loading ? "جارِ الدخول..." : "دخول"}
+          {loading
+            ? t("login", "loading")
+            : t("login", "submit")}
         </button>
       </form>
     </div>

@@ -1,35 +1,38 @@
 import "./Dashboard.css";
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { authFetch } from "../Login/auth.js";
-import { useDashboardLogic } from "../../UI_Logic/DashboardLogic.jsx";
 
-// Import Icons 
+import { authFetch } from "../../services/UsersServices.js";
+import { useDashboardLogic } from "../../UI_Logic/DashboardLogic.jsx";
+import { useLanguage } from "../../context/LanguageContext.jsx";
+
+// Import Icons
 import { CiExport } from "react-icons/ci";
 
-// Import Components 
+// Import Components
 import Button from "../../Components/Button/Button";
 import ContentHeader from "../../Components/ContentHeader/ContentHeader.jsx";
 import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner.jsx";
-import StatCard from '../../Components/StatCard/StatCard';
+import StatCard from "../../Components/StatCard/StatCard";
 import StatsContainer from "../../Components/StatCard/StatsContainer";
 import RevenueChart from "../../Components/Charts/DashboardChart";
 
 export default function Dashboard() {
   const { user } = useOutletContext();
+  const { language, t } = useLanguage();
+
   const [sessionTime, setSessionTime] = useState("");
 
- 
   useEffect(() => {
     const now = new Date();
 
     setSessionTime(
-      now.toLocaleTimeString([], {
+      now.toLocaleTimeString(language === "ar" ? "ar-EG" : "en-US", {
         hour: "2-digit",
         minute: "2-digit",
-      }),
+      })
     );
-  }, []);
+  }, [language]);
 
   const {
     loading,
@@ -50,102 +53,110 @@ export default function Dashboard() {
     missingDataTotal,
   } = useDashboardLogic(authFetch);
 
-   const statsData = [
+  const statsData = [
     {
-      title: "Total Products",
+      title: t("dashboard", "totalProducts"),
       value: loading ? "..." : active.length,
-      description: "Products in inventory",
-      icon: <ProductsIcon size={32}/>
+      description: t("dashboard", "productsInInventory"),
+      icon: <ProductsIcon size={32} />,
     },
     {
-      title: "Total Quantity",
-          value: loading ? "..." : totalQuantity ,
-          description:"Units across all products",
-          icon: <QuantityIcon /> 
+      title: t("dashboard", "totalQuantity"),
+      value: loading ? "..." : totalQuantity,
+      description: t("dashboard", "unitsAcrossProducts"),
+      icon: <QuantityIcon />,
     },
     {
-       title:"Low Stock",
-          value: loading ? "..." : low.length ,
-          description:"Products with 1–5 units",
-          icon: <WarningIcon /> 
+      title: t("dashboard", "lowStock"),
+      value: loading ? "..." : low.length,
+      description: t("dashboard", "productsWithLowStock"),
+      icon: <WarningIcon />,
     },
     {
-      title:"Negative Quantity",
-          value: loading ? "..." : negative.length ,
-          description:"Products below zero",
-          icon: <AlertIcon /> 
-    }
-
-  ]
+      title: t("dashboard", "negativeQuantity"),
+      value: loading ? "..." : negative.length,
+      description: t("dashboard", "productsBelowZero"),
+      icon: <AlertIcon />,
+    },
+  ];
 
   // Loading
-  if (loading) return <LoadingSpinner />;
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
-  // Error 
+  // Error
   if (error) {
     return (
-      <div className="dash-state">
-        <b>Couldn't load dashboard data</b>
+      <div
+        className="dash-state"
+        dir={language === "ar" ? "rtl" : "ltr"}
+      >
+        <b>{t("dashboard", "loadError")}</b>
         <p>{error}</p>
+
         <button
           type="button"
           className="dash-btn dash-btn-primary dash-retry-btn"
           onClick={load}
-          >
-          Try again
+        >
+          {t("dashboard", "tryAgain")}
         </button>
       </div>
     );
-}
+  }
 
-  
   return (
-    <div className="dashboard">
+    <div
+      className="dashboard"
+      dir={language === "ar" ? "rtl" : "ltr"}
+    >
       <ContentHeader
-        title="Dashboard"
-        subTitle="View all statistics in one place."
+        title={t("dashboard", "title")}
+        subTitle={t("dashboard", "subtitle")}
         user={user}
         sessionTime={sessionTime}
         action={
-          <Button
-          icon={<CiExport />}
-          >
-            export report 
+          <Button icon={<CiExport />}>
+            {t("dashboard", "exportReport")}
           </Button>
         }
       />
 
+      {/* Statistics */}
       <StatsContainer>
-
-        {statsData.map((state) => (
+        {statsData.map((stat) => (
           <StatCard
-          title={state.title}
-          value={state.value}
-          description={state.description}
-          icon={state.icon}
+            key={stat.title}
+            title={stat.title}
+            value={stat.value}
+            description={stat.description}
+            icon={stat.icon}
           />
         ))}
       </StatsContainer>
 
+      {/* Revenue Chart */}
       <RevenueChart />
 
+      {/* Product Image Coverage */}
       <section className="dash-cols">
-
-
         <article className="dash-card">
           <div className="dash-section-head">
-            <h2>Product Image Coverage</h2>
-            <p>Products with images in the catalog</p>
+            <h2>{t("dashboard", "imageCoverage")}</h2>
+            <p>{t("dashboard", "productsWithImages")}</p>
           </div>
 
           {loading ? (
-            <StateMessage message="Loading image data..." />
+            <StateMessage
+              message={t("dashboard", "loadingImageData")}
+            />
           ) : (
             <div className="dash-ring-box">
               <div
                 className="dash-ring"
                 role="img"
-                aria-label={`Image coverage ${photoPercentage}%`}
+                aria-label={`${t("dashboard", "imageCoverage")} ${photoPercentage}%`}
               >
                 <svg viewBox="0 0 120 120" aria-hidden="true">
                   <circle
@@ -172,26 +183,26 @@ export default function Dashboard() {
 
                 <div className="dash-ring-center">
                   <strong>{photoPercentage}%</strong>
-                  <span>Coverage</span>
+                  <span>{t("dashboard", "coverage")}</span>
                 </div>
               </div>
 
               <div className="dash-ring-label">
                 <div className="dash-coverage-row">
                   <span className="dash-coverage-dot dash-coverage-good" />
-                  <span>With images</span>
+                  <span>{t("dashboard", "withImages")}</span>
                   <b>{withImage}</b>
                 </div>
 
                 <div className="dash-coverage-row">
                   <span className="dash-coverage-dot dash-coverage-missing" />
-                  <span>Missing images</span>
+                  <span>{t("dashboard", "missingImages")}</span>
                   <b>{noImage.length}</b>
                 </div>
 
                 <div className="dash-coverage-row">
                   <span className="dash-coverage-dot dash-coverage-category" />
-                  <span>Missing categories</span>
+                  <span>{t("dashboard", "missingCategories")}</span>
                   <b>{noCategory.length}</b>
                 </div>
               </div>
@@ -200,25 +211,33 @@ export default function Dashboard() {
         </article>
       </section>
 
+      {/* Manufacturers and Inventory Alerts */}
       <section className="dash-cols dash-cols-bottom">
+        {/* Manufacturers */}
         <article className="dash-card">
           <div className="dash-section-head">
-            <h2>Manufacturers</h2>
-            <p>Product count by manufacturer</p>
+            <h2>{t("dashboard", "manufacturers")}</h2>
+            <p>{t("dashboard", "productCountByManufacturer")}</p>
           </div>
 
           {loading ? (
-            <StateMessage message="Loading manufacturers..." />
+            <StateMessage
+              message={t("dashboard", "loadingManufacturers")}
+            />
           ) : manufacturers.length === 0 ? (
-            <StateMessage message="No manufacturer information available." />
+            <StateMessage
+              message={t("dashboard", "noManufacturerData")}
+            />
           ) : (
             <div className="dash-table-wrap">
               <table className="dash-table">
                 <thead>
                   <tr>
-                    <th>Manufacturer</th>
-                    <th className="dash-table-number">Products</th>
-                    <th>Distribution</th>
+                    <th>{t("dashboard", "manufacturer")}</th>
+                    <th className="dash-table-number">
+                      {t("dashboard", "products")}
+                    </th>
+                    <th>{t("dashboard", "distribution")}</th>
                   </tr>
                 </thead>
 
@@ -226,13 +245,19 @@ export default function Dashboard() {
                   {manufacturers.map(([manufacturer, count]) => (
                     <tr key={manufacturer}>
                       <td>{manufacturer}</td>
+
                       <td className="dash-table-number">{count}</td>
+
                       <td>
                         <div className="dash-table-track">
                           <div
                             className="dash-table-fill"
                             style={{
-                              width: `${(count / manufacturers[0][1]) * 100}%`,
+                              width: `${
+                                manufacturers[0][1] > 0
+                                  ? (count / manufacturers[0][1]) * 100
+                                  : 0
+                              }%`,
                             }}
                           />
                         </div>
@@ -245,40 +270,46 @@ export default function Dashboard() {
           )}
         </article>
 
+        {/* Inventory Alerts */}
         <article className="dash-card">
           <div className="dash-section-head">
-            <h2>Inventory Alerts</h2>
-            <p>Data that may need your attention</p>
+            <h2>{t("dashboard", "inventoryAlerts")}</h2>
+            <p>{t("dashboard", "attentionRequired")}</p>
           </div>
 
           {loading ? (
-            <StateMessage message="Checking inventory..." />
+            <StateMessage
+              message={t("dashboard", "checkingInventory")}
+            />
           ) : (
             <div className="dash-alert-list">
               <AlertRow
-                title="Low stock"
-                description="Products with 1–5 units remaining"
+                title={t("dashboard", "lowStock")}
+                description={t("dashboard", "lowStockDescription")}
                 count={low.length}
                 variant="gold"
               />
 
               <AlertRow
-                title="Negative quantities"
-                description="Products with quantity below zero"
+                title={t("dashboard", "negativeQuantities")}
+                description={t(
+                  "dashboard",
+                  "negativeQuantityDescription"
+                )}
                 count={negative.length}
                 variant="danger"
               />
 
               <AlertRow
-                title="Missing images"
-                description="Products without an image"
+                title={t("dashboard", "missingImages")}
+                description={t("dashboard", "productsWithoutImage")}
                 count={noImage.length}
                 variant="neutral"
               />
 
               <AlertRow
-                title="Missing categories"
-                description="Products without a category"
+                title={t("dashboard", "missingCategories")}
+                description={t("dashboard", "productsWithoutCategory")}
                 count={noCategory.length}
                 variant="accent"
               />
@@ -288,10 +319,7 @@ export default function Dashboard() {
       </section>
     </div>
   );
-
 }
-
-
 
 function AlertRow({ title, description, count, variant }) {
   return (
@@ -301,7 +329,9 @@ function AlertRow({ title, description, count, variant }) {
         <p>{description}</p>
       </div>
 
-      <span className={`dash-badge dash-badge-${variant}`}>{count}</span>
+      <span className={`dash-badge dash-badge-${variant}`}>
+        {count}
+      </span>
     </div>
   );
 }

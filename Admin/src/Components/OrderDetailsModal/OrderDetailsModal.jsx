@@ -23,9 +23,11 @@ export default function OrderDetailsModal({ order, logic }) {
 
   if (!order) return null;
 
-  console.log(order)
   const {
     setSelectedOrder,
+
+    changeOrderStatus,
+    setChangeOderStatus,
     getCustomerName,
     getCustomerPhone,
     getCustomerEmail,
@@ -37,9 +39,13 @@ export default function OrderDetailsModal({ order, logic }) {
     formatMoney,
     formatDate,
     statuses,
+    getPriceType
   } = logic;
 
-  const onClose = () => setSelectedOrder(null);
+  const onCloseOrder = () => setSelectedOrder(null);
+
+  const onCloseChangeOrder = () => setChangeOderStatus(!changeOrderStatus)
+
 
   return (
     <div className="orders-modal-backdrop">
@@ -53,7 +59,6 @@ export default function OrderDetailsModal({ order, logic }) {
           <div className="orders-modal-header-top">
             <span className="orders-eyebrow">ORDER DETAILS</span>
 
-            <Button variant="close"></Button>
           </div>
 
           <div className="orders-modal-header-bottom">
@@ -62,13 +67,21 @@ export default function OrderDetailsModal({ order, logic }) {
             </h2>
 
             <div className="orders-modal-header-status">
-              <OrderStatus status={orderStatus} change/>
+              
+              <OrderStatus 
+              status={orderStatus} 
+              change
+              onClose={onCloseChangeOrder}
+              />
 
+              {changeOrderStatus &&
               <ChangeOrderStatus
                 status={orderStatus}
                 id={order._id}
                 onStatusUpdated={setOrderStatus}
-              />
+                onClose={onCloseChangeOrder}
+              />}
+              
             </div>
 
             <div className="orders-modal-header-date">
@@ -124,7 +137,7 @@ export default function OrderDetailsModal({ order, logic }) {
 
                   <span className="orders-detail-item-info-unitPrice">
                     <TbBrandCashapp size={16} />{" "}
-                    {formatMoney(getItemUnitPrice(item,"wholesalePrice"))}
+                    {formatMoney(getPriceType(item,"wholesalePrice"))}
                   </span>
                 </div>
 
@@ -159,7 +172,7 @@ export default function OrderDetailsModal({ order, logic }) {
           <button
             type="button"
             className="orders-close-button"
-            onClick={onClose}
+            onClick={onCloseOrder}
           >
             Close
           </button>

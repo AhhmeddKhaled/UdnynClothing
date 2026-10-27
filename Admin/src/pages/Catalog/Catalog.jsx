@@ -1,7 +1,7 @@
 
 import "./Catalog.css";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { authFetch } from "../Login/auth.js";
+import { authFetch } from "../../services/UsersServices.js";
 
 const API_URL = (
   import.meta.env.VITE_API_URL || "http://localhost:5000"

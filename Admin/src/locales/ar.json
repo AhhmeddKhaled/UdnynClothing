@@ -1,0 +1,101 @@
+{
+  "common": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "search": "بحث",
+    "loading": "جاري التحميل"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "subtitle": "اعرض كل الإحصائيات في مكان واحد.",
+    "exportReport": "تصدير التقرير",
+    "totalProducts": "إجمالي المنتجات",
+    "productsInInventory": "المنتجات الموجودة في المخزون",
+    "totalQuantity": "إجمالي الكمية",
+    "unitsAcrossProducts": "إجمالي الوحدات في كل المنتجات",
+    "lowStock": "مخزون منخفض",
+    "productsWithLowStock": "منتجات يتبقى منها من 1 إلى 5 وحدات",
+    "negativeQuantity": "كمية سالبة",
+    "productsBelowZero": "منتجات كميتها أقل من صفر",
+    "loadError": "تعذر تحميل بيانات لوحة التحكم",
+    "tryAgain": "حاول مرة أخرى",
+    "imageCoverage": "تغطية صور المنتجات",
+    "productsWithImages": "المنتجات التي تحتوي على صور في الكتالوج",
+    "coverage": "نسبة التغطية",
+    "withImages": "بها صور",
+    "missingImages": "صور مفقودة",
+    "missingCategories": "تصنيفات مفقودة",
+    "manufacturers": "الشركات المصنعة",
+    "productCountByManufacturer": "عدد المنتجات حسب الشركة المصنعة",
+    "manufacturer": "الشركة المصنعة",
+    "products": "المنتجات",
+    "distribution": "التوزيع",
+    "inventoryAlerts": "تنبيهات المخزون",
+    "attentionRequired": "بيانات قد تحتاج إلى مراجعتك",
+    "negativeQuantities": "كميات سالبة",
+    "lowStockDescription": "منتجات يتبقى منها من 1 إلى 5 وحدات",
+    "negativeQuantityDescription": "منتجات كميتها أقل من صفر",
+    "productsWithoutImage": "منتجات بدون صور",
+    "productsWithoutCategory": "منتجات بدون تصنيف",
+    "loadingImageData": "جارٍ تحميل بيانات الصور...",
+    "loadingManufacturers": "جارٍ تحميل الشركات المصنعة...",
+    "noManufacturerData": "لا توجد بيانات متاحة عن الشركات المصنعة.",
+    "checkingInventory": "جارٍ فحص المخزون..."
+  },
+  "sidebar": {
+    "dashboard": "لوحة التحكم",
+    "availableStock": "المخزون المتاح",
+    "products": "المنتجات",
+    "catalog": "الكتالوج",
+    "users": "المستخدمون",
+    "orders": "الطلبات",
+    "allOrders": "كل الطلبات",
+    "addOrder": "إضافة طلب",
+    "adminPanel": "لوحة الإدارة",
+    "switchToLightMode": "التبديل إلى الوضع الفاتح",
+    "switchToDarkMode": "التبديل إلى الوضع الداكن",
+    "openMenu": "فتح القائمة",
+    "closeMenu": "إغلاق القائمة",
+    "closeNavigation": "إغلاق قائمة التنقل",
+    "mainNavigation": "القائمة الرئيسية",
+    "user": "مستخدم",
+    "admin": "مدير",
+    "loggedInAt": "تم تسجيل الدخول في",
+    "loginTimeUnavailable": "وقت تسجيل الدخول غير متاح",
+    "switchLanguage": "تغيير اللغة",
+    "settings": "الإعدادات",
+    "logout": "تسجيل الخروج"
+  },
+  "products": {
+    "title": "المنتجات",
+    "addProduct": "إضافة منتج",
+    "productName": "اسم المنتج",
+    "price": "السعر",
+    "quantity": "الكمية"
+  },
+  "orders": {
+    "title": "الطلبات",
+    "addOrder": "إضافة طلب",
+    "orderNumber": "رقم الطلب",
+    "customerName": "اسم العميل",
+    "total": "الإجمالي"
+  },
+  "users": {
+    "title": "المستخدمون",
+    "addUser": "إضافة مستخدم",
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "role": "الصلاحية"
+  },
+  "login": {
+    "title": "تسجيل الدخول",
+    "subtitle": "لوحة تحكم يدنين",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "loading": "جارِ الدخول...",
+    "submit": "دخول"
+  },
+  "toolbar": {
+    "search": "ابحث عن أي شيء"
+  }
+}

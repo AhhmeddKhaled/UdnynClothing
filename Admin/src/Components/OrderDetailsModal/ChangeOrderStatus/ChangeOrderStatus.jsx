@@ -10,15 +10,20 @@ import useUpdateData from "../../../Hooks/useUpdateData";
 import { GoDotFill } from "react-icons/go";
 import { HiArrowLongRight } from "react-icons/hi2";
 
-export default function ChangeOrderStatus({ status, id, onStatusUpdated }) {
-  const { updateStatus, isUpdating, error } = useUpdateData(id);
+export default function ChangeOrderStatus({
+  status,
+  id,
+  onStatusUpdated,
+  onClose,
+}) {
+  const { updateStatus, isUpdating, error, loading } = useUpdateData(id);
 
   const handleStatusChange = async (
     newStatus,
     isCurrentStatus,
     canTransitions,
   ) => {
-    if ((!isCurrentStatus && canTransitions)) {
+    if (!isCurrentStatus && canTransitions) {
       try {
         const data = await updateStatus(newStatus);
 
@@ -27,6 +32,8 @@ export default function ChangeOrderStatus({ status, id, onStatusUpdated }) {
         console.error("Update error:", err);
       }
     }
+
+    onClose();
   };
 
   return (
@@ -52,7 +59,9 @@ export default function ChangeOrderStatus({ status, id, onStatusUpdated }) {
               ${canTransitions ? "transition" : "notTransition"}
               `}
               key={i}
-              onClick={() => handleStatusChange(st,isCurrentStatus,canTransitions)}
+              onClick={() =>
+                handleStatusChange(st, isCurrentStatus, canTransitions)
+              }
             >
               <span className="change-order-status-item-dot">
                 <GoDotFill />
@@ -60,7 +69,7 @@ export default function ChangeOrderStatus({ status, id, onStatusUpdated }) {
 
               <div className="change-order-status-item-text">
                 <span className="change-order-status-item-text-status">
-                  {st}
+                  {loading && canTransitions ? "Loading..." : st}
                 </span>
 
                 <span className="change-order-status-item-text-des">

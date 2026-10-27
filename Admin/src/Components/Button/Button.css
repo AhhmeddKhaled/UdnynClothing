@@ -87,6 +87,7 @@
   display: inline-flex;
   padding: 0;
   background-color: inherit;
+  cursor: pointer;
 }
 
 /* Close  */

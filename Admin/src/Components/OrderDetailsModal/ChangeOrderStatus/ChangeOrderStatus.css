@@ -75,6 +75,10 @@
     cursor: not-allowed;
   }
   
+  .currentStatus {
+    cursor: not-allowed;
+  }
+
   .change-order-status-item-pending .change-order-status-item-dot {
     color: var(--status-pending);
   }

@@ -1,0 +1,14 @@
+.orderStatus {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-xl);
+  font-size: var(--text-sm);
+  font-weight: bold;
+  text-transform: capitalize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.change {
+  cursor: pointer;
+}

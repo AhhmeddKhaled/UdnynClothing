@@ -1,15 +1,12 @@
 import { useEffect } from "react";
-import {
-  Routes,
-  Route,
-  Navigate,
-  useLocation,
-} from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 import Login from "./pages/Login/Login.jsx";
 import Layout from "./Layout/Layout.jsx";
 import ProtectedRoute from "./Layout/ProtectedRoute.jsx";
-import { getUser } from "./pages/Login/auth.js";
+
+// Import Logic
+import { getRole, HomeRedirect } from "./services/UsersServices.js";
 
 import Dashboard from "./pages/Dashboard/Dashboard.jsx";
 import AvailableStock from "./pages/AvailableStock/AvailableStock.jsx";
@@ -36,37 +33,28 @@ function PageTitle() {
       "/login": "Udnyn Login",
     };
 
-    document.title =
-      titles[location.pathname] || "Udnyn Dashboard";
+    document.title = titles[location.pathname] || "Udnyn Dashboard";
   }, [location.pathname]);
 
   return null;
 }
 
-// Admin-only pages
-function AdminOnly({ children }) {
-  const user = getUser();
-  const role = String(user?.role || "").toLowerCase();
 
-  if (role !== "admin") {
+function AdminOnly({ children }) {
+  const role = getRole();
+
+  if (role === "admin") {
+    return children;
+  }
+
+  if (role === "moderator") {
     return <Navigate to="/orders/new" replace />;
   }
 
-  return children;
+  return <Navigate to="/login" replace />;
 }
 
 // Redirect users based on role
-function HomeRedirect() {
-  const user = getUser();
-  const role = String(user?.role || "").toLowerCase();
-
-  return (
-    <Navigate
-      to={role === "admin" ? "/dashboard" : "/orders/new"}
-      replace
-    />
-  );
-}
 
 function App() {
   return (
@@ -77,22 +65,7 @@ function App() {
         {/* Login */}
         <Route
           path="/login"
-          element={
-            <Login
-              onSuccess={() => {
-                const user = getUser();
-                const role = String(
-                  user?.role || ""
-                ).toLowerCase();
-
-                window.location.replace(
-                  role === "admin"
-                    ? "/dashboard"
-                    : "/orders/new"
-                );
-              }}
-            />
-          }
+          element={<Login />}
         />
 
         {/* Protected application layout */}
@@ -105,7 +78,7 @@ function App() {
           }
         >
           {/* Home redirect */}
-          <Route index element={<HomeRedirect />} />
+          <Route index element={HomeRedirect()} />
 
           {/* Admin-only pages */}
           <Route
@@ -154,22 +127,13 @@ function App() {
           />
 
           {/* Orders available to authenticated users */}
-          <Route
-            path="orders"
-            element={<Orders />}
-          />
+          <Route path="orders" element={<Orders />} />
 
-          <Route
-            path="orders/new"
-            element={<AddOrder />}
-          />
+          <Route path="orders/new" element={<AddOrder />} />
         </Route>
 
         {/* Unknown routes */}
-        <Route
-          path="*"
-          element={<HomeRedirect />}
-        />
+        <Route path="*" element={HomeRedirect()} />
       </Routes>
     </>
   );

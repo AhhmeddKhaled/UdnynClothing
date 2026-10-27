@@ -11,7 +11,7 @@ import {
 } from "recharts";
 
 import { useDashboardLogic } from "../../UI_Logic/DashboardLogic";
-import { authFetch } from "../../pages/Login/auth.js";
+import { authFetch } from "../../services/UsersServices.js";
 
 export default function RevenueChart() {
   const { categories } = useDashboardLogic(authFetch);

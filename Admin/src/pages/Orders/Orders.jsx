@@ -327,7 +327,7 @@ export default function Orders() {
       </section>
 
       {selectedOrder && (
-        <OrderDetailsModal order={selectedOrder} logic={logic} />
+        <OrderDetailsModal order={selectedOrder} logic={logic}/>
       )}
     </section>
   );

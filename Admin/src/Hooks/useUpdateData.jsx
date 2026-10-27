@@ -1,16 +1,20 @@
 import { useState } from "react";
-import { getToken } from "../pages/Login/auth.js";
+import { getToken } from "../services/UsersServices.js";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function useUpdateData(id) {
   const [isUpdating, setIsUpdating] = useState(false);
+
   const [error, setError] = useState(null);
+
+  const [loading, setLoading] = useState(false);
 
   const updateStatus = async (newStatus) => {
     try {
       setIsUpdating(true);
       setError(null);
+      setLoading(true);
 
       const response = await fetch(`${API_URL}/api/orders/${id}/status`, {
         method: "PATCH",
@@ -24,6 +28,7 @@ export default function useUpdateData(id) {
       if (!response.ok) {
         if (!response.ok) {
           const errorData = await response.json().catch(() => null);
+          setLoading(false);
 
           console.error("Server error:", errorData);
 
@@ -46,5 +51,5 @@ export default function useUpdateData(id) {
     }
   };
 
-  return { updateStatus, isUpdating, error };
+  return { updateStatus, isUpdating, error, loading };
 }

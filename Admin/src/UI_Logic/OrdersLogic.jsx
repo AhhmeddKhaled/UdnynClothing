@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { authFetch } from "../pages/Login/auth.js";
+import { authFetch } from "../services/UsersServices.js";
 import { Audio } from "../services/audio.js";
 
 import {
@@ -14,6 +14,7 @@ import {
   formatMoney,
   formatDate,
   getOrderSubtotal,
+  getPriceType,
   getItemLineTotal,
   getOrderTotal,
   readResponse,
@@ -40,6 +41,8 @@ export function useOrdersLogic() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState(null);
+
+  const [changeOrderStatus, setChangeOderStatus] = useState(false);
 
   const [showAddOrder, setShowAddOrder] = useState(false);
   const [form, setForm] = useState({ ...EMPTY_FORM });
@@ -576,8 +579,13 @@ export function useOrdersLogic() {
     setSearch,
     statusFilter,
     setStatusFilter,
+
     selectedOrder,
     setSelectedOrder,
+    
+    changeOrderStatus,
+    setChangeOderStatus,
+
     clearFilters,
     hasActiveFilters,
     refreshOrders,
@@ -614,6 +622,7 @@ export function useOrdersLogic() {
     getItemName,
     getProductPrice,
     getStockForProduct,
+    getPriceType,
     getOrderSubtotal,
     getItemLineTotal,
     getOrderTotal,
