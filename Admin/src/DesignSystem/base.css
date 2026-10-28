@@ -62,11 +62,14 @@ a:focus-visible {
 }
 
 /* Inputs */
-
 input,
 select,
 textarea {
   border: 1px solid var(--color-line);
+  min-height: 40px;
+  background-color: inherit;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
   transition: background-color var(--dur-fast) ease;
   background-color: transparent;
   &:hover {
@@ -75,6 +78,15 @@ textarea {
 }
 
 input::placeholder,
+select {
+  min-width: 220px;
+}
+
+input,
+label {
+  cursor: pointer;
+}
+
 textarea::placeholder {
   color: var(--color-muted);
   font-size: var(--text-sm);
@@ -95,22 +107,10 @@ textarea:focus-visible {
   outline-offset: 1px;
 }
 
-input,
-select,
-textarea {
-  min-height: 40px;
-  background-color: inherit;
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-md);
-}
-
-select {
-  min-width: 220px;
-}
-
-input,
-label {
-  cursor: pointer;
+input[type="submit"] {
+  background-color: var(--color-accent);
+  color: var(--color-paper);
+  font-weight: bold;
 }
 
 svg {

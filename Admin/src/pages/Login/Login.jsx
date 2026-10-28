@@ -1,10 +1,19 @@
-
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { login, HomeRedirect } from "../../services/UsersServices.js";
-import { useLanguage } from "../../context/LanguageContext";
 
 import "./Login.css";
+
+// IMPORT UI COMPONENTS
+import { login, HomeRedirect } from "../../services/UsersServices.js";
+
+// IMPORT LOGIN SERVICES
+import { useLanguage } from "../../context/LanguageContext";
+
+import {
+  Form,
+  FieldInputGroup,
+  FieldSelectGroup,
+} from "../../Components/Form/Form";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -13,9 +22,13 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+
   const { t, language } = useLanguage();
 
   const handleSubmit = async (e) => {
+    console.log("Email:", JSON.stringify(email));
+    console.log("Password length:", password.length);
+
     e.preventDefault();
     setError("");
     setLoading(true);
@@ -31,46 +44,58 @@ export default function Login() {
   };
 
   return (
-    <div
-      className="login-wrap"
-      dir={language === "ar" ? "rtl" : "ltr"}
-    >
-      <form className="login-card" onSubmit={handleSubmit}>
+    <div className="login-wrap" dir={language === "ar" ? "rtl" : "ltr"}>
+      <Form onSubmit={handleSubmit}>
         <h1>{t("login", "title")}</h1>
 
-        <p className="login-sub">
-          {t("login", "subtitle")}
-        </p>
+        <FieldInputGroup
+          label={{
+            name: t("login", "email"),
+            id: "email",
+          }}
+          inputOptions={{
+            id: "email",
+            type: "email",
+            value: email,
+            required: true,
+            minLength: 5,
+            maxLength: 30,
+            onChange: (e) => setEmail(e.target.value),
+            focus: true,
+          }}
+        />
 
-        <label>
-          {t("login", "email")}
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoFocus
-          />
-        </label>
+        <FieldInputGroup
+          label={{
+            name: t("login", "password"),
+            id: "password",
+          }}
+          inputOptions={{
+            id: "password",
+            type: "password",
+            value: password,
+            required: true,
+            minLength: 8,
+            maxLength: 16,
+            onChange: (e) => setPassword(e.target.value),
+          }}
+        />
 
-        <label>
-          {t("login", "password")}
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </label>
+        <FieldInputGroup
+          inputOptions={{
+            id: "submit",
+            type: "submit",
+            value: loading ? t("login", "loading") : t("login", "submit"),
+            disabled: loading,
+          }}
+        />
 
-        {error && <p className="login-error">{error}</p>}
-
-        <button type="submit" disabled={loading}>
-          {loading
-            ? t("login", "loading")
-            : t("login", "submit")}
-        </button>
-      </form>
+        {error && (
+          <p className="login-error" role="alert">
+            {error}
+          </p>
+        )}
+      </Form>
     </div>
   );
 }

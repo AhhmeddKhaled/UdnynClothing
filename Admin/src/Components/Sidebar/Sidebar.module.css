@@ -215,6 +215,9 @@
 
 .sbAside.rtl {
   right: 0;
+    .sbItem .label {
+      text-align: right;
+  }
 }
 
 .sbAside.ltr {
@@ -223,53 +226,35 @@
 
 .sbBrand {
   display: flex;
-
   justify-content: space-between;
-
   align-items: flex-start;
-
   gap: var(--space-2);
-
   padding: 0 var(--space-4) var(--space-5);
-
   margin-bottom: var(--space-4);
-
   border-bottom: 1px solid var(--color-line);
 }
 
 .sbBrand h1 {
   margin: 0;
-
   color: var(--color-plum);
-
   font-family: var(--font-display);
-
   font-size: var(--text-lg);
-
   font-weight: 700;
 }
 
 .sbBrand span {
   display: block;
-
   margin-top: var(--space-1);
-
   color: var(--color-plum-soft);
-
   font-size: var(--text-xs);
 }
 
 .sbNav {
   display: flex;
-
   flex-direction: column;
-
   flex: 1;
-
   gap: var(--space-1);
-
   min-height: 0;
-
   padding: 0 var(--space-3);
 }
 

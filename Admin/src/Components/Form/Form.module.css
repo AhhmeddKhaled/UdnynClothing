@@ -3,6 +3,12 @@
     align-items: flex-end;
     gap: var(--space-6);
     margin-bottom: var(--space-10);
+    background-color: var(--color-page-bg);
+    border: 1px solid var(--color-line);
+    padding: var(--space-2) var(--space-4);
+    width: 360px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
 }
 
 .fieldInputGroup,
@@ -11,6 +17,11 @@
     flex-direction: column;
     text-transform: capitalize;
     position: relative;
+    gap: var(--space-2);
+}
+
+.fieldInputGroup input {
+    width: 100%;
 }
 
 .fieldInputGroup label,
@@ -26,4 +37,31 @@
     top: 50%;
     transform: translateY(-50%);
     display: inline-flex;
+}
+
+.iconPassword {
+    position: absolute;
+    left: 4%;
+    top: 55px;
+    transform: translateY(-50%);
+    display: inline-flex;
+    cursor: pointer;
+}
+
+.statusMessage {
+    font-size: var(--text-xs);
+    font-weight: 400;
+    opacity: .7;
+}
+
+.statusMessage.valid {
+    color: var(--status-success-text);
+}
+
+.statusMessage.inValid {
+    color: var(--status-error-text);
+}
+
+.input.notFocus + .statusMessage {
+    display: none;
 }
