@@ -4,7 +4,7 @@
     align-items: center;
     width: fit-content;
     border-radius: var(--radius-md);
-    box-sizing: border-box;
+    margin: var(--space-8) 0;
     .tab {
         font-size: var(--text-md);
         font-weight: 500;

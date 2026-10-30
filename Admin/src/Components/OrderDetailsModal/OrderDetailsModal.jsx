@@ -32,14 +32,13 @@ export default function OrderDetailsModal({ order, logic }) {
     getCustomerPhone,
     getCustomerEmail,
     getItemName,
-    getItemUnitPrice,
     getItemLineTotal,
     getOrderSubtotal,
+    getProductPrice,
     getOrderTotal,
     formatMoney,
     formatDate,
     statuses,
-    getPriceType
   } = logic;
 
   const onCloseOrder = () => setSelectedOrder(null);
@@ -137,7 +136,7 @@ export default function OrderDetailsModal({ order, logic }) {
 
                   <span className="orders-detail-item-info-unitPrice">
                     <TbBrandCashapp size={16} />{" "}
-                    {formatMoney(getPriceType(item,"wholesalePrice"))}
+                    {formatMoney(getProductPrice(item,"retail"))}
                   </span>
                 </div>
 

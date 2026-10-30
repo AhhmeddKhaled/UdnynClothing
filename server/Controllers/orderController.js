@@ -47,9 +47,11 @@ async function removeUploadedFiles(files = []) {
   );
 }
 
+
 async function createOrder(req, res, next) {
   let session;
   let orderCreated = false;
+
   const uploadedFiles = Array.isArray(req.files) ? req.files : [];
 
   try {
@@ -66,6 +68,7 @@ async function createOrder(req, res, next) {
 
     let items = body.items;
 
+    // Parse order items
     if (typeof items === "string") {
       try {
         items = JSON.parse(items);
@@ -74,6 +77,7 @@ async function createOrder(req, res, next) {
       }
     }
 
+    // Validate customer name
     if (
       typeof customerName !== "string" ||
       !customerName.trim() ||
@@ -82,6 +86,7 @@ async function createOrder(req, res, next) {
       return sendError(res, 400, "Valid customer name is required");
     }
 
+    // Validate phone
     if (
       typeof customerPhone !== "string" ||
       !customerPhone.trim() ||
@@ -90,6 +95,7 @@ async function createOrder(req, res, next) {
       return sendError(res, 400, "Valid customer phone is required");
     }
 
+    // Validate governorate
     if (
       typeof governorate !== "string" ||
       !EGYPTIAN_GOVERNORATES.includes(governorate.trim())
@@ -97,6 +103,7 @@ async function createOrder(req, res, next) {
       return sendError(res, 400, "Please select a valid governorate");
     }
 
+    // Validate address
     if (
       typeof shippingAddress !== "string" ||
       !shippingAddress.trim() ||
@@ -105,10 +112,15 @@ async function createOrder(req, res, next) {
       return sendError(res, 400, "Valid shipping address is required");
     }
 
-    if (typeof customerNote !== "string" || customerNote.length > 2000) {
+    // Validate note
+    if (
+      typeof customerNote !== "string" ||
+      customerNote.length > 2000
+    ) {
       return sendError(res, 400, "Invalid customer note");
     }
 
+    // Validate shipping cost
     const parsedShippingCost = Number(shippingCost);
 
     if (
@@ -119,14 +131,20 @@ async function createOrder(req, res, next) {
       return sendError(res, 400, "Invalid shipping cost");
     }
 
+    // Validate items
     if (!Array.isArray(items) || items.length === 0) {
-      return sendError(res, 400, "Order must contain at least one item");
+      return sendError(
+        res,
+        400,
+        "Order must contain at least one item",
+      );
     }
 
     if (items.length > 100) {
       return sendError(res, 400, "Order contains too many items");
     }
 
+    // Process uploaded images
     const imagePathByItemId = new Map();
 
     for (const file of uploadedFiles) {
@@ -164,29 +182,69 @@ async function createOrder(req, res, next) {
       );
     }
 
+    // Validate and combine duplicate items
     const quantitiesByItemId = new Map();
 
     for (const item of items) {
       const itemId = Number(item?.itemId);
       const quantity = Number(item?.quantity);
 
+      const priceType = String(item?.priceType || "")
+        .trim()
+        .toLowerCase();
+
       if (!Number.isSafeInteger(itemId) || itemId <= 0) {
-        return sendError(res, 400, "Each item must have a valid itemId");
+        return sendError(
+          res,
+          400,
+          "Each item must have a valid itemId",
+        );
       }
 
       if (!Number.isSafeInteger(quantity) || quantity <= 0) {
-        return sendError(res, 400, "Each quantity must be a positive integer");
+        return sendError(
+          res,
+          400,
+          "Each quantity must be a positive integer",
+        );
       }
 
-      const combinedQuantity = (quantitiesByItemId.get(itemId) || 0) + quantity;
+      if (!["retail", "wholesale", "offer"].includes(priceType)) {
+        return sendError(
+          res,
+          400,
+          `Invalid price type for item ${itemId}`,
+        );
+      }
+
+      const existing = quantitiesByItemId.get(itemId);
+
+      if (existing && existing.priceType !== priceType) {
+        return sendError(
+          res,
+          400,
+          `Conflicting price types for item ${itemId}`,
+        );
+      }
+
+      const combinedQuantity =
+        (existing?.quantity || 0) + quantity;
 
       if (!Number.isSafeInteger(combinedQuantity)) {
-        return sendError(res, 400, "Invalid combined item quantity");
+        return sendError(
+          res,
+          400,
+          "Invalid combined item quantity",
+        );
       }
 
-      quantitiesByItemId.set(itemId, combinedQuantity);
+      quantitiesByItemId.set(itemId, {
+        quantity: combinedQuantity,
+        priceType,
+      });
     }
 
+    // Validate uploaded image references
     for (const itemId of imagePathByItemId.keys()) {
       if (!quantitiesByItemId.has(itemId)) {
         return sendError(
@@ -197,10 +255,14 @@ async function createOrder(req, res, next) {
       }
     }
 
-    const requestedItems = [...quantitiesByItemId.entries()].sort(
-      ([a], [b]) => a - b,
-    );
+    const requestedItems = [...quantitiesByItemId.entries()]
+      .sort(([a], [b]) => a - b)
+      .map(([itemId, data]) => ({
+        itemId,
+        ...data,
+      }));
 
+    // Start transaction
     session = await mongoose.startSession();
 
     let responseOrder = null;
@@ -209,7 +271,12 @@ async function createOrder(req, res, next) {
       const orderItems = [];
       let subtotal = 0;
 
-      for (const [itemId, quantity] of requestedItems) {
+      for (const {
+        itemId,
+        quantity,
+        priceType,
+      } of requestedItems) {
+        // Deduct stock atomically
         const stockItem = await AvailableStock.findOneAndUpdate(
           {
             itemId,
@@ -220,59 +287,88 @@ async function createOrder(req, res, next) {
             $inc: { qty: -quantity },
           },
           {
-            new: true,
+            returnDocument: "after",
             session,
           },
         );
 
+        // Check stock availability
         if (!stockItem) {
-          const existingItem = await AvailableStock.findOne({ itemId })
+          const existingItem = await AvailableStock.findOne({
+            itemId,
+          })
             .session(session)
             .lean();
 
-          if (!existingItem || !existingItem.active) {
-            const error = new Error(`Item ${itemId} is unavailable`);
-            error.statusCode = 409;
-            throw error;
-          }
+          console.log("STOCK DEBUG:", {
+            itemId,
+            requestedQuantity: quantity,
+            stock: existingItem,
+          });
 
-          const error = new Error(`Insufficient stock for item ${itemId}`);
+          const message =
+            !existingItem || !existingItem.active
+              ? `Item ${itemId} is unavailable`
+              : `Insufficient stock for item ${itemId}`;
+
+          const error = new Error(message);
+          error.statusCode = 409;
+
+          throw error;
+        }
+
+        // Get selected price
+        const priceMap = {
+          retail: stockItem.retailPrice,
+          wholesale: stockItem.wholesalePrice,
+          offer: stockItem.offerPrice,
+        };
+
+        const rawPrice = priceMap[priceType];
+        const unitPrice = Number(rawPrice);
+
+        if (
+          rawPrice === null ||
+          rawPrice === undefined ||
+          rawPrice === "" ||
+          !Number.isFinite(unitPrice) ||
+          unitPrice < 0
+        ) {
+          const error = new Error(
+            `Invalid ${priceType} price for item ${itemId}`,
+          );
+
           error.statusCode = 409;
           throw error;
         }
 
-        const offerPrice = Number(stockItem.offerPrice) || 0;
-        const wholesalePrice = Number(stockItem.wholesalePrice) || 0;
-        const retailPrice = Number(stockItem.retailPrice) || 0;
-        const unitPrice = offerPrice > 0 ? offerPrice : retailPrice;
-
-        if (unitPrice === "retailPrice") {
-          unitPrice = retailPrice;
-        } else if (unitPrice === "wholesalePrice") {
-          unitPrice = wholesalePrice;
-        } else if (unitPrice === "offerPrice") {
-          unitPrice = offerPrice;
-        } else {
-          return sendError(res, 400, "Price Type Invalid");
-        }
-
+        // Calculate line total
         const lineTotal = Number(
-          ((offerPrice || wholesalePrice || retailPrice) * quantity).toFixed(2),
+          (unitPrice * quantity).toFixed(2),
         );
-        subtotal = Number((subtotal + lineTotal).toFixed(2));
 
+        subtotal = Number(
+          (subtotal + lineTotal).toFixed(2),
+        );
+
+        // Add item to order
         orderItems.push({
           itemId: stockItem.itemId,
           name: stockItem.name,
           unitPrice,
           quantity,
           lineTotal,
-          realImagePath: imagePathByItemId.get(itemId) || null,
+          realImagePath:
+            imagePathByItemId.get(itemId) || null,
         });
       }
 
-      const totalAmount = Number((subtotal + parsedShippingCost).toFixed(2));
+      // Calculate total
+      const totalAmount = Number(
+        (subtotal + parsedShippingCost).toFixed(2),
+      );
 
+      // Create order
       const [createdOrder] = await Order.create(
         [
           {
@@ -290,6 +386,7 @@ async function createOrder(req, res, next) {
             governorate: governorate.trim(),
             shippingAddress: shippingAddress.trim(),
             customerNote: customerNote.trim(),
+
             status: "pending",
           },
         ],
@@ -306,16 +403,32 @@ async function createOrder(req, res, next) {
       message: "Order created successfully",
       order: responseOrder,
     });
+
   } catch (error) {
+    console.error("CREATE ORDER ERROR:", error);
+
+    if (res.headersSent) {
+      return next(error);
+    }
+
     if (error.statusCode) {
-      return sendError(res, error.statusCode, error.message);
+      return sendError(
+        res,
+        error.statusCode,
+        error.message,
+      );
     }
 
     if (error.code === 11000) {
-      return sendError(res, 409, "Order number conflict. Please try again.");
+      return sendError(
+        res,
+        409,
+        "Order number conflict. Please try again.",
+      );
     }
 
     return next(error);
+
   } finally {
     if (session) {
       await session.endSession();

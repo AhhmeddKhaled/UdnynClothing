@@ -37,31 +37,42 @@ body {
   color: var(--color-ink);
 }
 
-button,
 input,
 select,
 textarea {
-  font: inherit;
   color: inherit;
 }
 
-a,
-a:link,
-a:visited {
-  color: var(--color-accent);
+/* Links  */
+a {
   text-decoration: none;
-  transition:
-    color var(--dur-fast) ease,
-    text-decoration-color var(--dur-fast) ease;
+  color: inherit;
 }
-
+a:link,
 a:hover,
 a:focus-visible {
   color: var(--color-accent-hover);
   text-decoration-color: currentColor;
 }
 
-/* Inputs */
+/* Buttons  */
+button {
+  border: none;
+  outline: none;
+  background-color: transparent;
+  font: inherit;
+}
+
+/* Forms */
+
+form.full {
+  width: 100;
+}
+
+form.fit {
+  width: fit-content;
+}
+
 input,
 select,
 textarea {

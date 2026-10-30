@@ -296,7 +296,7 @@ async function uploadProductImage(
       `/uploads/${req.file.filename}`;
 
     const product =
-      await AvailableStock.findOneAndUpdate(
+      await AvailableStock.(
         {
           itemId,
           active: true,

@@ -5,8 +5,6 @@
   color: var(--color-ink);
 
   border-color: var(--color-line);
-
-  direction: rtl;
 }
 
 .sbAside *,
@@ -181,8 +179,6 @@
 
   right: auto;
 
-  height: 100vh;
-
   height: 100dvh;
 
   box-sizing: border-box;
@@ -235,18 +231,10 @@
 }
 
 .sbBrand h1 {
-  margin: 0;
   color: var(--color-plum);
   font-family: var(--font-display);
   font-size: var(--text-lg);
   font-weight: 700;
-}
-
-.sbBrand span {
-  display: block;
-  margin-top: var(--space-1);
-  color: var(--color-plum-soft);
-  font-size: var(--text-xs);
 }
 
 .sbNav {
@@ -259,42 +247,15 @@
 }
 
 .sbItem {
-  width: 100%;
-
-  min-width: 0;
-
   display: flex;
-
   flex-direction: row;
-
   align-items: center;
-
   gap: var(--space-2);
-
   padding: var(--space-2) var(--space-3);
-
-  border: none;
-
-  background: transparent;
-
   border-radius: var(--radius-md);
-
-  color: var(--color-plum-soft);
-
-  font-family: inherit;
-
+  color: var(--color-ink);
   font-size: var(--text-sm);
-
   font-weight: 500;
-
-  text-align: left;
-
-  text-decoration: none;
-
-  direction: ltr;
-
-  cursor: pointer;
-
   transition:
     background-color 0.2s ease,
     color 0.2s ease,
@@ -303,99 +264,74 @@
 
 .sbItem .icon {
   display: inline-flex;
-
   align-items: center;
-
   justify-content: center;
-
   flex: 0 0 auto;
 }
 
 .sbItem .icon svg {
   display: block;
-
   flex-shrink: 0;
 }
 
 .sbItem .label {
   flex: 1;
-
-  min-width: 0;
-
-  text-align: left;
-
-  direction: ltr;
 }
 
 .sbItem.sbActive {
   color: var(--color-plum);
-
   background: hsl(from var(--color-plum) h s l / 0.1);
-
   font-weight: 700;
 }
 
 .sbItem:focus-visible {
   outline: 2px solid var(--color-plum);
-
   outline-offset: -2px;
 }
 
 .ordersNote {
   background-color: var(--color-accent);
-
   color: var(--color-primary);
-
   color: #fff;
-
   padding: var(--space-1) var(--space-4);
-
   border-radius: var(--radius-xl);
-
   font-size: var(--text-xs);
 }
 
 .sbOrdersGroup {
   display: flex;
-
   flex-direction: column;
-
   width: 100%;
-
   min-width: 0;
 }
 
 .sbSubmenu {
   position: relative;
-
   display: flex;
-
   flex-direction: column;
-
   gap: var(--space-1);
-
-  width: 100%;
-
-  min-width: 0;
-
   margin: var(--space-1) 0 var(--space-2);
+  padding: var(--space-1) var(--space-4);
 
-  padding: var(--space-1) 0 var(--space-1) 24px;
+  > a {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--space-2);
+    font-size: var(--text-md);
+    font-weight: 400;
+  }
 }
 
-.sbBottom {
-  display: flex;
 
-  flex-direction: column;
-
-  gap: var(--space-2);
-
-  padding: var(--space-4) var(--space-3) 0;
-
-  margin-top: var(--space-4);
-
-  border-top: 1px solid var(--color-line);
-}
+/* Sidebar Buttom  */
+  .sbBottom {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-3) 0;
+    margin-top: var(--space-4);
+    border-top: 1px solid var(--color-line);
 
 .sbUser {
   display: flex;
@@ -412,7 +348,6 @@
 
   margin-bottom: var(--space-2);
 
-  direction: ltr;
 }
 
 .sbUserAvatar {
@@ -530,8 +465,6 @@
 
   text-align: left;
 
-  direction: ltr;
-
   cursor: pointer;
 
   transition:
@@ -601,6 +534,7 @@
 
   pointer-events: auto;
 }
+  }
 
 @media (max-width: 860px) {
   .sbTopbar {

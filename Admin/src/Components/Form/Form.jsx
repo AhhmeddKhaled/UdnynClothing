@@ -7,9 +7,14 @@ import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 
 import { formValidition } from "../../services/LoginServices.js";
 
-export function Form({ children, onSubmit }) {
+export function Form({ children, onSubmit, width = "fit" }) {
   return (
-    <form onSubmit={onSubmit} className={styles.form}>
+    <form
+      onSubmit={onSubmit}
+      className={`${styles.form}
+      ${width}
+      `}
+    >
       {children}
     </form>
   );

@@ -2,26 +2,38 @@ import styles from "./AddOrder.module.css";
 import "./RealImagePicker.css";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { HiOutlineSearch,HiOutlinePlus,HiOutlineArrowLeft,HiOutlineCamera,HiOutlineClipboard,} from "react-icons/hi";
+import {
+  HiOutlineSearch,
+  HiOutlinePlus,
+  HiOutlineArrowLeft,
+  HiOutlineCamera,
+  HiOutlineClipboard,
+} from "react-icons/hi";
 
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api/orders`;
 
 // Import Services
-import { parseCustomerMessage, normalizePhone, normalizeDigits, isValidPhone,} from "./parseCustomerMessage.js";
+import {
+  parseCustomerMessage,
+  normalizePhone,
+  normalizeDigits,
+  isValidPhone,
+} from "./parseCustomerMessage.js";
 import { findGovernorateOption, getShippingFeeFor } from "./governorates.js";
 import { useOrdersLogic } from "../../../UI_Logic/OrdersLogic.jsx";
-import { getPriceType, PriceTypesList  } from "../../../services/OrdersServices.js";
+import {
+  PriceTypesList,
+} from "../../../services/OrdersServices.js";
 import RealImagePicker from "./RealImagePicker.jsx";
 import BarcodeScanner from "./BarcodeScanner.jsx";
 
-// Import Components 
+// Import Components
 import ContentHeader from "../../../Components/ContentHeader/ContentHeader.jsx";
 import Button from "../../../Components/Button/Button";
 import Tabs from "../../../Components/Tabs/Tabs.jsx";
-import { Form  } from "../../../Components/Form/Form";
+import { Form } from "../../../Components/Form/Form";
 
 const CODE_FIELDS = ["barcode", "sku", "code", "itemId"];
-
-const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api/orders`;
 
 // Build the product image URL.
 function getProductImageUrl(imagePath) {
@@ -47,13 +59,19 @@ function ProductImage({ imagePath, name, itemId }) {
 
   if (!imageUrl || imageFailed) {
     return (
-      <span className={styles['ao-product-image'] + " " + styles['ao-product-image-empty']}>No image</span>
+      <span
+        className={
+          styles["ao-product-image"] + " " + styles["ao-product-image-empty"]
+        }
+      >
+        No image
+      </span>
     );
   }
 
   return (
     <img
-      className={styles['ao-product-image']}
+      className={styles["ao-product-image"]}
       src={imageUrl}
       alt={name || `Item ${itemId}`}
       loading="lazy"
@@ -88,7 +106,6 @@ function useToast() {
   return { toast, showToast };
 }
 
-
 export default function AddOrder() {
   const logic = useOrdersLogic();
   const navigate = useNavigate();
@@ -114,6 +131,9 @@ export default function AddOrder() {
     formatMoney,
     getProductPrice,
     getStockForProduct,
+
+    setUnitPrice,
+    unit
   } = logic;
 
   const [showProductResults, setShowProductResults] = useState(false);
@@ -164,13 +184,19 @@ export default function AddOrder() {
       styles["orders-form-field"],
       autofill[field] === "review" ? styles["ao-needs-review"] : "",
       autofill[field] === "auto" ? styles["ao-autofilled"] : "",
-    ].filter(Boolean).join(" ");
+    ]
+      .filter(Boolean)
+      .join(" ");
 
   const badge = (field) =>
     autofill[field] === "auto" ? (
-      <em className={styles['ao-badge'] + " " + styles['ao-badge-auto']}>Extracted</em>
+      <em className={styles["ao-badge"] + " " + styles["ao-badge-auto"]}>
+        Extracted
+      </em>
     ) : autofill[field] === "review" ? (
-      <em className={styles['ao-badge'] + " " + styles['ao-badge-review']}>Check</em>
+      <em className={styles["ao-badge"] + " " + styles["ao-badge-review"]}>
+        Check
+      </em>
     ) : null;
 
   // -------------------------------------------------
@@ -469,7 +495,7 @@ export default function AddOrder() {
   // -------------------------------------------------
 
   return (
-    <section className={styles['add-order-page']}>
+    <section className={styles["add-order-page"]}>
       <ContentHeader
         title="Add New Order"
         subTitle="Paste the customer's message, check the details, and add products."
@@ -481,15 +507,21 @@ export default function AddOrder() {
         }
       />
 
-      <Tabs tabs={PriceTypesList} />
+      <Tabs tabs={PriceTypesList} setValue={setUnitPrice} />
 
-      <Form className={styles['add-order-form']} onSubmit={handleSubmit}>
-        <div className={styles['orders-modal-content']}>
+      <Form
+        className={styles["add-order-form"]}
+        onSubmit={handleSubmit}
+        width="full"
+      >
+        <div className={styles["orders-modal-content"]}>
           {/* 1. Customer message */}
 
-          <h3 className={styles['orders-detail-section-title']}>Customer Message</h3>
+          <h3 className={styles["orders-detail-section-title"]}>
+            Customer Message
+          </h3>
 
-          <div className={styles['ao-paste']}>
+          <div className={styles["ao-paste"]}>
             <textarea
               ref={pasteRef}
               rows="4"
@@ -508,10 +540,10 @@ export default function AddOrder() {
               placeholder="Paste the customer's message here. Name, phone, governorate and address are filled in automatically."
             />
 
-            <div className={styles['ao-paste-actions']}>
+            <div className={styles["ao-paste-actions"]}>
               <button
                 type="button"
-                className={styles['orders-details-button']}
+                className={styles["orders-details-button"]}
                 onClick={pasteFromClipboard}
                 disabled={addingOrder}
               >
@@ -521,7 +553,7 @@ export default function AddOrder() {
 
               <button
                 type="button"
-                className={styles['orders-details-button']}
+                className={styles["orders-details-button"]}
                 onClick={() => runExtraction()}
                 disabled={addingOrder || !rawMessage.trim()}
               >
@@ -530,27 +562,37 @@ export default function AddOrder() {
             </div>
 
             {parseInfo && (
-              <div className={styles['ao-paste-notes']}>
+              <div className={styles["ao-paste-notes"]}>
                 {parseInfo.missing.length > 0 ? (
-                  <p className={styles['ao-paste-note'] + " " + styles['is-warning']}>
+                  <p
+                    className={
+                      styles["ao-paste-note"] + " " + styles["is-warning"]
+                    }
+                  >
                     Couldn't find: {parseInfo.missing.join(", ")}. Please fill
                     in the highlighted fields.
                   </p>
                 ) : (
-                  <p className={styles['ao-paste-note'] + " " + styles['is-ok']}>
+                  <p
+                    className={styles["ao-paste-note"] + " " + styles["is-ok"]}
+                  >
                     Details extracted. Please review them before saving.
                   </p>
                 )}
 
                 {parseInfo.multipleNames && (
-                  <p className={styles['ao-paste-note'] + " " + styles['is-warning']}>
+                  <p
+                    className={
+                      styles["ao-paste-note"] + " " + styles["is-warning"]
+                    }
+                  >
                     The message contains more than one name. Check who the
                     customer is.
                   </p>
                 )}
 
                 {parseInfo.hints.length > 0 && (
-                  <div className={styles['ao-hints']}>
+                  <div className={styles["ao-hints"]}>
                     <span>Mentioned in the message:</span>
 
                     {parseInfo.hints.map((hint) => (
@@ -564,9 +606,11 @@ export default function AddOrder() {
 
           {/* 2. Customer details */}
 
-          <h3 className={styles['orders-detail-section-title']}>Customer Details</h3>
+          <h3 className={styles["orders-detail-section-title"]}>
+            Customer Details
+          </h3>
 
-          <div className={styles['orders-form-grid']}>
+          <div className={styles["orders-form-grid"]}>
             <label className={fieldClass("customerName")}>
               <span>Customer Name * {badge("customerName")}</span>
               <input
@@ -604,7 +648,7 @@ export default function AddOrder() {
               />
 
               {phoneInvalid && (
-                <small className={styles['ao-field-msg']}>
+                <small className={styles["ao-field-msg"]}>
                   Phone must be 11 digits and start with 01.
                 </small>
               )}
@@ -613,7 +657,7 @@ export default function AddOrder() {
 
           {/* 3. Products */}
 
-          <h3 className={styles['orders-detail-section-title']}>Products</h3>
+          <h3 className={styles["orders-detail-section-title"]}>Products</h3>
 
           {productsLoading ? (
             <p>Loading products...</p>
@@ -623,13 +667,19 @@ export default function AddOrder() {
             <p>No products are currently available.</p>
           ) : (
             <>
-              <div className={styles['orders-form-grid']}>
-                <div className={styles['orders-form-field'] + " " + styles['orders-product-picker']}>
+              <div className={styles["orders-form-grid"]}>
+                <div
+                  className={
+                    styles["orders-form-field"] +
+                    " " +
+                    styles["orders-product-picker"]
+                  }
+                >
                   <label htmlFor="add-order-product-search">
                     Search or Scan Products *
                   </label>
 
-                  <div className={styles['orders-product-search']}>
+                  <div className={styles["orders-product-search"]}>
                     <HiOutlineSearch aria-hidden="true" />
 
                     <input
@@ -678,7 +728,7 @@ export default function AddOrder() {
 
                     <button
                       type="button"
-                      className={styles['ao-scan-btn']}
+                      className={styles["ao-scan-btn"]}
                       onClick={() => setShowScanner(true)}
                       disabled={addingOrder}
                       aria-label="Scan barcode with camera"
@@ -688,16 +738,17 @@ export default function AddOrder() {
                   </div>
 
                   {showProductResults && (
-                    <div className={styles['orders-product-results']}>
+                    <div className={styles["orders-product-results"]}>
                       {filteredProducts.length > 0 ? (
-                        filteredProducts.map((product) => {
+                        
+                        filteredProducts.map((product,i) => {
                           const stock = getStockForProduct(product);
 
                           return (
                             <button
                               type="button"
                               key={product.itemId}
-                              className={styles['orders-product-result']}
+                              className={styles["orders-product-result"]}
                               disabled={addingOrder || stock < 1}
                               onClick={() => {
                                 updateFormField(
@@ -713,32 +764,32 @@ export default function AddOrder() {
                                 setShowProductResults(false);
                               }}
                             >
-                              <span className={styles['ao-product-info']}>
+                              <span className={styles["ao-product-info"]}>
                                 <ProductImage
                                   imagePath={product.imagePath}
                                   name={product.name}
                                   itemId={product.itemId}
                                 />
 
-                                <span className={styles['ao-product-text']}>
+                                <span className={styles["ao-product-text"]}>
                                   <strong>
                                     {product.name || `Item ${product.itemId}`}
                                   </strong>
 
                                   <small>
-                                    {formatMoney(getProductPrice(product))}
+                                    {formatMoney(getProductPrice(product,"retail"))}
                                   </small>
                                 </span>
                               </span>
 
-                              <small className={styles['ao-product-stock']}>
+                              <small className={styles["ao-product-stock"]}>
                                 {stock > 0 ? `Stock: ${stock}` : "Out of stock"}
                               </small>
                             </button>
                           );
                         })
                       ) : (
-                        <p className={styles['orders-product-search-empty']}>
+                        <p className={styles["orders-product-search-empty"]}>
                           No matching products found.
                         </p>
                       )}
@@ -746,7 +797,7 @@ export default function AddOrder() {
                   )}
                 </div>
 
-                <label className={styles['orders-form-field']}>
+                <label className={styles["orders-form-field"]}>
                   <span>Quantity *</span>
 
                   <input
@@ -766,7 +817,7 @@ export default function AddOrder() {
 
               <button
                 type="button"
-                className={styles['orders-details-button']}
+                className={styles["orders-details-button"]}
                 onClick={handleAddItem}
                 disabled={
                   addingOrder ||
@@ -785,30 +836,32 @@ export default function AddOrder() {
 
           {form.items.length > 0 && (
             <>
-              <h3 className={styles['orders-detail-section-title']}>
+              <h3 className={styles["orders-detail-section-title"]}>
                 Selected Products ({form.items.length})
               </h3>
-
-              <div className={styles['orders-detail-items']}>
+              <div className={styles["orders-detail-items"]}>
                 {form.items.map((item) => {
                   const qty = Number(item.quantity);
                   const max = Number(item.availableStock);
 
                   return (
-                    <div className={styles['orders-detail-item']} key={item.itemId}>
-                      <div className={styles['ao-selected-product']}>
+                    <div
+                      className={styles["orders-detail-item"]}
+                      key={item.itemId}
+                    >
+                      <div className={styles["ao-selected-product"]}>
                         <ProductImage
                           imagePath={item.imagePath}
                           name={item.name}
                           itemId={item.itemId}
                         />
 
-                        <div className={styles['ao-selected-product-details']}>
+                        <div className={styles["ao-selected-product-details"]}>
                           <strong>{item.name}</strong>
 
                           <span>Unit Price: {formatMoney(item.unitPrice)}</span>
 
-                          <div className={styles['ao-stepper']}>
+                          <div className={styles["ao-stepper"]}>
                             <button
                               type="button"
                               aria-label="Decrease quantity"
@@ -851,7 +904,7 @@ export default function AddOrder() {
                           </div>
 
                           {qty >= max && (
-                            <small className={styles['ao-field-msg']}>
+                            <small className={styles["ao-field-msg"]}>
                               Maximum available stock reached ({max}).
                             </small>
                           )}
@@ -867,14 +920,14 @@ export default function AddOrder() {
                         disabled={addingOrder}
                       />
 
-                      <div className={styles['ao-selected-product-actions']}>
+                      <div className={styles["ao-selected-product-actions"]}>
                         <strong>
                           {formatMoney(Number(item.unitPrice) * qty)}
                         </strong>
 
                         <button
                           type="button"
-                          className={styles['orders-details-button']}
+                          className={styles["orders-details-button"]}
                           disabled={addingOrder}
                           onClick={() => removeItem(item.itemId)}
                         >
@@ -890,7 +943,9 @@ export default function AddOrder() {
 
           {/* 4. Delivery details */}
 
-          <h3 className={styles['orders-detail-section-title']}>Delivery Details</h3>
+          <h3 className={styles["orders-detail-section-title"]}>
+            Delivery Details
+          </h3>
 
           <label className={fieldClass("governorate")}>
             <span>Governorate * {badge("governorate")}</span>
@@ -933,11 +988,17 @@ export default function AddOrder() {
             />
           </label>
 
-          <div className={styles['orders-form-field']}>
+          <div className={styles["orders-form-field"]}>
             <label htmlFor="ao-shipping">
               Shipping Cost (EGP) *{" "}
               {shippingOverridden && (
-                <em className={styles['ao-badge'] + " " + styles['ao-badge-review']}>Manual</em>
+                <em
+                  className={
+                    styles["ao-badge"] + " " + styles["ao-badge-review"]
+                  }
+                >
+                  Manual
+                </em>
               )}
             </label>
 
@@ -959,7 +1020,9 @@ export default function AddOrder() {
             />
 
             {!canEditShipping ? (
-              <small className={styles['ao-field-msg'] + " " + styles['is-muted']}>
+              <small
+                className={styles["ao-field-msg"] + " " + styles["is-muted"]}
+              >
                 Set automatically from the governorate.
               </small>
             ) : (
@@ -967,7 +1030,7 @@ export default function AddOrder() {
               defaultFee != null && (
                 <button
                   type="button"
-                  className={styles['ao-link']}
+                  className={styles["ao-link"]}
                   onClick={() => applyGovernorate(form.governorate)}
                 >
                   Reset to default ({formatMoney(defaultFee)})
@@ -991,31 +1054,33 @@ export default function AddOrder() {
 
           {/* 5. Order summary */}
 
-          <h3 className={styles['orders-detail-section-title']}>Order Summary</h3>
+          <h3 className={styles["orders-detail-section-title"]}>
+            Order Summary
+          </h3>
 
-          <div className={styles['orders-detail-total']}>
+          <div className={styles["orders-detail-total"]}>
             <span>Products Subtotal</span>
             <strong>{formatMoney(estimatedSubtotal)}</strong>
           </div>
 
-          <div className={styles['orders-detail-total']}>
+          <div className={styles["orders-detail-total"]}>
             <span>Shipping</span>
             <strong>{formatMoney(validShippingCost)}</strong>
           </div>
 
-          <div className={styles['orders-detail-total']}>
+          <div className={styles["orders-detail-total"]}>
             <span>Grand Total</span>
             <strong>{formatMoney(estimatedTotal)}</strong>
           </div>
 
           {totalDiff !== null &&
             (totalDiff === 0 ? (
-              <p className={styles['ao-chip'] + " " + styles['is-ok']}>
+              <p className={styles["ao-chip"] + " " + styles["is-ok"]}>
                 ✓ Matches the total in the customer's message (
                 {formatMoney(parseInfo.statedTotal)})
               </p>
             ) : (
-              <p className={styles['ao-chip'] + " " + styles['is-warning']}>
+              <p className={styles["ao-chip"] + " " + styles["is-warning"]}>
                 ⚠ The message says {formatMoney(parseInfo.statedTotal)} but this
                 order is {formatMoney(estimatedTotal)} (difference{" "}
                 {formatMoney(Math.abs(totalDiff))}). Check the products and
@@ -1024,14 +1089,18 @@ export default function AddOrder() {
             ))}
 
           {formError && (
-            <p className={styles['orders-form-error']} role="alert">
+            <p className={styles["orders-form-error"]} role="alert">
               {formError}
             </p>
           )}
         </div>
 
-        <footer className={styles['orders-modal-footer'] + " " + styles['add-order-bar']}>
-          <div className={styles['add-order-bar-total']}>
+        <footer
+          className={
+            styles["orders-modal-footer"] + " " + styles["add-order-bar"]
+          }
+        >
+          <div className={styles["add-order-bar-total"]}>
             <span>Total</span>
             <strong>{formatMoney(estimatedTotal)}</strong>
           </div>

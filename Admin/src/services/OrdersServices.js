@@ -128,10 +128,6 @@ export function StatusTransitions({ status, currentStatus }) {
   return { canTransitions, isCurrentStatus };
 }
 
-export function getPriceType(price_type) {
-  return price_type;
-}
-
 export function validateOrderForm(form) {
   const customerName = form.customerName.trim();
   const customerPhone = form.customerPhone.trim();
@@ -237,9 +233,26 @@ export function getItemName(item) {
   return item?.name || item?.productName || `Item ${item?.itemId || ""}`;
 }
 
-export function getProductPrice(product) {
-  const offerPrice = Number(product?.offerPrice || 0);
-  return offerPrice > 0 ? offerPrice : Number(product?.retailPrice || 0);
+export function getProductPrice(item, priceType) {
+  const priceMap = {
+    offer: item?.offerPrice,
+    retail: item?.retailPrice,
+    wholesale: item?.wholesalePrice,
+  };
+
+  const price = priceMap[priceType];
+
+  if (
+    price === undefined ||
+    price === null ||
+    price === "" ||
+    !Number.isFinite(Number(price)) ||
+    Number(price) < 0
+  ) {
+    return null;
+  }
+
+  return Number(price);
 }
 
 export function getStockForProduct(product) {
@@ -286,28 +299,6 @@ export function getOrderSubtotal(order) {
       ),
     0,
   );
-}
-
-export function getItemUnitPrice(item, price_type) {
-
-  switch (price_type) {
-    case "offerPrice":
-      item.unitPrice = "offerPrice";
-      break;
-    case "retailPrice":
-      item.unitPrice = "retailPrice";
-    case "wholesalePrice":
-      item.unitPrice = "wholesalePrice";
-    default:
-      return "type price Invalid"
-  }
-
-  if (item?.unitPrice != null) return Number(item.unitPrice);
-  if (item?.price != null) return Number(item.price);
-
-  const quantity = Number(item?.quantity || 0);
-
-  return quantity > 0 ? Number(item?.lineTotal || 0) / quantity : 0;
 }
 
 export function getItemLineTotal(item) {

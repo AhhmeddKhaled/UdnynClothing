@@ -128,7 +128,8 @@ export default function Sidebar({ user, onLogout }) {
       .filter(Boolean)
       .join(" ");
 
-  const getSubItemClassName = (isActive, disabled = false) =>
+  
+      const getSubItemClassName = (isActive, disabled = false) =>
     [
       styles.sbSubitem,
       isActive ? styles.sbSubitemActive : "",
@@ -210,7 +211,6 @@ export default function Sidebar({ user, onLogout }) {
         <div className={styles.sbBrand}>
           <div>
             <h1>Udnyn</h1>
-            <span>{t("sidebar", "adminPanel")}</span>
           </div>
 
           <button

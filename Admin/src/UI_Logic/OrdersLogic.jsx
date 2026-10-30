@@ -14,7 +14,6 @@ import {
   formatMoney,
   formatDate,
   getOrderSubtotal,
-  getPriceType,
   getItemLineTotal,
   getOrderTotal,
   readResponse,
@@ -23,16 +22,17 @@ import {
   EMPTY_FORM,
 } from "../services/OrdersServices.js";
 
-
 export function useOrdersLogic() {
   const [orders, setOrders] = useState([]);
   const [products, setProducts] = useState([]);
 
-  const [deletingOrderId, setDeletingOrderId] = useState(null);
-
   const [loading, setLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
+
   const [addingOrder, setAddingOrder] = useState(false);
+  const [deletingOrderId, setDeletingOrderId] = useState(null);
+
+  const [unit, setUnitPrice] = useState("retail");
 
   const [error, setError] = useState("");
   const [productsError, setProductsError] = useState("");
@@ -87,6 +87,10 @@ export function useOrdersLogic() {
       const response = await authFetch("/api/availableStock");
       const data = await readResponse(response);
 
+      console.log(
+        "Available Stock API:",
+        data.products?.find((p) => Number(p.itemId) === 22),
+      );
       setProducts(Array.isArray(data.products) ? data.products : []);
     } catch (err) {
       setProducts([]);
@@ -164,7 +168,12 @@ export function useOrdersLogic() {
         const orderItems = items.map((item) => ({
           itemId: Number(item.itemId),
           quantity: Number(item.quantity),
+          priceType: String(item.priceType || "")
+            .trim()
+            .toLowerCase(),
         }));
+
+        console.log("ORDER ITEMS:", orderItems);
 
         formData.append("items", JSON.stringify(orderItems));
 
@@ -336,9 +345,38 @@ export function useOrdersLogic() {
     }
 
     const itemId = Number(selectedProduct.itemId);
+
+    const priceType = String(unit || "")
+      .trim()
+      .toLowerCase();
+
+    if (!["retail", "wholesale", "offer"].includes(priceType)) {
+      setFormError("Please select a valid price type.");
+      return;
+    }
+
+    const unitPrice = getProductPrice(selectedProduct, priceType);
+
+    if (
+      unitPrice === null ||
+      unitPrice === undefined ||
+      !Number.isFinite(Number(unitPrice)) ||
+      Number(unitPrice) < 0
+    ) {
+      setFormError("Invalid product price for selected price type.");
+      return;
+    }
+
     const existingItem = form.items.find(
       (item) => Number(item.itemId) === itemId,
     );
+
+    if (existingItem && existingItem.priceType !== priceType) {
+      setFormError(
+        "This product already exists with a different price type. Remove it first.",
+      );
+      return;
+    }
 
     const totalRequested =
       requestedQuantity + Number(existingItem?.quantity || 0);
@@ -359,6 +397,7 @@ export function useOrdersLogic() {
               ? {
                   ...item,
                   quantity: Number(item.quantity) + requestedQuantity,
+                  availableStock: stock,
                 }
               : item,
           )
@@ -368,13 +407,10 @@ export function useOrdersLogic() {
               itemId,
               name: selectedProduct.name || `Item ${itemId}`,
               quantity: requestedQuantity,
-              unitPrice: getProductPrice(selectedProduct),
+              priceType,
+              unitPrice: Number(unitPrice),
               availableStock: stock,
-
-              // صورة الكتالوج للعرض فقط.
               imagePath: selectedProduct.imagePath || null,
-
-              // صورة الطبيعة تُرفع بشكل مستقل.
               realImageFile: null,
             },
           ];
@@ -387,20 +423,22 @@ export function useOrdersLogic() {
         quantity: "1",
       };
     });
-  }, [selectedProduct, form.quantity, form.items]);
+  }, [selectedProduct, form.quantity, form.items, unit]);
 
   const changeItemQuantity = useCallback(
     (itemId, value) => {
       const nextQuantity = Number(value);
-      const item = form.items.find(
+
+      const product = products.find(
         (entry) => String(entry.itemId) === String(itemId),
       );
 
+      const stock = product ? Number(getStockForProduct(product)) : 0;
+
       if (
-        !item ||
         !Number.isSafeInteger(nextQuantity) ||
         nextQuantity < 1 ||
-        nextQuantity > Number(item.availableStock)
+        nextQuantity > stock
       ) {
         return;
       }
@@ -409,14 +447,18 @@ export function useOrdersLogic() {
         ...current,
         items: current.items.map((entry) =>
           String(entry.itemId) === String(itemId)
-            ? { ...entry, quantity: nextQuantity }
+            ? {
+                ...entry,
+                quantity: nextQuantity,
+                availableStock: stock,
+              }
             : entry,
         ),
       }));
 
       setFormError("");
     },
-    [form.items],
+    [form.items, products],
   );
 
   const removeItem = useCallback((itemId) => {
@@ -582,7 +624,7 @@ export function useOrdersLogic() {
 
     selectedOrder,
     setSelectedOrder,
-    
+
     changeOrderStatus,
     setChangeOderStatus,
 
@@ -622,11 +664,13 @@ export function useOrdersLogic() {
     getItemName,
     getProductPrice,
     getStockForProduct,
-    getPriceType,
     getOrderSubtotal,
     getItemLineTotal,
     getOrderTotal,
     formatMoney,
     formatDate,
+
+    setUnitPrice,
+    unit,
   };
 }
