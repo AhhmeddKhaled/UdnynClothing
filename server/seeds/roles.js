@@ -96,7 +96,7 @@ async function seedRoles() {
       );
     }
 
-    console.log("Roles seeded successfully");
+    ("Roles seeded successfully");
   } catch (error) {
     console.error("Role seed error:", error.message);
   }

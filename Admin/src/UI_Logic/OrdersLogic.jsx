@@ -87,10 +87,6 @@ export function useOrdersLogic() {
       const response = await authFetch("/api/availableStock");
       const data = await readResponse(response);
 
-      console.log(
-        "Available Stock API:",
-        data.products?.find((p) => Number(p.itemId) === 22),
-      );
       setProducts(Array.isArray(data.products) ? data.products : []);
     } catch (err) {
       setProducts([]);
@@ -116,7 +112,11 @@ export function useOrdersLogic() {
   }, [refreshOrders, refreshProducts]);
 
   useEffect(() => {
-    refreshAll();
+    const timeoutId = window.setTimeout(() => {
+      refreshAll();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
   }, [refreshAll]);
 
   const addOrder = useCallback(
@@ -173,7 +173,7 @@ export function useOrdersLogic() {
             .toLowerCase(),
         }));
 
-        console.log("ORDER ITEMS:", orderItems);
+        ("ORDER ITEMS:", orderItems);
 
         formData.append("items", JSON.stringify(orderItems));
 

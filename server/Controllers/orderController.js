@@ -300,7 +300,7 @@ async function createOrder(req, res, next) {
             .session(session)
             .lean();
 
-          console.log("STOCK DEBUG:", {
+          ("STOCK DEBUG:", {
             itemId,
             requestedQuantity: quantity,
             stock: existingItem,

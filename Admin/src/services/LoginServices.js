@@ -3,7 +3,7 @@ export function formValidition(inputType, value) {
   if (inputType === "email") {
     const emailRegex = /\w+b*@(gmail|yahoo).com/i;
     const emailValid = emailRegex.test(value);
-    console.log(emailValid);
+    (emailValid);
 
     const statusMessage = emailValid
       ? "Valid Email"
@@ -16,7 +16,7 @@ export function formValidition(inputType, value) {
     const passwordRegex = /^(?=.*[A-Z])(?=.*[@#])(?=.*\d).{8,}$/;
     const passwordValid = passwordRegex.test(value);
 
-    console.log(passwordValid);
+    (passwordValid);
     
     const statusMessage = passwordValid
       ? "Valid Password"

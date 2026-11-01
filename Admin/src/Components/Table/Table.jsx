@@ -1,8 +1,9 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import styles from "./Table.module.css";
-import { useOrdersLogic } from "../../UI_Logic/OrdersLogic.jsx";
 
-import { formatID, formatDate } from "../../services/OrdersServices.js";
+import { formatID, formatMoney } from "../../services/OrdersServices.js";
+
+import OrderStatus from "../OrderStatus/OrderStatus.jsx";
 
 function getValue(obj, path) {
   return path.split(".").reduce((value, key) => value?.[key], obj);
@@ -52,18 +53,15 @@ function formatTableItem(key, formattedValue) {
   switch (key) {
     case "status":
       return (
-        <span
-          className={`order-status order-status-${String(key ?? "")
-            .toLowerCase()
-            .replace(/\s+/g, "-")}`}
+        <OrderStatus
+          status={formattedValue}
+          change={false}
         >
           {formattedValue}
-        </span>
+        </OrderStatus>
       );
-      break;
     case "_id":
       return <a href="#">{formattedValue}</a>;
-      break;
     default:
       return <span>{formattedValue}</span>;
   }

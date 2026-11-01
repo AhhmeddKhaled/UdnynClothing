@@ -372,7 +372,7 @@ router.post(
   imageUpload.single("image"),
   async (req, res) => {
     try {
-      console.log(
+      (
         "🔥 POST /api/availableStock/:itemId/image HIT"
       );
 
@@ -436,12 +436,12 @@ router.post(
         });
       }
 
-      console.log(
+      (
         "Image file:",
         req.file.originalname
       );
 
-      console.log(
+      (
         "Saved as:",
         req.file.filename
       );
@@ -507,7 +507,7 @@ router.post(
               oldFilePath
             );
 
-            console.log(
+            (
               "Old image deleted:",
               oldFilename
             );
@@ -597,7 +597,7 @@ router.post(
   excelUpload.single("file"),
   async (req, res) => {
     try {
-      console.log(
+      (
         "🔥 POST /api/availableStock/import HIT"
       );
 
@@ -613,12 +613,12 @@ router.post(
         });
       }
 
-      console.log(
+      (
         "Excel file:",
         req.file.originalname
       );
 
-      console.log(
+      (
         "Saved as:",
         req.file.filename
       );
@@ -681,7 +681,7 @@ router.post(
           }
         );
 
-      console.log(
+      (
         "Excel rows:",
         rawRows.length
       );
@@ -704,7 +704,7 @@ router.post(
        * =====================================================
        */
 
-      console.log(
+      (
         "Excel headers:",
         Object.keys(rawRows[0])
       );
@@ -732,7 +732,7 @@ router.post(
         }
       );
 
-      console.log(
+      (
         "Normalized headers:",
         Object.keys(rows[0])
       );
@@ -787,7 +787,7 @@ router.post(
           ),
       };
 
-      console.log(
+      (
         "Looking for headers:",
         HEADER
       );
@@ -888,7 +888,7 @@ router.post(
           productsMap.values()
         );
 
-      console.log(
+      (
         "Valid products:",
         products.length
       );
@@ -1012,7 +1012,7 @@ router.post(
       const modified =
         result.modifiedCount || 0;
 
-      console.log(
+      (
         "Import completed:",
         {
           total:

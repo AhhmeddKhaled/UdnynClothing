@@ -1,14 +1,20 @@
 .orderStatus {
   padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-md);
   font-size: var(--text-sm);
   font-weight: bold;
   text-transform: capitalize;
   display: flex;
   align-items: center;
-  justify-content: center;
+  width: fit-content;
 }
 
 .change {
   cursor: pointer;
+}
+
+.orderStatus .statusIcon {
+  display: inline-flex;
+  vertical-align: middle;
+  font-size: var(--text-lg);
 }

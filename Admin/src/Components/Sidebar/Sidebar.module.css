@@ -1,27 +1,15 @@
 .sbAside,
 .sbTopbar {
   font-family: var(--font-body);
-
   color: var(--color-ink);
-
   border-color: var(--color-line);
-}
-
-.sbAside *,
-.sbTopbar *,
-.sbOverlay {
-  box-sizing: border-box;
 }
 
 .dashboardLayout {
   display: flex;
-
   height: 100dvh;
-
   overflow: hidden;
-
   background: var(--color-paper);
-
   color: var(--color-ink);
 }
 
@@ -243,7 +231,7 @@
   flex: 1;
   gap: var(--space-1);
   min-height: 0;
-  padding: 0 var(--space-3);
+  padding: 0 var(--space-4);
 }
 
 .sbItem {
@@ -565,10 +553,6 @@
     padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
 
     transform: translateX(-100%);
-
-    visibility: hidden;
-
-    pointer-events: none;
 
     transition:
       transform 0.25s ease,

@@ -95,7 +95,7 @@ async function login(req, res, next) {
       .select("+password")
       .populate("role", "name permissions");
 
-    console.log("LOGIN USER:", {
+    ("LOGIN USER:", {
       found: !!user,
       email: user?.email,
       role: user?.role?.name,

@@ -123,7 +123,7 @@ export default function ProductImageUpload() {
         `تم رفع صورة الصنف ${itemId} بنجاح`
       );
 
-      console.log(
+      (
         "Image upload result:",
         data
       );

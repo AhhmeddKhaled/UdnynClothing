@@ -93,9 +93,7 @@ function App() {
           <Route
             path="availableStock"
             element={
-              <AdminOnly>
                 <AvailableStock />
-              </AdminOnly>
             }
           />
 

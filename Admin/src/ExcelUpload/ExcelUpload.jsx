@@ -120,7 +120,7 @@ export default function ExcelUpload() {
         input.value = "";
       }
 
-      console.log(
+      (
         "Import result:",
         data
       );

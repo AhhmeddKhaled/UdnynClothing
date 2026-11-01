@@ -24,7 +24,6 @@ export function FieldInputGroup({ label = {}, inputOptions = {}, note = "" }) {
   const [showPassword, setShowPassword] = useState(false);
   const [valid, setValid] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
-  const [focus, setFocus] = useState(false);
 
   const handleChange = (value) => {
     const result = formValidition(inputOptions.type, value);

@@ -41,7 +41,7 @@ app.use("/api/orders", orderRoutes);
 
 // Temporary catalog POST diagnostic; remove after testing.
 app.post("/api/catalog", (_req, res) => {
-  console.log("CATALOG POST DIAGNOSTIC ROUTE REACHED");
+  ("CATALOG POST DIAGNOSTIC ROUTE REACHED");
 
   res.status(200).json({
     success: true,
@@ -52,19 +52,19 @@ app.post("/api/catalog", (_req, res) => {
 app.use(errorHandler);
 
 const server = app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
+  (`Server running on port ${PORT}`);
 });
 
 connectMongoDB();
 
 async function shutdown(signal) {
-  console.log(`${signal} received`);
+  (`${signal} received`);
 
   server.close(async () => {
     try {
       const mongoose = require("mongoose");
       await mongoose.connection.close();
-      console.log("MongoDB connection closed");
+      ("MongoDB connection closed");
     } catch (error) {
       console.error("Error closing MongoDB:", error.message);
     }

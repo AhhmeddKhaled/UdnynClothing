@@ -77,7 +77,7 @@ async function seedPermissions() {
       );
     }
 
-    console.log("Permissions seeded successfully");
+    ("Permissions seeded successfully");
   } catch (error) {
     console.error("Permission seed error:", error.message);
     throw error;

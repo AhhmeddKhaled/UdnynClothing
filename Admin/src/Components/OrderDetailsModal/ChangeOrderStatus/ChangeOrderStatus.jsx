@@ -16,7 +16,7 @@ export default function ChangeOrderStatus({
   onStatusUpdated,
   onClose,
 }) {
-  const { updateStatus, isUpdating, error, loading } = useUpdateData(id);
+  const { loading } = useUpdateData(id);
 
   const handleStatusChange = async (
     newStatus,
@@ -25,8 +25,6 @@ export default function ChangeOrderStatus({
   ) => {
     if (!isCurrentStatus && canTransitions) {
       try {
-        const data = await updateStatus(newStatus);
-
         onStatusUpdated?.(newStatus);
       } catch (err) {
         console.error("Update error:", err);

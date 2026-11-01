@@ -51,7 +51,7 @@ export default function Users() {
   //   },
   // ];
 
-  // console.log(filteredUsers);
+  // (filteredUsers);
   
   if(loading) return <LoadingSpinner />
   

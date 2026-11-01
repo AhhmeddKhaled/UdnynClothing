@@ -19,7 +19,6 @@ import ContentHeader from "../../Components/ContentHeader/ContentHeader.jsx";
 import Button from "../../Components/Button/Button";
 import StatsContainer from "../../Components/StatCard/StatsContainer";
 import StatCard from "../../Components/StatCard/StatCard";
-import OrderStatus from "../../Components/OrderStatus/OrderStatus";
 import Table from "../../Components/Table/Table.jsx";
 
 import OrderDetailsModal from "../../Components/OrderDetailsModal/OrderDetailsModal";
@@ -47,15 +46,12 @@ export default function Orders() {
     exportQPExpresse,
     exportingOrders,
     refreshOrders,
-    getCustomerName,
-    getItemCount,
     formatMoney,
-    formatDate,
     deleteOrder,
     deletingOrderId,
   } = logic;
 
-  console.log(filteredOrders);
+  (filteredOrders);
 
   const statCards = [
     {

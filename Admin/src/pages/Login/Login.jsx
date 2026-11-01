@@ -26,8 +26,8 @@ export default function Login() {
   const { t, language } = useLanguage();
 
   const handleSubmit = async (e) => {
-    console.log("Email:", JSON.stringify(email));
-    console.log("Password length:", password.length);
+    ("Email:", JSON.stringify(email));
+    ("Password length:", password.length);
 
     e.preventDefault();
     setError("");

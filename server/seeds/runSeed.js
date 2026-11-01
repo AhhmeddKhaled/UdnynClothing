@@ -11,7 +11,7 @@ async function runSeed() {
     await seedPermissions();
     await seedRoles();
 
-    console.log("Database seed completed successfully");
+    ("Database seed completed successfully");
 
     process.exit(0);
   } catch (error) {

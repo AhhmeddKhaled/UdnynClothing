@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 
 import styles from "./Sidebar.module.css";
@@ -12,24 +12,22 @@ import { useOrdersLogic } from "../../UI_Logic/OrdersLogic.jsx";
 
 import {
   getLoginTime,
-  getUser,
+  getRole,
 } from "../../services/UsersServices.js";
+
+// Import Components 
+import Dropdown from "../Dropdwon/Dropdown.jsx";
 
 import { RxDashboard } from "react-icons/rx";
 import { PiStorefrontThin } from "react-icons/pi";
 import { LiaProductHunt } from "react-icons/lia";
 import { GrCatalog } from "react-icons/gr";
-import { GoGoal } from "react-icons/go";
 import { HiOutlineUsers } from "react-icons/hi2";
 import { MdDarkMode } from "react-icons/md";
 import { CiLight, CiSettings } from "react-icons/ci";
 import { RiLogoutBoxRLine } from "react-icons/ri";
+import { IoListCircleOutline } from "react-icons/io5";
 
-import {
-  HiOutlineChevronDown,
-  HiOutlineClipboardList,
-  HiOutlinePlus,
-} from "react-icons/hi";
 
 const NAV_ITEMS = [
   {
@@ -75,23 +73,10 @@ export default function Sidebar({ user, onLogout }) {
     handleCloseMenu,
   } = useSidebarLogic(onLogout);
 
-  const currentUser = getUser();
+  const currentUser = getRole();
 
-  const role = String(
-    currentUser?.role || user?.role || ""
-  ).toLowerCase();
-
-  const isAdmin = role === "admin";
-  const isOrdersRoute = location.pathname.startsWith("/orders");
-
-  const [ordersExpanded, setOrdersExpanded] =
-    useState(isOrdersRoute);
-
-  useEffect(() => {
-    if (isOrdersRoute) {
-      setOrdersExpanded(true);
-    }
-  }, [isOrdersRoute]);
+  const isAdmin = currentUser === "admin";
+  // const isModerator = currentUser === "moderator";
 
   const loginTime = getLoginTime();
 
@@ -104,39 +89,6 @@ export default function Sidebar({ user, onLogout }) {
         }
       )
     : null;
-
-  const toggleOrders = () => {
-    setOrdersExpanded((previous) => !previous);
-  };
-
-  const handleRestrictedNavigation = (event) => {
-    if (!isAdmin) {
-      event.preventDefault();
-      event.stopPropagation();
-      return;
-    }
-
-    handleNavigation();
-  };
-
-  const getNavClassName = (isActive, disabled) =>
-    [
-      styles.sbItem,
-      isActive ? styles.sbActive : "",
-      disabled ? styles.sbItemDisabled : "",
-    ]
-      .filter(Boolean)
-      .join(" ");
-
-  
-      const getSubItemClassName = (isActive, disabled = false) =>
-    [
-      styles.sbSubitem,
-      isActive ? styles.sbSubitemActive : "",
-      disabled ? styles.sbSubitemDisabled : "",
-    ]
-      .filter(Boolean)
-      .join(" ");
 
   const themeLabel =
     theme === "dark"
@@ -230,11 +182,9 @@ export default function Sidebar({ user, onLogout }) {
               key={item.path}
               to={item.path}
               end={item.path === "/dashboard"}
-              className={({ isActive }) =>
-                getNavClassName(isActive, !isAdmin)
-              }
-              onClick={handleRestrictedNavigation}
+              className={styles.sbItem}
               aria-disabled={!isAdmin}
+              disabled={!isAdmin}
               tabIndex={isAdmin ? 0 : -1}
             >
               <span className={styles.icon}>
@@ -248,102 +198,27 @@ export default function Sidebar({ user, onLogout }) {
           ))}
 
           {/* Orders Dropdown */}
-          <div
-            className={[
-              styles.sbOrdersGroup,
-              isOrdersRoute
-                ? styles.sbOrdersGroupActive
-                : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-          >
-            <button
-              type="button"
-              className={[
-                styles.sbItem,
-                styles.sbOrdersToggle,
-                isOrdersRoute ? styles.sbActive : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              onClick={toggleOrders}
-              aria-expanded={ordersExpanded}
-              aria-controls="sb-orders-submenu"
-            >
-              <span className={styles.icon}>
-                <GoGoal size={20} />
-              </span>
-
-              <span className={styles.label}>
-                {t("sidebar", "orders")}
-              </span>
-
-              <span className={styles.ordersNote}>
-                {orders.length}
-              </span>
-
-              <HiOutlineChevronDown
-                className={[
-                  styles.sbOrdersChevron,
-                  ordersExpanded
-                    ? styles.sbChevronOpen
-                    : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-                size={16}
+             <Dropdown 
+             icon={<IoListCircleOutline size={24}/>}
+              label={t("sidebar", "Orders")}
+              options={["All Orders", "Add Order"]}
+              onSelect={(option) => {
+                if (option === "All Orders") {
+                  handleNavigation("/orders");
+                }
+                if (option === "Add Order") {
+                  handleNavigation("/orders/new");
+                }
+              }}
               />
-            </button>
-
-            {ordersExpanded && (
-              <div
-                id="sb-orders-submenu"
-                className={styles.sbSubmenu}
-              >
-                {/* All Orders */}
-                <NavLink
-                  to="/orders"
-                  end
-                  className={({ isActive }) =>
-                    getSubItemClassName(isActive, !isAdmin)
-                  }
-                  onClick={handleRestrictedNavigation}
-                  aria-disabled={!isAdmin}
-                  tabIndex={isAdmin ? 0 : -1}
-                >
-                  <HiOutlineClipboardList size={18} />
-                  <span>
-                    {t("sidebar", "allOrders")}
-                  </span>
-                </NavLink>
-
-                {/* Add Order */}
-                <NavLink
-                  to="/orders/new"
-                  className={({ isActive }) =>
-                    getSubItemClassName(isActive)
-                  }
-                  onClick={handleNavigation}
-                >
-                  <HiOutlinePlus size={18} />
-                  <span>
-                    {t("sidebar", "addOrder")}
-                  </span>
-                </NavLink>
-              </div>
-            )}
-          </div>
 
           {/* Users */}
           {NAV_ITEMS.slice(4).map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
-              className={({ isActive }) =>
-                getNavClassName(isActive, !isAdmin)
-              }
-              onClick={handleRestrictedNavigation}
+              className={styles.sbItem}
+              // onClick={handleRestrictedNavigation}
               aria-disabled={!isAdmin}
               tabIndex={isAdmin ? 0 : -1}
             >
@@ -373,8 +248,8 @@ export default function Sidebar({ user, onLogout }) {
                 </b>
 
                 <span className={styles.sbUserRole}>
-                  {role
-                    ? t("sidebar", role) || role
+                  {currentUser
+                    ? t("sidebar", currentUser) || currentUser
                     : t("sidebar", "user")}
                 </span>
               </div>

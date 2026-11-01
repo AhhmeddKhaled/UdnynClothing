@@ -112,7 +112,7 @@ async function importProducts(req, res, next) {
         active: false,
       });
 
-    console.log("Excel import completed:", {
+    ("Excel import completed:", {
       totalCount,
       activeCount,
       inactiveCount,
@@ -168,7 +168,7 @@ async function getProducts(req, res, next) {
         active: false,
       });
 
-    console.log("Available Stock:", {
+    ("Available Stock:", {
       totalCount,
       activeCount,
       inactiveCount,

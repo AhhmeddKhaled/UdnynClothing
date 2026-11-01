@@ -124,6 +124,12 @@ input[type="submit"] {
   font-weight: bold;
 }
 
+a:disabled {
+  pointer-events: not-allowed;
+  opacity: .5;
+  background-color: red;
+}
+
 svg {
   font-size: var(--text-base);
   border-radius: var(--radius-circle);

@@ -5,7 +5,7 @@ async function seedDatabase() {
   await seedPermissions();
   await seedRoles();
 
-  console.log("Database seed completed");
+  ("Database seed completed");
 }
 
 module.exports = seedDatabase;
