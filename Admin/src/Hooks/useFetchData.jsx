@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
+import { getToken } from "../services/UsersServices.js";
 
-export function useFetchData(url, authFetch, options = {}) {
+export function useFetchData(url, options = {}) {
   const {
     initialData = null,
     enabled = true,
@@ -17,8 +18,20 @@ export function useFetchData(url, authFetch, options = {}) {
     setError("");
 
     try {
-      const response = await authFetch(url, {
+      const token = getToken();
+
+      const headers = {
+        "Content-Type": "application/json",
+      };
+
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+
+      const response = await fetch(url, {
+        method: "GET",
         cache: "no-store",
+        headers,
       });
 
       const result = await response.json();
@@ -26,29 +39,21 @@ export function useFetchData(url, authFetch, options = {}) {
       if (!response.ok || result?.success === false) {
         throw new Error(
           result?.message ||
-            result?.error ||
-            "Unexpected response from server"
+          result?.error ||
+          "Unexpected response from server"
         );
       }
 
-      // يدعم أي شكل للاستجابة:
-      // Array, Object, String, Number, Boolean
       setData(result);
       return result;
     } catch (err) {
       console.error("Data loading error:", err);
-
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Couldn't reach the data"
-      );
-
+      setError(err.message || "Couldn't reach the data");
       return null;
     } finally {
       setLoading(false);
     }
-  }, [url, authFetch, enabled]);
+  }, [url, enabled]);
 
   useEffect(() => {
     load();
@@ -58,7 +63,9 @@ export function useFetchData(url, authFetch, options = {}) {
     data,
     setData,
     loading,
+    setLoading,
     error,
+    setError,
     load,
   };
 }

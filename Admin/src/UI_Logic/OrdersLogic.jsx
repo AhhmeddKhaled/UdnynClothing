@@ -2,6 +2,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { authFetch } from "../services/UsersServices.js";
 import { Audio } from "../services/audio.js";
 
+import { useFetchData } from "../Hooks/useFetchData.jsx";
+
+import useDeleteItem from "../Hooks/useDeleteItem.jsx";
+
 import {
   validateOrderForm,
   getCustomerName,
@@ -23,18 +27,26 @@ import {
 } from "../services/OrdersServices.js";
 
 export function useOrdersLogic() {
-  const [orders, setOrders] = useState([]);
+
+  const { deleteItem, isDeleting, error: deleteError } = useDeleteItem();
+
+  const {
+    data: orders = [],
+    setData: setOrders,
+    loading,
+    setLoading,
+    error,
+    setError,
+  } = useFetchData("/api/orders", { initialData: [], enabled: true });
+
   const [products, setProducts] = useState([]);
 
-  const [loading, setLoading] = useState(true);
   const [productsLoading, setProductsLoading] = useState(true);
 
   const [addingOrder, setAddingOrder] = useState(false);
-  const [deletingOrderId, setDeletingOrderId] = useState(null);
 
   const [unit, setUnitPrice] = useState("retail");
 
-  const [error, setError] = useState("");
   const [productsError, setProductsError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
@@ -564,40 +576,15 @@ export function useOrdersLogic() {
     }
   }, []);
 
-  const deleteOrder = async (order) => {
-    const orderId = order?._id || order?.id;
 
-    if (!orderId || deletingOrderId) return;
-
-    const confirmed = window.confirm(
-      `هل أنت متأكد من حذف الأوردر ${
-        order.orderNumber || orderId
-      }؟ لا يمكن التراجع عن هذا الإجراء.`,
-    );
-
-    if (!confirmed) return;
-
-    setDeletingOrderId(orderId);
-    setError("");
-
+  const deleteOrder = async (id) => {
     try {
-      const response = await authFetch(
-        `/api/orders/${encodeURIComponent(orderId)}`,
-        { method: "DELETE" },
-      );
+      await deleteItem(id);
 
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(data.message || "فشل حذف الأوردر");
-      }
-
-      setSuccessMessage("تم حذف الأوردر بنجاح");
+      // Refresh after successful deletion
       await refreshOrders();
-    } catch (error) {
-      setError(error.message || "حدث خطأ أثناء حذف الأوردر");
-    } finally {
-      setDeletingOrderId(null);
+    } catch (err) {
+      console.error("Delete order failed:", err.message);
     }
   };
 
@@ -635,7 +622,8 @@ export function useOrdersLogic() {
     addOrder,
 
     deleteOrder,
-    deletingOrderId,
+    isDeleting,
+    deleteError,
 
     showAddOrder,
     openAddOrder,

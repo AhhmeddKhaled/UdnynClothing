@@ -1,8 +1,6 @@
 import "./Dashboard.css";
-import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
 
-import { authFetch } from "../../services/UsersServices.js";
 import { useDashboardLogic } from "../../UI_Logic/DashboardLogic.jsx";
 import { useLanguage } from "../../context/LanguageContext.jsx";
 
@@ -21,23 +19,9 @@ export default function Dashboard() {
   const { user } = useOutletContext();
   const { language, t } = useLanguage();
 
-  const [sessionTime, setSessionTime] = useState("");
-
-  useEffect(() => {
-    const now = new Date();
-
-    setSessionTime(
-      now.toLocaleTimeString(language === "ar" ? "ar-EG" : "en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    );
-  }, [language]);
-
   const {
     loading,
     error,
-    syncedAt,
     load,
     active,
     totalQuantity,
@@ -45,13 +29,10 @@ export default function Dashboard() {
     negative,
     noCategory,
     noImage,
-    categories,
-    maxCategory,
     manufacturers,
     withImage,
     photoPercentage,
-    missingDataTotal,
-  } = useDashboardLogic(authFetch);
+  } = useDashboardLogic();
 
   const statsData = [
     {
@@ -115,7 +96,6 @@ export default function Dashboard() {
         title={t("dashboard", "title")}
         subTitle={t("dashboard", "subtitle")}
         user={user}
-        sessionTime={sessionTime}
         action={
           <Button icon={<CiExport />}>
             {t("dashboard", "exportReport")}

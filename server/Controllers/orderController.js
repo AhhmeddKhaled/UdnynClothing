@@ -442,6 +442,12 @@ async function createOrder(req, res, next) {
 
 async function getMyOrders(req, res, next) {
   try {
+
+    console.log("GET MY ORDERS:", {
+      userId: req.user?._id,
+      query: req.query,
+    });
+    
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
     const limit = Math.min(
       100,

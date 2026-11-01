@@ -1,22 +1,19 @@
 import { useMemo } from "react";
 import { useFetchData } from "../Hooks/useFetchData";
 
-export function useDashboardLogic(authFetch) {
+export function useDashboardLogic() {
   const {
-    data,
+    data: products = [],
     loading,
     error,
     load,
-  } = useFetchData("/api/availableStock", authFetch);
+  } = useFetchData("/api/availableStock", {
+    initialData: [],
+    enabled: true,
+  });
 
-const products = Array.isArray(data)
-  ? data
-  : Array.isArray(data?.products)
-    ? data.products
-    : [];
-    
-  const stats = useMemo(() => {
-    const active = products;
+  const dashboard = useMemo(() => {
+    const active = Array.isArray(products) ? products : [];
 
     const totalQuantity = active.reduce(
       (sum, product) => sum + (Number(product.qty) || 0),
@@ -28,13 +25,10 @@ const products = Array.isArray(data)
       return qty > 0 && qty <= 5;
     });
 
-    const negative = active.filter(
-      (product) => Number(product.qty) < 0
-    );
+    const negative = active.filter((product) => Number(product.qty) < 0);
 
     const noCategory = active.filter(
-      (product) =>
-        !product.category || !String(product.category).trim()
+      (product) => !product.category || !String(product.category).trim()
     );
 
     const noImage = active.filter((product) => !product.imagePath);
@@ -42,7 +36,7 @@ const products = Array.isArray(data)
     const categoryMap = {};
 
     active.forEach((product) => {
-      const category = product.category?.trim() || "Uncategorized";
+      const category = String(product.category || "").trim() || "Uncategorized";
       categoryMap[category] = (categoryMap[category] || 0) + 1;
     });
 
@@ -55,7 +49,7 @@ const products = Array.isArray(data)
     const manufacturerMap = {};
 
     active.forEach((product) => {
-      const manufacturer = product.manufacturer?.trim();
+      const manufacturer = String(product.manufacturer || "").trim();
 
       if (manufacturer) {
         manufacturerMap[manufacturer] =
@@ -93,10 +87,10 @@ const products = Array.isArray(data)
   }, [products]);
 
   return {
+    ...dashboard,
     products,
     loading,
     error,
     load,
-    ...stats,
   };
 }

@@ -19,7 +19,7 @@ import ToolBar from "../Components/ToolBar/ToolBar";
 import styles from "./Layout.module.css";
 
 export default function Layout() {
-  const { toggleLanguage, language, t } = useLanguage();
+  const { language} = useLanguage();
 
   const { syncedAt, load, loading, missingDataTotal } =
     useDashboardLogic(authFetch);

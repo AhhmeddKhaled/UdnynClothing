@@ -47,11 +47,12 @@ export default function Orders() {
     exportingOrders,
     refreshOrders,
     formatMoney,
+
     deleteOrder,
-    deletingOrderId,
+    isDeleting,
   } = logic;
 
-  (filteredOrders);
+  filteredOrders;
 
   const statCards = [
     {
@@ -118,7 +119,7 @@ export default function Orders() {
       element: (order) => (
         <Button
           variant="details"
-          disabled={Boolean(deletingOrderId)}
+          disabled={Boolean(isDeleting)}
           onClick={() => setSelectedOrder(order)}
         ></Button>
       ),
@@ -127,14 +128,16 @@ export default function Orders() {
       element: (order) => (
         <Button
           variant="delete"
-          onClick={() => deleteOrder(order)}
-          disabled={Boolean(deletingOrderId)}
-          // loading={deletingOrderId === orderId}
-          aria-label={`Delete order ${order.orderNumber || ""}`}
-        ></Button>
+          onClick={() => {
+            deleteOrder(order?._id);
+          }}
+          disabled={Boolean(isDeleting)}
+        />
       ),
     },
   ];
+
+  console.log("filteredOrders", filteredOrders);
 
   return (
     <section className="orders-page">
@@ -201,8 +204,6 @@ export default function Orders() {
       </StatsContainer>
 
       <section className="orders-panel">
-      
-
         <div className="orders-toolbar">
           <label className="orders-search">
             <input
@@ -308,7 +309,6 @@ export default function Orders() {
           </div>
         )}
 
-
         <footer className="orders-panel-footer">
           <span>Live data from the Orders API</span>
 
@@ -323,7 +323,7 @@ export default function Orders() {
       </section>
 
       {selectedOrder && (
-        <OrderDetailsModal order={selectedOrder} logic={logic}/>
+        <OrderDetailsModal order={selectedOrder} logic={logic} />
       )}
     </section>
   );
