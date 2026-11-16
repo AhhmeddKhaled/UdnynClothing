@@ -222,16 +222,17 @@ export function useOrdersLogic() {
   );
 
   const statusCounts = useMemo(() => {
-    const counts = { all: orders.length };
+    const counts = { all: orders?.length };
 
     for (const status of STATUSES) {
-      counts[status] = orders.filter((order) => order.status === status).length;
+      counts[status] = orders.filter((order) => order.status === status);
     }
 
     return counts;
   }, [orders]);
 
   const stats = useMemo(() => {
+
     const countByStatus = (status) =>
       orders.filter((order) => order.status === status).length;
 
@@ -253,8 +254,7 @@ export function useOrdersLogic() {
   const filteredOrders = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return orders
-      .filter((order) => {
+    return orders.filter((order) => {
         const matchesStatus =
           statusFilter === "all" || order.status === statusFilter;
 

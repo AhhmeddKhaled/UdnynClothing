@@ -1,9 +1,10 @@
 .table {
-  width: max-content;
   min-width: 100%;
+  width: max-content;
   border-collapse: collapse;
   table-layout: auto;
-
+  max-height: 300px;
+  overflow: auto;
   th,
   td {
     width: 1px;

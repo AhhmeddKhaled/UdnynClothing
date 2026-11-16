@@ -14,6 +14,7 @@ import LoadingSpinner from "../../Components/LoadingSpinner/LoadingSpinner.jsx";
 import StatCard from "../../Components/StatCard/StatCard";
 import StatsContainer from "../../Components/StatCard/StatsContainer";
 import RevenueChart from "../../Components/Charts/DashboardChart";
+import DataError from "../../Components/DataError/DataError";
 
 export default function Dashboard() {
   const { user } = useOutletContext();
@@ -69,21 +70,7 @@ export default function Dashboard() {
   // Error
   if (error) {
     return (
-      <div
-        className="dash-state"
-        dir={language === "ar" ? "rtl" : "ltr"}
-      >
-        <b>{t("dashboard", "loadError")}</b>
-        <p>{error}</p>
-
-        <button
-          type="button"
-          className="dash-btn dash-btn-primary dash-retry-btn"
-          onClick={load}
-        >
-          {t("dashboard", "tryAgain")}
-        </button>
-      </div>
+      <DataError />
     );
   }
 

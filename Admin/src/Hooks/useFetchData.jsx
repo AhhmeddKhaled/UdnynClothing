@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { getToken } from "../services/UsersServices.js";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export function useFetchData(url, options = {}) {
   const {
     initialData = null,
@@ -28,11 +30,12 @@ export function useFetchData(url, options = {}) {
         headers.Authorization = `Bearer ${token}`;
       }
 
-      const response = await fetch(url, {
+      const response = await fetch(`${API_URL}${url}`, {
         method: "GET",
         cache: "no-store",
         headers,
       });
+
 
       const result = await response.json();
 
@@ -45,6 +48,9 @@ export function useFetchData(url, options = {}) {
       }
 
       setData(result);
+
+      console.log(data);
+      
       return result;
     } catch (err) {
       console.error("Data loading error:", err);

@@ -166,7 +166,6 @@ export function isLoggedIn() {
   return Boolean(localStorage.getItem("token"));
 }
 
-
 export function getToken() {
 
   const token = localStorage.getItem("token");

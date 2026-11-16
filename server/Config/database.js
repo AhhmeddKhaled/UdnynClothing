@@ -7,14 +7,14 @@ async function connectMongoDB() {
   }
 
   try {
-    console.log("Connecting to MongoDB...");
+    ("Connecting to MongoDB...");
 
     await mongoose.connect(process.env.MONGO_URI, {
       serverSelectionTimeoutMS: 5000,
       connectTimeoutMS: 5000,
     });
 
-    console.log("MongoDB connected successfully");
+    ("MongoDB connected successfully");
   } catch (err) {
     console.error(
       "MongoDB connection error:",
@@ -28,7 +28,7 @@ async function connectMongoDB() {
 // ======================================================
 
 mongoose.connection.on("connected", () => {
-  console.log("Mongoose: connected");
+  ("Mongoose: connected");
 });
 
 mongoose.connection.on("error", (err) => {
@@ -39,7 +39,7 @@ mongoose.connection.on("error", (err) => {
 });
 
 mongoose.connection.on("disconnected", () => {
-  console.log("Mongoose: disconnected");
+  ("Mongoose: disconnected");
 });
 
 module.exports = connectMongoDB;

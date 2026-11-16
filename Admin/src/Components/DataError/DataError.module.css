@@ -1,0 +1,16 @@
+.dataErrorDiv {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    img {
+        width: 400px;
+        height: 400px;
+    }
+
+    .try {
+        font-size: var(--text-lg);
+        text-transform: capitalize;
+    }
+}

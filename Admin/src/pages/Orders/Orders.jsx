@@ -137,8 +137,6 @@ export default function Orders() {
     },
   ];
 
-  console.log("filteredOrders", filteredOrders);
-
   return (
     <section className="orders-page">
       <ContentHeader
