@@ -57,6 +57,12 @@ async function createOrder(req, res, next) {
   try {
     const body = req.body || {};
 
+    const creatorId = req.user?._id;
+
+    if (!creatorId) {
+      return sendError(res, 401, "Authentication required");
+    }
+
     const {
       customerName,
       customerPhone,
@@ -68,7 +74,6 @@ async function createOrder(req, res, next) {
 
     let items = body.items;
 
-    // Parse order items
     if (typeof items === "string") {
       try {
         items = JSON.parse(items);
@@ -77,7 +82,6 @@ async function createOrder(req, res, next) {
       }
     }
 
-    // Validate customer name
     if (
       typeof customerName !== "string" ||
       !customerName.trim() ||
@@ -86,7 +90,6 @@ async function createOrder(req, res, next) {
       return sendError(res, 400, "Valid customer name is required");
     }
 
-    // Validate phone
     if (
       typeof customerPhone !== "string" ||
       !customerPhone.trim() ||
@@ -95,7 +98,6 @@ async function createOrder(req, res, next) {
       return sendError(res, 400, "Valid customer phone is required");
     }
 
-    // Validate governorate
     if (
       typeof governorate !== "string" ||
       !EGYPTIAN_GOVERNORATES.includes(governorate.trim())
@@ -103,7 +105,6 @@ async function createOrder(req, res, next) {
       return sendError(res, 400, "Please select a valid governorate");
     }
 
-    // Validate address
     if (
       typeof shippingAddress !== "string" ||
       !shippingAddress.trim() ||
@@ -112,15 +113,10 @@ async function createOrder(req, res, next) {
       return sendError(res, 400, "Valid shipping address is required");
     }
 
-    // Validate note
-    if (
-      typeof customerNote !== "string" ||
-      customerNote.length > 2000
-    ) {
+    if (typeof customerNote !== "string" || customerNote.length > 2000) {
       return sendError(res, 400, "Invalid customer note");
     }
 
-    // Validate shipping cost
     const parsedShippingCost = Number(shippingCost);
 
     if (
@@ -131,20 +127,14 @@ async function createOrder(req, res, next) {
       return sendError(res, 400, "Invalid shipping cost");
     }
 
-    // Validate items
     if (!Array.isArray(items) || items.length === 0) {
-      return sendError(
-        res,
-        400,
-        "Order must contain at least one item",
-      );
+      return sendError(res, 400, "Order must contain at least one item");
     }
 
     if (items.length > 100) {
       return sendError(res, 400, "Order contains too many items");
     }
 
-    // Process uploaded images
     const imagePathByItemId = new Map();
 
     for (const file of uploadedFiles) {
@@ -182,7 +172,6 @@ async function createOrder(req, res, next) {
       );
     }
 
-    // Validate and combine duplicate items
     const quantitiesByItemId = new Map();
 
     for (const item of items) {
@@ -194,27 +183,15 @@ async function createOrder(req, res, next) {
         .toLowerCase();
 
       if (!Number.isSafeInteger(itemId) || itemId <= 0) {
-        return sendError(
-          res,
-          400,
-          "Each item must have a valid itemId",
-        );
+        return sendError(res, 400, "Each item must have a valid itemId");
       }
 
       if (!Number.isSafeInteger(quantity) || quantity <= 0) {
-        return sendError(
-          res,
-          400,
-          "Each quantity must be a positive integer",
-        );
+        return sendError(res, 400, "Each quantity must be a positive integer");
       }
 
       if (!["retail", "wholesale", "offer"].includes(priceType)) {
-        return sendError(
-          res,
-          400,
-          `Invalid price type for item ${itemId}`,
-        );
+        return sendError(res, 400, `Invalid price type for item ${itemId}`);
       }
 
       const existing = quantitiesByItemId.get(itemId);
@@ -227,15 +204,10 @@ async function createOrder(req, res, next) {
         );
       }
 
-      const combinedQuantity =
-        (existing?.quantity || 0) + quantity;
+      const combinedQuantity = (existing?.quantity || 0) + quantity;
 
       if (!Number.isSafeInteger(combinedQuantity)) {
-        return sendError(
-          res,
-          400,
-          "Invalid combined item quantity",
-        );
+        return sendError(res, 400, "Invalid combined item quantity");
       }
 
       quantitiesByItemId.set(itemId, {
@@ -244,7 +216,6 @@ async function createOrder(req, res, next) {
       });
     }
 
-    // Validate uploaded image references
     for (const itemId of imagePathByItemId.keys()) {
       if (!quantitiesByItemId.has(itemId)) {
         return sendError(
@@ -271,11 +242,7 @@ async function createOrder(req, res, next) {
       const orderItems = [];
       let subtotal = 0;
 
-      for (const {
-        itemId,
-        quantity,
-        priceType,
-      } of requestedItems) {
+      for (const { itemId, quantity, priceType } of requestedItems) {
         // Deduct stock atomically
         const stockItem = await AvailableStock.findOneAndUpdate(
           {
@@ -300,7 +267,7 @@ async function createOrder(req, res, next) {
             .session(session)
             .lean();
 
-          ("STOCK DEBUG:", {
+          console.log("STOCK DEBUG:", {
             itemId,
             requestedQuantity: quantity,
             stock: existingItem,
@@ -343,13 +310,9 @@ async function createOrder(req, res, next) {
         }
 
         // Calculate line total
-        const lineTotal = Number(
-          (unitPrice * quantity).toFixed(2),
-        );
+        const lineTotal = Number((unitPrice * quantity).toFixed(2));
 
-        subtotal = Number(
-          (subtotal + lineTotal).toFixed(2),
-        );
+        subtotal = Number((subtotal + lineTotal).toFixed(2));
 
         // Add item to order
         orderItems.push({
@@ -358,21 +321,20 @@ async function createOrder(req, res, next) {
           unitPrice,
           quantity,
           lineTotal,
-          realImagePath:
-            imagePathByItemId.get(itemId) || null,
+          realImagePath: imagePathByItemId.get(itemId) || null,
         });
       }
 
       // Calculate total
-      const totalAmount = Number(
-        (subtotal + parsedShippingCost).toFixed(2),
-      );
+      const totalAmount = Number((subtotal + parsedShippingCost).toFixed(2));
 
       // Create order
       const [createdOrder] = await Order.create(
         [
           {
             orderNumber: getOrderNumber(),
+
+            createdBy: creatorId, // الجديد
 
             customer: null,
             customerName: customerName.trim(),
@@ -403,7 +365,6 @@ async function createOrder(req, res, next) {
       message: "Order created successfully",
       order: responseOrder,
     });
-
   } catch (error) {
     console.error("CREATE ORDER ERROR:", error);
 
@@ -412,23 +373,14 @@ async function createOrder(req, res, next) {
     }
 
     if (error.statusCode) {
-      return sendError(
-        res,
-        error.statusCode,
-        error.message,
-      );
+      return sendError(res, error.statusCode, error.message);
     }
 
     if (error.code === 11000) {
-      return sendError(
-        res,
-        409,
-        "Order number conflict. Please try again.",
-      );
+      return sendError(res, 409, "Order number conflict. Please try again.");
     }
 
     return next(error);
-
   } finally {
     if (session) {
       await session.endSession();
@@ -443,11 +395,6 @@ async function createOrder(req, res, next) {
 async function getMyOrders(req, res, next) {
   try {
 
-    console.log("GET MY ORDERS:", {
-      userId: req.user?._id,
-      query: req.query,
-    });
-    
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
     const limit = Math.min(
       100,

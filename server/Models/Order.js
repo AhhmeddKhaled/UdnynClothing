@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { EGYPTIAN_GOVERNORATES, VALID_STATUSES } = require("../Data/OrdersData");
 
 const orderItemSchema = new mongoose.Schema(
   {
@@ -12,29 +11,23 @@ const orderItemSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-
-     unitPrice: {
-      type: String,
+    unitPrice: {
+      type: Number,
       required: true,
       min: 0,
     },
-
-
     offerPrice: {
       type: Number,
       min: 0,
     },
-
     wholesalePrice: {
       type: Number,
       min: 0,
     },
-
     retailPrice: {
       type: Number,
       min: 0,
     },
-
     quantity: {
       type: Number,
       required: true,
@@ -49,7 +42,6 @@ const orderItemSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
-
     realImagePath: {
       type: String,
       default: null,
@@ -65,112 +57,81 @@ const orderSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
-      index: true,
     },
 
-    customer: {
+    
+    createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null,
       index: true,
     },
 
+    customer: {
+      type: mongoose.Schema.Types.ObjectId,
+      default: null,
+    },
     customerName: {
       type: String,
       required: true,
       trim: true,
-      maxlength: 120,
     },
-
     customerPhone: {
       type: String,
       required: true,
       trim: true,
-      maxlength: 30,
     },
 
     items: {
       type: [orderItemSchema],
-      required: true,
-      validate: {
-        validator: (items) => Array.isArray(items) && items.length > 0,
-        message: "Order must contain at least one item",
-      },
+      default: [],
     },
-
-    // Product subtotal before shipping.
     subtotal: {
       type: Number,
       required: true,
       min: 0,
     },
-
     shippingCost: {
       type: Number,
-      required: true,
-      min: 0,
       default: 0,
+      min: 0,
     },
-
-    // Total = subtotal + shippingCost.
     totalAmount: {
       type: Number,
       required: true,
       min: 0,
     },
 
-    status: {
-      type: String,
-      enum: VALID_STATUSES,
-      default: "pending",
-      index: true,
-    },
-
-    // Customer-selected Egyptian governorate.
     governorate: {
       type: String,
-      required: [true, "Governorate is required"],
+      required: true,
       trim: true,
-      enum: {
-        values: EGYPTIAN_GOVERNORATES,
-        message: "Please select a valid Egyptian governorate",
-      },
     },
-
     shippingAddress: {
       type: String,
       required: true,
       trim: true,
-      maxlength: 1000,
     },
-
     customerNote: {
       type: String,
-      trim: true,
       default: "",
-      maxlength: 2000,
+      trim: true,
     },
 
-    statusUpdatedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      default: null,
-    },
-
-    statusUpdatedAt: {
-      type: Date,
-      default: null,
-    },
-
-    stockRestored: {
-      type: Boolean,
-      default: false,
+    status: {
+      type: String,
+      enum: [
+        "pending",
+        "confirmed",
+        "processing",
+        "shipped",
+        "delivered",
+        "cancelled",
+      ],
+      default: "pending",
     },
   },
   { timestamps: true },
 );
 
-orderSchema.index({ customer: 1, createdAt: -1 });
-orderSchema.index({ status: 1, createdAt: -1 });
-
-module.exports = mongoose.models.Order || mongoose.model("Order", orderSchema);
+module.exports = mongoose.model("Order", orderSchema);

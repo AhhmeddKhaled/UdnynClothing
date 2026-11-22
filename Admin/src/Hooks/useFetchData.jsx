@@ -49,8 +49,6 @@ export function useFetchData(url, options = {}) {
 
       setData(result);
 
-      console.log(data);
-      
       return result;
     } catch (err) {
       console.error("Data loading error:", err);

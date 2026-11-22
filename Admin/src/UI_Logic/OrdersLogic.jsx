@@ -39,6 +39,8 @@ export function useOrdersLogic() {
     setError,
   } = useFetchData("/api/orders", { initialData: [], enabled: true });
 
+  console.log(orders);
+  
   const [products, setProducts] = useState([]);
 
   const [productsLoading, setProductsLoading] = useState(true);
@@ -57,7 +59,9 @@ export function useOrdersLogic() {
   const [changeOrderStatus, setChangeOderStatus] = useState(false);
 
   const [showAddOrder, setShowAddOrder] = useState(false);
+
   const [form, setForm] = useState({ ...EMPTY_FORM });
+
   const [formError, setFormError] = useState("");
 
   const updateFormField = useCallback((field, value) => {
@@ -221,100 +225,106 @@ export function useOrdersLogic() {
     [refreshOrders, refreshProducts],
   );
 
-  const statusCounts = useMemo(() => {
-    const counts = { all: orders?.length };
+const safeOrders = useMemo(() => {
+  if (Array.isArray(orders)) return orders;
+  if (Array.isArray(orders?.data)) return orders.data;
+  if (Array.isArray(orders?.orders)) return orders.orders;
+  return [];
+}, [orders]);
 
-    for (const status of STATUSES) {
-      counts[status] = orders.filter((order) => order.status === status);
-    }
+const statusCounts = useMemo(() => {
+  const counts = { all: safeOrders.length };
 
-    return counts;
-  }, [orders]);
+  for (const status of STATUSES) {
+    counts[status] = safeOrders.filter((order) => order.status === status).length;
+  }
 
-  const stats = useMemo(() => {
+  return counts;
+}, [safeOrders]);
 
-    const countByStatus = (status) =>
-      orders.filter((order) => order.status === status).length;
+const stats = useMemo(() => {
+  const countByStatus = (status) =>
+    safeOrders.filter((order) => order.status === status).length;
 
-    return {
-      total: orders.length,
-      pending: countByStatus("pending"),
-      inProgress: orders.filter((order) =>
-        ["confirmed", "processing"].includes(order.status),
-      ).length,
-      shipped: countByStatus("shipped"),
-      delivered: countByStatus("delivered"),
-      cancelled: countByStatus("cancelled"),
-      revenue: orders
-        .filter((order) => order.status !== "cancelled")
-        .reduce((total, order) => total + Number(order.totalAmount || 0), 0),
-    };
-  }, [orders]);
+  return {
+    total: safeOrders.length,
+    pending: countByStatus("pending"),
+    inProgress: safeOrders.filter((order) =>
+      ["confirmed", "processing"].includes(order.status),
+    ).length,
+    shipped: countByStatus("shipped"),
+    delivered: countByStatus("delivered"),
+    cancelled: countByStatus("cancelled"),
+    revenue: safeOrders
+      .filter((order) => order.status !== "cancelled")
+      .reduce((total, order) => total + Number(order.totalAmount || 0), 0),
+  };
+}, [safeOrders]);
 
-  const filteredOrders = useMemo(() => {
-    const query = search.trim().toLowerCase();
+const filteredOrders = useMemo(() => {
+  const query = search.trim().toLowerCase();
 
-    return orders.filter((order) => {
-        const matchesStatus =
-          statusFilter === "all" || order.status === statusFilter;
+  return safeOrders
+    .filter((order) => {
+      const matchesStatus =
+        statusFilter === "all" || order.status === statusFilter;
 
-        const itemNames = (order.items || [])
-          .map((item) => item.name || item.productName || "")
-          .join(" ");
+      const itemNames = (Array.isArray(order.items) ? order.items : [])
+        .map((item) => item.name || item.productName || "")
+        .join(" ");
 
-        const searchableText = [
-          order.orderNumber,
-          getCustomerName(order),
-          getCustomerPhone(order),
-          getCustomerEmail(order),
-          order.shippingAddress,
-          itemNames,
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
+      const searchableText = [
+        order.orderNumber,
+        getCustomerName(order),
+        getCustomerPhone(order),
+        getCustomerEmail(order),
+        order.shippingAddress,
+        itemNames,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
 
-        return matchesStatus && searchableText.includes(query);
-      })
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt || 0).getTime() -
-          new Date(a.createdAt || 0).getTime(),
-      );
-  }, [orders, search, statusFilter]);
+      return matchesStatus && searchableText.includes(query);
+    })
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt || 0).getTime() -
+        new Date(a.createdAt || 0).getTime(),
+    );
+}, [safeOrders, search, statusFilter]);
 
-  const filteredProducts = useMemo(() => {
-    const query = form.productSearch.trim().toLowerCase();
+const filteredProducts = useMemo(() => {
+  const query = (form.productSearch || "").trim().toLowerCase();
+  const list = Array.isArray(products) ? products : [];
 
-    return products.filter((product) => {
-      if (!query) return true;
+  return list.filter((product) => {
+    if (!query) return true;
 
-      return (
-        String(product.name || "")
-          .toLowerCase()
-          .includes(query) ||
-        String(product.itemId ?? "")
-          .toLowerCase()
-          .includes(query)
-      );
-    });
-  }, [products, form.productSearch]);
+    return (
+      String(product.name || "").toLowerCase().includes(query) ||
+      String(product.itemId ?? "").toLowerCase().includes(query)
+    );
+  });
+}, [products, form.productSearch]);
 
-  const selectedProduct = useMemo(
-    () =>
-      products.find((product) => String(product.itemId) === form.productId) ||
-      null,
-    [products, form.productId],
-  );
+const selectedProduct = useMemo(
+  () =>
+    (Array.isArray(products) ? products : []).find(
+      (product) => String(product.itemId) === form.productId,
+    ) || null,
+  [products, form.productId],
+);
 
-  const estimatedSubtotal = useMemo(
-    () =>
-      form.items.reduce(
-        (total, item) => total + Number(item.unitPrice) * Number(item.quantity),
-        0,
-      ),
-    [form.items],
-  );
+const estimatedSubtotal = useMemo(
+  () =>
+    (form.items || []).reduce(
+      (total, item) =>
+        total + Number(item.unitPrice || 0) * Number(item.quantity || 0),
+      0,
+    ),
+  [form.items],
+);
 
   const parsedShippingCost = Number(form.shippingCost);
 
