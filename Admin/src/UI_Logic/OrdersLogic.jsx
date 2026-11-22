@@ -42,26 +42,17 @@ export function useOrdersLogic() {
   console.log(orders);
   
   const [products, setProducts] = useState([]);
-
   const [productsLoading, setProductsLoading] = useState(true);
-
   const [addingOrder, setAddingOrder] = useState(false);
-
   const [unit, setUnitPrice] = useState("retail");
-
   const [productsError, setProductsError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState(null);
-
   const [changeOrderStatus, setChangeOderStatus] = useState(false);
-
   const [showAddOrder, setShowAddOrder] = useState(false);
-
   const [form, setForm] = useState({ ...EMPTY_FORM });
-
   const [formError, setFormError] = useState("");
 
   const updateFormField = useCallback((field, value) => {

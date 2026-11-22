@@ -243,7 +243,6 @@ async function createOrder(req, res, next) {
       let subtotal = 0;
 
       for (const { itemId, quantity, priceType } of requestedItems) {
-        // Deduct stock atomically
         const stockItem = await AvailableStock.findOneAndUpdate(
           {
             itemId,
@@ -259,7 +258,6 @@ async function createOrder(req, res, next) {
           },
         );
 
-        // Check stock availability
         if (!stockItem) {
           const existingItem = await AvailableStock.findOne({
             itemId,
@@ -284,7 +282,6 @@ async function createOrder(req, res, next) {
           throw error;
         }
 
-        // Get selected price
         const priceMap = {
           retail: stockItem.retailPrice,
           wholesale: stockItem.wholesalePrice,
@@ -309,12 +306,10 @@ async function createOrder(req, res, next) {
           throw error;
         }
 
-        // Calculate line total
         const lineTotal = Number((unitPrice * quantity).toFixed(2));
 
         subtotal = Number((subtotal + lineTotal).toFixed(2));
 
-        // Add item to order
         orderItems.push({
           itemId: stockItem.itemId,
           name: stockItem.name,
@@ -334,7 +329,7 @@ async function createOrder(req, res, next) {
           {
             orderNumber: getOrderNumber(),
 
-            createdBy: creatorId, // الجديد
+            createdBy: creatorId,
 
             customer: null,
             customerName: customerName.trim(),
