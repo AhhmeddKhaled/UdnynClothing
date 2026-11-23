@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { authFetch } from "../services/UsersServices.js";
 import { Audio } from "../services/audio.js";
+import { getRole, getUser } from "../services/UsersServices.js";
 
 import { useFetchData } from "../Hooks/useFetchData.jsx";
 
@@ -28,19 +29,22 @@ import {
 
 export function useOrdersLogic() {
 
+  const userRole = getRole()
+  const userId = getUser().id;
+
   const { deleteItem, isDeleting, error: deleteError } = useDeleteItem();
 
   const {
-    data: orders = [],
+    data,
     setData: setOrders,
     loading,
     setLoading,
     error,
     setError,
   } = useFetchData("/api/orders", { initialData: [], enabled: true });
-
-  console.log(orders);
   
+  const orders = Array.isArray(data.orders) ? data.orders : [];
+
   const [products, setProducts] = useState([]);
   const [productsLoading, setProductsLoading] = useState(true);
   const [addingOrder, setAddingOrder] = useState(false);
@@ -54,6 +58,14 @@ export function useOrdersLogic() {
   const [showAddOrder, setShowAddOrder] = useState(false);
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [formError, setFormError] = useState("");
+
+  const filteredOrdersByModerator = () => {
+    if(userRole === 'admin') {
+      return orders
+    } else {
+      return orders.filter((order) => order.createdBy === userId)
+    }
+  }
 
   const updateFormField = useCallback((field, value) => {
     setForm((current) => ({ ...current, [field]: value }));
@@ -78,12 +90,8 @@ export function useOrdersLogic() {
   }, 10000);
 
   const refreshOrders = useCallback(async () => {
-    const response = await authFetch("/api/orders");
-    const data = await readResponse(response);
-    const fetchedOrders = Array.isArray(data.orders) ? data.orders : [];
-
-    setOrders(fetchedOrders);
-    return fetchedOrders;
+    setOrders(orders);
+    return orders;
   }, []);
 
   const refreshProducts = useCallback(async () => {
@@ -216,46 +224,41 @@ export function useOrdersLogic() {
     [refreshOrders, refreshProducts],
   );
 
-const safeOrders = useMemo(() => {
-  if (Array.isArray(orders)) return orders;
-  if (Array.isArray(orders?.data)) return orders.data;
-  if (Array.isArray(orders?.orders)) return orders.orders;
-  return [];
-}, [orders]);
-
-const statusCounts = useMemo(() => {
-  const counts = { all: safeOrders.length };
+const statusCounts = () => {
+  const counts = { all: orders.length };
 
   for (const status of STATUSES) {
-    counts[status] = safeOrders.filter((order) => order.status === status).length;
+    counts[status] = orders.filter((order) => order.status === status).length;
   }
 
   return counts;
-}, [safeOrders]);
+}
 
-const stats = useMemo(() => {
+const stats = () => {
   const countByStatus = (status) =>
-    safeOrders.filter((order) => order.status === status).length;
+    orders.filter((order) => order.status === status).length;
 
   return {
-    total: safeOrders.length,
+    total: orders.length,
     pending: countByStatus("pending"),
-    inProgress: safeOrders.filter((order) =>
+    inProgress: orders.filter((order) =>
       ["confirmed", "processing"].includes(order.status),
     ).length,
     shipped: countByStatus("shipped"),
     delivered: countByStatus("delivered"),
     cancelled: countByStatus("cancelled"),
-    revenue: safeOrders
+    revenue: orders
       .filter((order) => order.status !== "cancelled")
       .reduce((total, order) => total + Number(order.totalAmount || 0), 0),
   };
-}, [safeOrders]);
+}
 
-const filteredOrders = useMemo(() => {
+const filteredOrders = () => {
   const query = search.trim().toLowerCase();
 
-  return safeOrders
+  const orders = filteredOrdersByModerator();
+
+  return orders
     .filter((order) => {
       const matchesStatus =
         statusFilter === "all" || order.status === statusFilter;
@@ -283,9 +286,9 @@ const filteredOrders = useMemo(() => {
         new Date(b.createdAt || 0).getTime() -
         new Date(a.createdAt || 0).getTime(),
     );
-}, [safeOrders, search, statusFilter]);
+}
 
-const filteredProducts = useMemo(() => {
+const filteredProducts = () => {
   const query = (form.productSearch || "").trim().toLowerCase();
   const list = Array.isArray(products) ? products : [];
 
@@ -297,7 +300,8 @@ const filteredProducts = useMemo(() => {
       String(product.itemId ?? "").toLowerCase().includes(query)
     );
   });
-}, [products, form.productSearch]);
+}
+
 
 const selectedProduct = useMemo(
   () =>
@@ -307,15 +311,13 @@ const selectedProduct = useMemo(
   [products, form.productId],
 );
 
-const estimatedSubtotal = useMemo(
+const estimatedSubtotal = 
   () =>
     (form.items || []).reduce(
       (total, item) =>
         total + Number(item.unitPrice || 0) * Number(item.quantity || 0),
       0,
-    ),
-  [form.items],
-);
+    )
 
   const parsedShippingCost = Number(form.shippingCost);
 
@@ -602,7 +604,7 @@ const estimatedSubtotal = useMemo(
     productsError,
     successMessage,
     setSuccessMessage,
-    filteredOrders,
+    filteredOrders: filteredOrders(),
     stats,
     statusCounts,
     search,

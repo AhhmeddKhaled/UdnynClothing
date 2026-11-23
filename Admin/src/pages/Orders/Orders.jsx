@@ -47,12 +47,9 @@ export default function Orders() {
     exportingOrders,
     refreshOrders,
     formatMoney,
-
     deleteOrder,
     isDeleting,
   } = logic;
-
-  filteredOrders;
 
   const statCards = [
     {

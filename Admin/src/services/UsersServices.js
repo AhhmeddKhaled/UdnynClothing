@@ -50,8 +50,6 @@ export function HomeRedirect() {
       ? "/orders/new"
       : "/login";
 }
-
-
 /*#######################
 END USERS DATA
 ########################*/

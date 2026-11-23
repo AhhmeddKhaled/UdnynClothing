@@ -200,7 +200,7 @@ export default function AvailableStock() {
     canImport,
 
     fileInputRefs,
-    fetchProducts,
+    products,
     getImageUrl,
     openImagePicker,
     handleImageUpload,
@@ -326,7 +326,7 @@ export default function AvailableStock() {
           <button
             type="button"
             className="btn btn-secondary"
-            onClick={fetchProducts}
+            onClick={products}
           >
             Try Again
           </button>

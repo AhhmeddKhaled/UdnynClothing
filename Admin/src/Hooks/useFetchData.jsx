@@ -36,7 +36,6 @@ export function useFetchData(url, options = {}) {
         headers,
       });
 
-
       const result = await response.json();
 
       if (!response.ok || result?.success === false) {
@@ -47,11 +46,12 @@ export function useFetchData(url, options = {}) {
         );
       }
 
+      console.log(result);
+      
       setData(result);
 
       return result;
     } catch (err) {
-      console.error("Data loading error:", err);
       setError(err.message || "Couldn't reach the data");
       return null;
     } finally {

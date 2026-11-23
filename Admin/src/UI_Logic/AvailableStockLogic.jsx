@@ -1,6 +1,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { authFetch } from "../services/UsersServices.js";
+import { useFetchData } from "../Hooks/useFetchData.jsx";
 
 const API_URL = (import.meta.env.VITE_API_URL || "").replace(/\/+$/, "");
 
@@ -16,9 +16,17 @@ function getCurrentUser() {
 }
 
 export function useAvailableStockLogic() {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+
+  const {
+    data,
+    setData: setProducts,
+    loading,
+    setLoading,
+    error,
+    setError
+  } = useFetchData('/api/availableStock', { initialData: [], enabled: true });
+
+  const products = Array.isArray(data.products) ? data.products : [];
 
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
@@ -27,7 +35,7 @@ export function useAvailableStockLogic() {
   const [importing, setImporting] = useState(false);
   const [imageUploadingFor, setImageUploadingFor] = useState(null);
 
-  const [successMessage,setSuccessMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const fileInputRefs = useRef({});
   const currentUser = useMemo(() => getCurrentUser(), []);
@@ -37,43 +45,6 @@ export function useAvailableStockLogic() {
   );
 
   const canImport = canManageImages;
-
-  const fetchProducts = useCallback(async () => {
-    setLoading(true);
-    setError("");
-
-    try {
-      const response = await authFetch("/api/availableStock");
-      const data = await response.json();
-
-      if (!response.ok || data?.success === false) {
-        throw new Error(
-          data?.message || "Failed to load available stock."
-        );
-      }
-
-      const productList = Array.isArray(data)
-        ? data
-        : Array.isArray(data?.products)
-          ? data.products
-          : [];
-
-      setProducts(productList);
-      return productList;
-    } catch (err) {
-      console.error("Available Stock fetch error:", err);
-
-      setError(err.message || "Failed to load available stock.");
-      setProducts([]);
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
 
   const categories = useMemo(() => {
     return [
@@ -201,10 +172,10 @@ export function useAvailableStockLogic() {
         currentProducts.map((item) =>
           String(item.itemId) === productId
             ? {
-                ...item,
-                imagePath: newImagePath,
-                image: newImagePath,
-              }
+              ...item,
+              imagePath: newImagePath,
+              image: newImagePath,
+            }
             : item
         )
       );
@@ -252,7 +223,7 @@ export function useAvailableStockLogic() {
         throw new Error(data?.message || "Failed to import Excel file.");
       }
 
-      await fetchProducts();
+      await products;
 
       setSuccessMessage(data.message || "Products imported successfully.");
 
@@ -262,7 +233,7 @@ export function useAvailableStockLogic() {
     } finally {
       setImporting(false);
     }
-  }, [fetchProducts]);
+  }, [products]);
 
   const clearFilters = useCallback(() => {
     setSearch("");
@@ -292,7 +263,7 @@ export function useAvailableStockLogic() {
     canImport,
 
     fileInputRefs,
-    fetchProducts,
+    products,
     getImageUrl,
     openImagePicker,
     handleImageUpload,
