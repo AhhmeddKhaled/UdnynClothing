@@ -70,7 +70,8 @@ form.full {
 }
 
 form.fit {
-  width: fit-content;
+  width: 460px;
+  height: 400px;
 }
 
 input,

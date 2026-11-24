@@ -1,10 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-import "./Login.css";
+import styles from "./Login.module.css";
 
 // IMPORT UI COMPONENTS
-import { login, HomeRedirect } from "../../services/UsersServices.js";
+import useLoginLogic  from "../../UI_Logic/LoginLogic.jsx";
 
 // IMPORT LOGIN SERVICES
 import { useLanguage } from "../../context/LanguageContext";
@@ -12,39 +12,25 @@ import { useLanguage } from "../../context/LanguageContext";
 import {
   Form,
   FieldInputGroup,
-  FieldSelectGroup,
 } from "../../Components/Form/Form";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const navigate = useNavigate();
 
   const { t, language } = useLanguage();
 
-  const handleSubmit = async (e) => {
-    ("Email:", JSON.stringify(email));
-    ("Password length:", password.length);
+  const logic = useLoginLogic();
 
-    e.preventDefault();
-    setError("");
-    setLoading(true);
-
-    try {
-      await login(email, password);
-      navigate(HomeRedirect(), { replace: true });
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  const {
+    handleSubmit,
+    email,
+    setEmail,
+    password,
+    setPassword,
+    valid,
+    loading
+  } = logic;
   return (
-    <div className="login-wrap" dir={language === "ar" ? "rtl" : "ltr"}>
+    <div className={styles.loginWrap} dir={language === "ar" ? "rtl" : "ltr"}>
       <Form onSubmit={handleSubmit}>
         <h1>{t("login", "title")}</h1>
 
@@ -86,15 +72,9 @@ export default function Login() {
             id: "submit",
             type: "submit",
             value: loading ? t("login", "loading") : t("login", "submit"),
-            disabled: loading,
+            disabled: loading || !valid,
           }}
         />
-
-        {error && (
-          <p className="login-error" role="alert">
-            {error}
-          </p>
-        )}
       </Form>
     </div>
   );

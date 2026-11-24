@@ -5,28 +5,28 @@ export function formValidition(inputType, value) {
     const emailValid = emailRegex.test(value);
     (emailValid);
 
-    const statusMessage = emailValid
+    const message = emailValid
       ? "Valid Email"
       : "Email Not Valid, Please Try Again";
 
-    return { emailValid, statusMessage };
+    return { emailValid, message };
   }
 
   if (inputType === "password") {
-    const passwordRegex = /^(?=.*[A-Z])(?=.*[@#])(?=.*\d).{8,}$/;
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
     const passwordValid = passwordRegex.test(value);
 
     (passwordValid);
     
-    const statusMessage = passwordValid
+    const message = passwordValid
       ? "Valid Password"
       : "Password must be at least 8 characters and include a capital letter, a special character (@ or #), and a number.";
 
-    return { passwordValid, statusMessage };
+    return { passwordValid, message };
   }
 
   return {
     isValid: false,
-    statusMessage: null,
+    message: null,
   };
 }

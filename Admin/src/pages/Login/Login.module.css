@@ -1,10 +1,16 @@
-.login-wrap {
+.loginWrap {
   min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+  
+  form {
+    width: 300px;
+    input:disabled {
+      opacity: .5;
+    }
+  }
 }
 
 .login-card h1 {

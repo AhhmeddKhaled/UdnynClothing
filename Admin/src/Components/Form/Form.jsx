@@ -5,7 +5,7 @@ import styles from "./Form.module.css";
 import { IoIosSearch } from "react-icons/io";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 
-import { formValidition } from "../../services/LoginServices.js";
+import useLoginLogic from "../../UI_Logic/LoginLogic";
 
 export function Form({ children, onSubmit, width = "fit" }) {
   return (
@@ -21,22 +21,16 @@ export function Form({ children, onSubmit, width = "fit" }) {
 }
 
 export function FieldInputGroup({ label = {}, inputOptions = {}, note = "" }) {
-  const [showPassword, setShowPassword] = useState(false);
-  const [valid, setValid] = useState(false);
-  const [statusMessage, setStatusMessage] = useState("");
 
-  const handleChange = (value) => {
-    const result = formValidition(inputOptions.type, value);
-
-    if (!result) return;
-
-    setValid(result.emailValid ?? result.passwordValid ?? false);
-    setStatusMessage(result.statusMessage);
-  };
-
-  const handleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
+  const {
+    handleChange,
+    handleShowPassword,
+    showPassword,
+    valid,
+    emailValid,
+    passwordValid,
+    statusMessage,
+  } = useLoginLogic();
 
   return (
     <div className={styles.fieldInputGroup}>
@@ -66,14 +60,16 @@ export function FieldInputGroup({ label = {}, inputOptions = {}, note = "" }) {
           maxLength={inputOptions.maxLength || 100}
           onChange={(e) => {
             inputOptions.onChange?.(e);
-            handleChange(e.target.value);
           }}
+          onBlur={(e) =>
+            handleChange(e.target.value,inputOptions)
+          }
           autoFocus={inputOptions.focus || false}
         />
 
         {statusMessage && (
           <span
-            className={`${styles.statusMessage} ${valid ? styles.valid : styles.inValid}`}
+            className={`${styles.statusMessage} ${valid  ? styles.valid : styles.inValid}`}
           >
             {statusMessage}
           </span>
