@@ -27,16 +27,23 @@
   box-sizing: border-box;
 }
 
+@media (max-width: 860px) {
+.loContent {
+  margin-top: 20px;
+}
+}
+
+@media (min-width: 861px) {
+  .loContent.rtl {
+    transform: translateX(-240px);
+  }
+
+  .loContent.ltr {
+    transform: translateX(240px);
+  }
+}
 .loContent > div:nth-child(2) {
   min-height: calc(100vh - 890px);
-}
-
-.loContent.rtl {
-  transform: translateX(-240px);
-}
-
-.loContent.ltr {
-  transform: translateX(240px);
 }
 
 /* ======================================================
@@ -69,7 +76,7 @@
     width: 100%;
   }
 
-    .footer {
+  .footer {
     align-items: flex-start;
     flex-direction: column;
   }

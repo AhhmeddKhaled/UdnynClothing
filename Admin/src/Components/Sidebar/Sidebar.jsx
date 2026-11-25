@@ -17,6 +17,9 @@ import {
 
 // Import Components 
 import Dropdown from "../Dropdwon/Dropdown.jsx";
+import Notifications from "../ToolBar/Notifications.jsx";
+import Language from "../ToolBar/Language.jsx";
+import Theem from "../ToolBar/Theem.jsx";
 
 import { RxDashboard } from "react-icons/rx";
 import { PiStorefrontThin } from "react-icons/pi";
@@ -58,11 +61,8 @@ const NAV_ITEMS = [
 ];
 
 export default function Sidebar({ user, onLogout }) {
-  const { orders } = useOrdersLogic();
   const { theme, toggleTheme } = useTheme();
   const { toggleLanguage, language, t } = useLanguage();
-
-  const location = useLocation();
 
   const {
     open,
@@ -82,12 +82,12 @@ export default function Sidebar({ user, onLogout }) {
 
   const formattedLoginTime = loginTime
     ? loginTime.toLocaleTimeString(
-        language === "ar" ? "ar-EG" : "en-US",
-        {
-          hour: "2-digit",
-          minute: "2-digit",
-        }
-      )
+      language === "ar" ? "ar-EG" : "en-US",
+      {
+        hour: "2-digit",
+        minute: "2-digit",
+      }
+    )
     : null;
 
   const themeLabel =
@@ -198,19 +198,19 @@ export default function Sidebar({ user, onLogout }) {
           ))}
 
           {/* Orders Dropdown */}
-             <Dropdown 
-             icon={<IoListCircleOutline size={24}/>}
-              label={t("sidebar", "Orders")}
-              options={["All Orders", "Add Order"]}
-              onSelect={(option) => {
-                if (option === "All Orders") {
-                  handleNavigation("/orders");
-                }
-                if (option === "Add Order") {
-                  handleNavigation("/orders/new");
-                }
-              }}
-              />
+          <Dropdown
+            icon={<IoListCircleOutline size={24} />}
+            label={t("sidebar", "Orders")}
+            options={["All Orders", "Add Order"]}
+            onSelect={(option) => {
+              if (option === "All Orders") {
+                handleNavigation("/orders");
+              }
+              if (option === "Add Order") {
+                handleNavigation("/orders/new");
+              }
+            }}
+          />
 
           {/* Users */}
           {NAV_ITEMS.slice(4).map((item) => (
@@ -233,6 +233,16 @@ export default function Sidebar({ user, onLogout }) {
           ))}
         </nav>
 
+        <div className={styles.actions}>
+          <nav>
+            <li>
+              <Notifications classes={styles.notifi} />
+            </li>
+            <li>
+              <Language classes={styles.lang} />
+            </li>
+          </nav>
+        </div>
         {/* Bottom Area */}
         <div className={styles.sbBottom}>
           {/* Current User */}

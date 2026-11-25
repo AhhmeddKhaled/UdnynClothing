@@ -72,7 +72,7 @@ export default function Login() {
             id: "submit",
             type: "submit",
             value: loading ? t("login", "loading") : t("login", "submit"),
-            disabled: loading || !valid,
+            disabled: loading,
           }}
         />
       </Form>

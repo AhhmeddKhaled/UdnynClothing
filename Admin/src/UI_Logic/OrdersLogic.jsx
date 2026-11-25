@@ -30,7 +30,7 @@ import {
 export function useOrdersLogic() {
 
   const userRole = getRole()
-  const userId = getUser().id;
+  const userId = getUser() ? getUser().id : null;
 
   const { deleteItem, isDeleting, error: deleteError } = useDeleteItem();
 

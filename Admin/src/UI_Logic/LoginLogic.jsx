@@ -34,7 +34,7 @@ export default function useLoginLogic() {
         setStatusMessage(result.message);
     };
 
-    const valid = emailValid && passwordValid;
+    const valid = emailValid || passwordValid;
     console.log(valid);
     
 

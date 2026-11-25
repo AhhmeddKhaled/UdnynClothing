@@ -33,19 +33,7 @@
 
     }
 
-    .toolBarActionsNot {
-      position: relative;
-
-      &::before {
-        content: "";
-        width: 10px;
-        height: 10px;
-        background-color: red;
-        border-radius: var(--radius-circle);
-        right: 0;
-        position: absolute;
-      }
-    }
+    
   }
   .toolBarUserInfo {
     display: flex;
@@ -64,7 +52,6 @@
       opacity: .7;
     }
   }
-
   .toolBarUserInfoAvatar {
     display: flex;
     align-items: center;
@@ -76,4 +63,28 @@
       box-shadow: var(--shadow-pop);
     }
   }
+}
+
+.toolBarActionsNot {
+      position: relative;
+      &::before {
+        content: "";
+        width: 10px;
+        height: 10px;
+        background-color: red;
+        border-radius: var(--radius-circle);
+        right: 0;
+        position: absolute;
+      }
+    }
+    
+@media (max-width: 860px) {
+  .notifi,
+  .lang,
+  .theem,
+  .toolBarUserInfoName,
+  .toolBarUserInfoEmail {
+    display: none;
+  }
+
 }

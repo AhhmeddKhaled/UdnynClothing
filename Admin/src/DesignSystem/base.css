@@ -208,6 +208,10 @@ td {
     border-color 0.2s ease;
 }
 
+ul,
+nav {
+  list-style: none;
+}
 /* Accessibility */
 
 @media (prefers-reduced-motion: reduce) {
