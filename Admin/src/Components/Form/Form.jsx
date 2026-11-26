@@ -20,20 +20,20 @@ export function Form({ children, onSubmit, width = "fit" }) {
   );
 }
 
-export function FieldInputGroup({ label = {}, inputOptions = {}, note = "" }) {
+export function FieldInputGroup({ label = {}, inputOptions = {}, note = "" , classess}) {
 
   const {
     handleChange,
     handleShowPassword,
     showPassword,
     valid,
-    emailValid,
-    passwordValid,
     statusMessage,
   } = useLoginLogic();
 
   return (
-    <div className={styles.fieldInputGroup}>
+    <div className={`${styles.fieldInputGroup} ${classess}`}>
+
+      {Object.keys(label).length > 0 || note &&
       <div className={styles.fieldInputGroupTop}>
         {Object.keys(label).length > 0 && (
           <label htmlFor={inputOptions.id}>{label.name}</label>
@@ -41,6 +41,7 @@ export function FieldInputGroup({ label = {}, inputOptions = {}, note = "" }) {
 
         {note && <span>{note}</span>}
       </div>
+      }
 
       <div className={styles.fieldInputGroupDown}>
         <input

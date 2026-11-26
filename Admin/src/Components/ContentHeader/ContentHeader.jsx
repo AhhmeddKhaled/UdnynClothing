@@ -1,4 +1,4 @@
-import "./ContentHeader.css";
+import styles from "./ContentHeader.module.css";
 
 export default function ContentHeader({
   title,
@@ -8,15 +8,15 @@ export default function ContentHeader({
   action,
 }) {
   return (
-    <header className="header">
-      <div className="header-text">
+    <header className={styles.header}>
+      <div className={styles.headerText}>
         <h2>{title}</h2>
         <p>{subTitle}</p>
       </div>
 
-      <div className="header-right">
+      <div className={styles.headerRight}>
         {action && (
-          <div className="header-action">{action}</div>
+          <div className={styles.headerAction}>{action}</div>
         )}
       </div>
     </header>

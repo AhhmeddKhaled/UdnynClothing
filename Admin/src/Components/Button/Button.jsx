@@ -4,6 +4,7 @@ import { MdDeleteOutline , MdPublishedWithChanges } from "react-icons/md";
 import { CgDetailsMore } from "react-icons/cg";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { CiExport } from "react-icons/ci";
+import { RxUpdate } from "react-icons/rx";
 
 export default function Button({
   children,
@@ -39,7 +40,8 @@ export default function Button({
       aria-busy={loading || undefined}
     >
       {icons[variant] || null}
-      {loading ? "جاري التحميل..." : children}
+      {loading ? "Refresh... " : children}
+      {loading ?  <RxUpdate /> : ''}
     </button>
   );
 }

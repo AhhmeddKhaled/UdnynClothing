@@ -1,0 +1,82 @@
+.header {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: auto auto;
+  grid-template-areas: "text ... action";
+  color: var(--color-ink);
+  margin-bottom: var(--space-8);
+}
+
+.headerText {
+  flex: 1;
+  min-width: 0;
+  grid-area: text;
+}
+
+.headerText h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-ink);
+  text-transform: capitalize;
+}
+
+.headerText p {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--color-plum-soft);
+  text-transform: capitalize;
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-3);
+  grid-area: action;
+
+}
+
+.headerAction {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+@media (max-width: 600px) {
+  .header {
+  grid-template-areas: "text" "action";
+  text-align: left;
+  }
+
+  .header-text h2 {
+    font-size: var(--text-xl);
+  }
+
+  .header-text p {
+    font-size: var(--text-xs);
+  }
+
+  .header-right {
+    gap: var(--space-2);
+  }
+
+  .header-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .header-user-name {
+    font-size: var(--text-xs);
+  }
+
+  .header-user-role,
+  .header-user-time {
+    font-size: var(--text-xs);
+  }
+
+  .header-user-time {
+    max-width: 120px;
+  }
+}

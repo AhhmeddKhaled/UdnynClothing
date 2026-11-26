@@ -3,20 +3,24 @@
   align-items: center;
   gap: var(--space-2);
   font-size: var(--text-md);
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-md);
   color: var(--color-ink);
   width: 100%;
   cursor: pointer;
   font-weight: 500;
   transition:
-    background-color 0.2s ease,
-    color 0.2s ease,
-    border-color 0.2s ease;
+    background-color var(--dur-fast) ease,
+    color var(--dur-fast) ease,
+    border-color var(--dur-fast) ease;
+
+  &:hover {
+      background-color: hsl(from var(--color-accent) h s l / .1);
+    }
+
 }
 
 .dropdownMenu {
-    
     ul {
         overflow: hidden;
         display: grid;
@@ -30,9 +34,16 @@
   padding: var(--space-2) var(--space-6);
   font-size: var(--text-sm);
   font-weight: 400;
+  transition: var(--dur-fast) ease;
 }
 
 .arrowIcon {
     margin-left: auto;
-    transition: transform 0.2s ease;
+    .open {
+        transition: 150ms ease;
+    }
+}
+
+.arrowIcon .open {
+    transform: rotate(180deg);
 }

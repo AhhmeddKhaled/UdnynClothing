@@ -67,7 +67,6 @@ export function useDashboardLogic() {
       ? Math.round((withImage / active.length) * 100)
       : 0;
 
-    const missingDataTotal = noImage.length + noCategory.length;
 
     return {
       active,
@@ -82,7 +81,6 @@ export function useDashboardLogic() {
       manufacturers,
       withImage,
       photoPercentage,
-      missingDataTotal,
     };
   }, [products]);
 

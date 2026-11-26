@@ -7,6 +7,9 @@ import {
   authFetch,
 } from "../services/UsersServices.js";
 
+// Import icons 
+import { RxUpdate } from "react-icons/rx";
+
 import { useTheme } from "../context/ThemeContext.jsx";
 import { useLanguage } from "../context/LanguageContext.jsx";
 import { useDashboardLogic } from "../UI_Logic/DashboardLogic";
@@ -21,7 +24,7 @@ import styles from "./Layout.module.css";
 export default function Layout() {
   const { language} = useLanguage();
 
-  const { syncedAt, load, loading, missingDataTotal } =
+  const { syncedAt, load, loading } =
     useDashboardLogic(authFetch);
 
   const [user] = useState(getUser());
@@ -60,12 +63,11 @@ export default function Layout() {
             syncedAt,
             load,
             loading,
-            missingDataTotal,
           }}
         />
 
         <footer className={styles.footer}>
-          <span>
+          <span className="lginTime">
             {getLoginTime()
               ? `Logged in at ${getLoginTime().toLocaleTimeString([], {
                   hour: "2-digit",
@@ -76,11 +78,8 @@ export default function Layout() {
 
           <Button load={load} loading={loading}>
             Refresh
+            <RxUpdate />
           </Button>
-
-          <span className="footer-checks">
-            Data checks: {missingDataTotal ?? 0}
-          </span>
         </footer>
       </main>
     </div>

@@ -19,7 +19,6 @@ import {
 import Dropdown from "../Dropdwon/Dropdown.jsx";
 import Notifications from "../ToolBar/Notifications.jsx";
 import Language from "../ToolBar/Language.jsx";
-import Theem from "../ToolBar/Theem.jsx";
 
 import { RxDashboard } from "react-icons/rx";
 import { PiStorefrontThin } from "react-icons/pi";
@@ -243,6 +242,7 @@ export default function Sidebar({ user, onLogout }) {
             </li>
           </nav>
         </div>
+
         {/* Bottom Area */}
         <div className={styles.sbBottom}>
           {/* Current User */}

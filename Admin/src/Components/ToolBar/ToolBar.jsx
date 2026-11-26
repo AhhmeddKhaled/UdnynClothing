@@ -7,7 +7,7 @@ import { useLanguage } from "../../context/LanguageContext";
 // Import Ui Components 
 import Notifications from "./Notifications.jsx";
 import Language from "./Language";
-import Theem from "./Theem.jsx";
+import Avatar from "./Avatar.jsx";
 
 export default function ToolBar() {
     const { language, t } = useLanguage();
@@ -20,6 +20,7 @@ export default function ToolBar() {
             type: "search",
             placeholder: t("toolbar", "search"),
           }}
+
         />
       </div>
 
@@ -39,9 +40,7 @@ export default function ToolBar() {
           </span>
         </div>
 
-        <div className={styles.toolBarUserInfoAvatar}>
-          <img src="/img/userAvatar.jpg" alt="User Avatar" />
-        </div>
+        <Avatar />
       </div>
     </div>
   );

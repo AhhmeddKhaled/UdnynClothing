@@ -13,6 +13,7 @@
   > div {
     display: flex;
   }
+
   .toolBarActions {
     display: flex;
     align-items: center;
@@ -79,12 +80,11 @@
     }
     
 @media (max-width: 860px) {
-  .notifi,
-  .lang,
-  .theem,
-  .toolBarUserInfoName,
-  .toolBarUserInfoEmail {
+  .toolBarUser {
     display: none;
   }
 
+  .toolBarSearch {
+    width: 100%;
+  }
 }

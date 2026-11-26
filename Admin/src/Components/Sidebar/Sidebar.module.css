@@ -48,7 +48,7 @@
   top: 0;
   left: 0;
   right: 0;
-  z-index: 30;
+  z-index: 2;
 }
 
 .sbTopbarTitle {
@@ -142,51 +142,30 @@
 
 .sbAside {
   width: 240px;
-
-  flex: 0 0 240px;
-
+  gap: var(--space-4);
   display: flex;
-
-  flex-direction: column;
-
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
   position: fixed;
-
   top: 0;
-
   right: auto;
-
   height: 100dvh;
-
-  box-sizing: border-box;
-
-  overflow-y: auto;
-
-  overflow-x: hidden;
-
-  overscroll-behavior-y: contain;
-
   padding: var(--space-5) 0;
-
   padding-top: calc(var(--space-5) + env(safe-area-inset-top, 0px));
-
   padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
-
   background: var(--color-card);
-
   color: var(--color-ink);
-
   border-right: 1px solid var(--color-line);
-
-  z-index: 20;
-
+  z-index: 3;
+  overflow: auto;
   transition:
     background-color 0.2s ease,
     color 0.2s ease,
     border-color 0.2s ease;
-
   > * {
     padding: 0 var(--space-4);
   }
+
 }
 
 .sbAside.rtl {
@@ -222,13 +201,12 @@
   flex-direction: column;
   flex: 1;
   gap: var(--space-1);
-  min-height: 0;
-  padding: 0 var(--space-4);
+
+  
 }
 
 .sbItem {
   display: flex;
-  flex-direction: row;
   align-items: center;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
@@ -240,6 +218,9 @@
     background-color 0.2s ease,
     color 0.2s ease,
     border-color 0.2s ease;
+  &:hover {
+      background-color: hsl(from var(--color-accent) h s l / .1);
+    }
 }
 
 .sbItem .icon {
@@ -287,6 +268,7 @@
 
 .actions {
   display: none;
+  margin-top: var(--space-5);
   nav {
     display: flex;
     align-items: center;
@@ -530,53 +512,18 @@
 
   .sbAside {
     position: fixed;
-
     top: 0;
-
     right: auto;
-
     left: 0;
-
     bottom: 0;
-
     width: min(280px, 85vw);
-
-    height: 100vh;
-
     height: 100dvh;
-
-    flex: none;
-
-    padding-top: calc(var(--space-5) + env(safe-area-inset-top, 0px));
-
-    padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
-
     transform: translateX(-100%);
-
-    transition:
-      transform 0.25s ease,
-      visibility 0.25s ease,
-      background-color 0.2s ease,
-      color 0.2s ease;
-
-    z-index: 50;
-
-    background: var(--color-card);
-
-    border-right: 1px solid var(--color-line);
-
-    box-shadow: var(--shadow-card);
-
-    overflow-y: auto;
-
-    overscroll-behavior-y: contain;
   }
 
   .sbAside.sbOpen {
     transform: translateX(0);
-
     visibility: visible;
-
     pointer-events: auto;
   }
 
