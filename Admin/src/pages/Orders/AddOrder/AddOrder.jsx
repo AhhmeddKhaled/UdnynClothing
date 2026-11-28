@@ -32,7 +32,7 @@ import BarcodeScanner from "./BarcodeScanner.jsx";
 import ContentHeader from "../../../Components/ContentHeader/ContentHeader.jsx";
 import Button from "../../../Components/Button/Button";
 import Tabs from "../../../Components/Tabs/Tabs.jsx";
-import { Form } from "../../../Components/Form/Form";
+import { Form, FieldInputGroup } from "../../../Components/Form/Form";
 
 const CODE_FIELDS = ["barcode", "sku", "code", "itemId"];
 
@@ -132,7 +132,6 @@ export default function AddOrder() {
     formatMoney,
     getProductPrice,
     getStockForProduct,
-
     setUnitPrice,
     unit
   } = logic;
@@ -365,7 +364,7 @@ export default function AddOrder() {
     if (!pendingScan) return;
 
     if (form.productId === pendingScan && String(form.quantity) === "1") {
-      handleAddItem?.({ preventDefault() {} });
+      handleAddItem?.({ preventDefault() { } });
       updateFormField("productSearch", "");
       setPendingScan(null);
     }
@@ -511,567 +510,534 @@ export default function AddOrder() {
       <Tabs tabs={PriceTypesList} setValue={setUnitPrice} />
 
       <Form
-        className={styles["add-order-form"]}
         onSubmit={handleSubmit}
         width="full"
       >
         <div className={styles["orders-modal-content"]}>
-          {/* 1. Customer message */}
 
-          <h3 className={styles["orders-detail-section-title"]}>
-            Customer Message
-          </h3>
+          {/* Customer Details */}
+          <div className={styles.row}>
+            <div className={styles.customerMessage}>
+              <h3 className={styles["orders-detail-section-title"]}>
+                Customer Message
+              </h3>
+              <div className={styles["ao-paste"]}>
+                <textarea
+                  ref={pasteRef}
+                  rows="4"
+                  value={rawMessage}
+                  onChange={(event) => setRawMessage(event.target.value)}
+                  onPaste={(event) => {
+                    event.preventDefault();
 
-          <div className={styles["ao-paste"]}>
-            <textarea
-              ref={pasteRef}
-              rows="4"
-              value={rawMessage}
-              onChange={(event) => setRawMessage(event.target.value)}
-              onPaste={(event) => {
-                event.preventDefault();
+                    const text = event.clipboardData.getData("text");
 
-                const text = event.clipboardData.getData("text");
+                    setRawMessage(text);
+                    runExtraction(text);
+                  }}
+                  disabled={addingOrder}
+                  aria-label="Customer message"
+                  placeholder="Paste the customer's message here. Name, phone, governorate and address are filled in automatically."
+                />
 
-                setRawMessage(text);
-                runExtraction(text);
-              }}
-              disabled={addingOrder}
-              aria-label="Customer message"
-              placeholder="Paste the customer's message here. Name, phone, governorate and address are filled in automatically."
-            />
-
-            <div className={styles["ao-paste-actions"]}>
-              <button
-                type="button"
-                className={styles["orders-details-button"]}
-                onClick={pasteFromClipboard}
-                disabled={addingOrder}
-              >
-                <HiOutlineClipboard aria-hidden="true" />
-                Paste
-              </button>
-
-              <button
-                type="button"
-                className={styles["orders-details-button"]}
-                onClick={() => runExtraction()}
-                disabled={addingOrder || !rawMessage.trim()}
-              >
-                Extract details
-              </button>
-            </div>
-
-            {parseInfo && (
-              <div className={styles["ao-paste-notes"]}>
-                {parseInfo.missing.length > 0 ? (
-                  <p
-                    className={
-                      styles["ao-paste-note"] + " " + styles["is-warning"]
-                    }
+                <div className={styles["ao-paste-actions"]}>
+                  <button
+                    type="button"
+                    className={styles["orders-details-button"]}
+                    onClick={pasteFromClipboard}
+                    disabled={addingOrder}
                   >
-                    Couldn't find: {parseInfo.missing.join(", ")}. Please fill
-                    in the highlighted fields.
-                  </p>
-                ) : (
-                  <p
-                    className={styles["ao-paste-note"] + " " + styles["is-ok"]}
+                    <HiOutlineClipboard aria-hidden="true" />
+                    Paste
+                  </button>
+
+                  <button
+                    type="button"
+                    className={styles["orders-details-button"]}
+                    onClick={() => runExtraction()}
+                    disabled={addingOrder || !rawMessage.trim()}
                   >
-                    Details extracted. Please review them before saving.
-                  </p>
-                )}
-
-                {parseInfo.multipleNames && (
-                  <p
-                    className={
-                      styles["ao-paste-note"] + " " + styles["is-warning"]
-                    }
-                  >
-                    The message contains more than one name. Check who the
-                    customer is.
-                  </p>
-                )}
-
-                {parseInfo.hints.length > 0 && (
-                  <div className={styles["ao-hints"]}>
-                    <span>Mentioned in the message:</span>
-
-                    {parseInfo.hints.map((hint) => (
-                      <em key={hint}>{hint}</em>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* 2. Customer details */}
-
-          <h3 className={styles["orders-detail-section-title"]}>
-            Customer Details
-          </h3>
-
-          <div className={styles["orders-form-grid"]}>
-            <label className={fieldClass("customerName")}>
-              <span>Customer Name * {badge("customerName")}</span>
-              <input
-                id="ao-name"
-                type="text"
-                value={form.customerName}
-                onChange={(event) =>
-                  userEdit("customerName", event.target.value)
-                }
-                maxLength={120}
-                autoComplete="name"
-                required
-                disabled={addingOrder}
-                placeholder="Enter customer's full name"
-              />
-            </label>
-
-            <label className={fieldClass("customerPhone")}>
-              <span>Phone Number * {badge("customerPhone")}</span>
-
-              <input
-                id="ao-phone"
-                type="tel"
-                inputMode="tel"
-                value={form.customerPhone}
-                onChange={(event) =>
-                  userEdit("customerPhone", normalizePhone(event.target.value))
-                }
-                maxLength={30}
-                autoComplete="tel"
-                required
-                disabled={addingOrder}
-                placeholder="01xxxxxxxxx"
-                aria-invalid={phoneInvalid}
-              />
-
-              {phoneInvalid && (
-                <small className={styles["ao-field-msg"]}>
-                  Phone must be 11 digits and start with 01.
-                </small>
-              )}
-            </label>
-          </div>
-
-          {/* 3. Products */}
-
-          <h3 className={styles["orders-detail-section-title"]}>Products</h3>
-
-          {productsLoading ? (
-            <p>Loading products...</p>
-          ) : productsError ? (
-            <p role="alert">{productsError}</p>
-          ) : products.length === 0 ? (
-            <p>No products are currently available.</p>
-          ) : (
-            <>
-              <div className={styles["orders-form-grid"]}>
-                <div
-                  className={
-                    styles["orders-form-field"] +
-                    " " +
-                    styles["orders-product-picker"]
-                  }
-                >
-                  <label htmlFor="add-order-product-search">
-                    Search or Scan Products *
-                  </label>
-
-                  <div className={styles["orders-product-search"]}>
-                    <HiOutlineSearch aria-hidden="true" />
-
-                    <input
-                      id="add-order-product-search"
-                      type="search"
-                      value={form.productSearch || ""}
-                      onChange={(event) => {
-                        updateFormField("productSearch", event.target.value);
-
-                        updateFormField("productId", "");
-                        setShowProductResults(true);
-                      }}
-                      onFocus={() => setShowProductResults(true)}
-                      onKeyDown={(event) => {
-                        if (event.key !== "Enter") return;
-
-                        event.preventDefault();
-
-                        const code = event.currentTarget.value.trim();
-
-                        if (!code) return;
-
-                        const result = handleScannedCode(code);
-
-                        if (
-                          result.notFound &&
-                          !/^[A-Za-z0-9._-]{4,}$/.test(code)
-                        ) {
-                          return;
-                        }
-
-                        showToast(
-                          result.message,
-                          result.ok ? "success" : "error",
-                        );
-
-                        if (result.ok) {
-                          updateFormField("productSearch", "");
-                          setShowProductResults(false);
-                        }
-                      }}
-                      autoComplete="off"
-                      placeholder="Search by name or ID, or scan a barcode..."
-                      disabled={addingOrder}
-                    />
-
-                    <button
-                      type="button"
-                      className={styles["ao-scan-btn"]}
-                      onClick={() => setShowScanner(true)}
-                      disabled={addingOrder}
-                      aria-label="Scan barcode with camera"
-                    >
-                      <HiOutlineCamera aria-hidden="true" />
-                    </button>
-                  </div>
-
-                  {showProductResults && (
-                    <div className={styles["orders-product-results"]}>
-                      {filteredProducts.length > 0 ? (
-                        
-                        filteredProducts.map((product,i) => {
-                          const stock = getStockForProduct(product);
-
-                          return (
-                            <button
-                              type="button"
-                              key={product.itemId}
-                              className={styles["orders-product-result"]}
-                              disabled={addingOrder || stock < 1}
-                              onClick={() => {
-                                updateFormField(
-                                  "productId",
-                                  String(product.itemId),
-                                );
-
-                                updateFormField(
-                                  "productSearch",
-                                  product.name || `Item ${product.itemId}`,
-                                );
-
-                                setShowProductResults(false);
-                              }}
-                            >
-                              <span className={styles["ao-product-info"]}>
-                                <ProductImage
-                                  imagePath={product.imagePath}
-                                  name={product.name}
-                                  itemId={product.itemId}
-                                />
-
-                                <span className={styles["ao-product-text"]}>
-                                  <strong>
-                                    {product.name || `Item ${product.itemId}`}
-                                  </strong>
-
-                                  <small>
-                                    {formatMoney(getProductPrice(product,"retail"))}
-                                  </small>
-                                </span>
-                              </span>
-
-                              <small className={styles["ao-product-stock"]}>
-                                {stock > 0 ? `Stock: ${stock}` : "Out of stock"}
-                              </small>
-                            </button>
-                          );
-                        })
-                      ) : (
-                        <p className={styles["orders-product-search-empty"]}>
-                          No matching products found.
-                        </p>
-                      )}
-                    </div>
-                  )}
+                    Extract details
+                  </button>
                 </div>
 
-                <label className={styles["orders-form-field"]}>
-                  <span>Quantity *</span>
+                {parseInfo && (
+                  <div className={styles["ao-paste-notes"]}>
+                    {parseInfo.missing.length > 0 ? (
+                      <p
+                        className={
+                          styles["ao-paste-note"] + " " + styles["is-warning"]
+                        }
+                      >
+                        Couldn't find: {parseInfo.missing.join(", ")}. Please fill
+                        in the highlighted fields.
+                      </p>
+                    ) : (
+                      <p
+                        className={styles["ao-paste-note"] + " " + styles["is-ok"]}
+                      >
+                        Details extracted. Please review them before saving.
+                      </p>
+                    )}
 
-                  <input
-                    type="number"
-                    inputMode="numeric"
-                    min="1"
-                    step="1"
-                    value={form.quantity}
-                    onChange={(event) =>
-                      updateFormField("quantity", event.target.value)
-                    }
-                    required
-                    disabled={addingOrder}
-                  />
-                </label>
+                    {parseInfo.multipleNames && (
+                      <p
+                        className={
+                          styles["ao-paste-note"] + " " + styles["is-warning"]
+                        }
+                      >
+                        The message contains more than one name. Check who the
+                        customer is.
+                      </p>
+                    )}
+
+                    {parseInfo.hints.length > 0 && (
+                      <div className={styles["ao-hints"]}>
+                        <span>Mentioned in the message:</span>
+
+                        {parseInfo.hints.map((hint) => (
+                          <em key={hint}>{hint}</em>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
+            </div>
 
-              <button
-                type="button"
-                className={styles["orders-details-button"]}
-                onClick={handleAddItem}
-                disabled={
-                  addingOrder ||
-                  !form.productId ||
-                  !Number.isInteger(Number(form.quantity)) ||
-                  Number(form.quantity) < 1
-                }
-              >
-                <HiOutlinePlus aria-hidden="true" />
-                Add Product
-              </button>
-            </>
-          )}
-
-          {/* Selected products and actual product photos */}
-
-          {form.items.length > 0 && (
-            <>
-              <h3 className={styles["orders-detail-section-title"]}>
-                Selected Products ({form.items.length})
+            <div className={styles.customerDetails}>
+              <h3 className={styles["orders-detail-title"]}>
+                Customer Details
               </h3>
-              <div className={styles["orders-detail-items"]}>
-                {form.items.map((item) => {
-                  const qty = Number(item.quantity);
-                  const max = Number(item.availableStock);
 
-                  return (
+              <div className={styles["orders-form-grid"]}>
+                <FieldInputGroup
+                  label={{
+                    name: "customerName",
+                  }}
+
+                  inputOptions={{
+                    type: "text",
+                    value: form.customerName,
+                    required: true,
+                    disabled: addingOrder,
+                    id: "customer name",
+                    placeholder: "Enter customer's full name",
+                    onChange: (e) =>
+                      updateFormField("customerName", e.target.value)
+                  }}
+                />
+
+                <FieldInputGroup
+                  label={{
+                    name: "customerPhone",
+                  }}
+
+                  inputOptions={{
+                    type: "tel",
+                    value: form.customerPhone,
+                    required: true,
+                    disabled: addingOrder,
+                    id: "customerPhone",
+                    placeholder: "01xxxxxxxxx",
+                    onChange: (e) => updateFormField("customerPhone", normalizePhone(e.target.value))
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Products */}
+          <div className={styles.row}>
+
+            <div className={styles.products}>
+              <h3 className={styles["orders-detail-title"]}>Products</h3>
+              {productsLoading ? (
+                <p>Loading products...</p>
+              ) : productsError ? (
+                <p role="alert">{productsError}</p>
+              ) : products.length === 0 ? (
+                <p>No products are currently available.</p>
+              ) : (
+                <>
+                  <div className={styles["orders-form-grid"]}>
                     <div
-                      className={styles["orders-detail-item"]}
-                      key={item.itemId}
+                      className={
+                        styles["orders-form-field"] +
+                        " " +
+                        styles["orders-product-picker"]
+                      }
                     >
-                      <div className={styles["ao-selected-product"]}>
-                        <ProductImage
-                          imagePath={item.imagePath}
-                          name={item.name}
-                          itemId={item.itemId}
+
+                      {/* Products Seach  */}
+                      <div className={styles["orders-product-search"]}>
+                        <FieldInputGroup
+                          label={{
+                            name: "Search In Products",
+                          }}
+
+                          inputOptions={{
+                            id: "add-order-product-search",
+                            type: "search",
+                            value: form.productSearch,
+                            required: true,
+                            placeholder: "Search by name or ID",
+                            disabled: addingOrder,
+                            onFocus: () => setShowProductResults(true),
+                            onChange: (event) => {
+                              updateFormField("productSearch", event.target.value);
+                              updateFormField("productId", "");
+                              setShowProductResults(true);
+                            },
+                            onBlur: () => setShowProductResults(false)
+                          }}
                         />
 
-                        <div className={styles["ao-selected-product-details"]}>
-                          <strong>{item.name}</strong>
+                        {/* Quantity */}
+                        <FieldInputGroup
+                          label={{
+                            name: "Quantity",
+                          }}
 
-                          <span>Unit Price: {formatMoney(item.unitPrice)}</span>
+                          inputOptions={{
+                            type: "number",
+                            value: form.productSearch,
+                            required: true,
+                            disabled: addingOrder,
+                            value: form.quantity,
+                            min: 1,
+                            step: 1,
+                            onChange: (e) => {
+                              updateFormField("quantity", e.target.value)
+                            }
+                          }}
+                        />
+                      </div>
 
-                          <div className={styles["ao-stepper"]}>
-                            <button
-                              type="button"
-                              aria-label="Decrease quantity"
-                              disabled={addingOrder || qty <= 1}
-                              onClick={() =>
-                                changeItemQuantity(item.itemId, String(qty - 1))
-                              }
-                            >
-                              −
-                            </button>
+                      {showProductResults && (
+                        <div className={styles["orders-product-results"]}>
+                          {filteredProducts().length > 0 ? (
 
-                            <input
-                              type="number"
-                              inputMode="numeric"
-                              aria-label="Quantity"
-                              min="1"
-                              max={item.availableStock}
-                              step="1"
-                              value={item.quantity}
-                              required
-                              disabled={addingOrder}
-                              onChange={(event) =>
-                                changeItemQuantity(
-                                  item.itemId,
-                                  event.target.value,
-                                )
-                              }
-                            />
+                            filteredProducts().map((product, i) => {
+                              const stock = getStockForProduct(product);
 
-                            <button
-                              type="button"
-                              aria-label="Increase quantity"
-                              disabled={addingOrder || qty >= max}
-                              onClick={() =>
-                                changeItemQuantity(item.itemId, String(qty + 1))
-                              }
-                            >
-                              +
-                            </button>
-                          </div>
+                              return (
+                                <button
+                                  type="button"
+                                  key={product.itemId}
+                                  className={styles["orders-product-result"]}
+                                  disabled={addingOrder || stock < 1}
+                                  onClick={() => {
+                                    updateFormField(
+                                      "productId",
+                                      String(product.itemId),
+                                    );
 
-                          {qty >= max && (
-                            <small className={styles["ao-field-msg"]}>
-                              Maximum available stock reached ({max}).
-                            </small>
+                                    updateFormField(
+                                      "productSearch",
+                                      product.name || `Item ${product.itemId}`,
+                                    );
+
+                                    setShowProductResults(false);
+                                  }}
+                                >
+                                  <span className={styles["ao-product-info"]}>
+                                    <ProductImage
+                                      imagePath={product.imagePath}
+                                      name={product.name}
+                                      itemId={product.itemId}
+                                    />
+
+                                    <span className={styles["ao-product-text"]}>
+                                      <strong>
+                                        {product.name || `Item ${product.itemId}`}
+                                      </strong>
+
+                                      <small>
+                                        {formatMoney(getProductPrice(product, "retail"))}
+                                      </small>
+                                    </span>
+                                  </span>
+
+                                  <small className={styles["ao-product-stock"]}>
+                                    {stock > 0 ? `Stock: ${stock}` : "Out of stock"}
+                                  </small>
+                                </button>
+                              );
+                            })
+                          ) : (
+                            <p className={styles["orders-product-search-empty"]}>
+                              No matching products found.
+                            </p>
                           )}
                         </div>
-                      </div>
-
-                      {/* Actual photo is separate from the catalog image. */}
-                      <RealImagePicker
-                        file={item.realImageFile || null}
-                        onChange={(file) => {
-                          setItemRealImage(item.itemId, file);
-                        }}
-                        disabled={addingOrder}
-                      />
-
-                      <div className={styles["ao-selected-product-actions"]}>
-                        <strong>
-                          {formatMoney(Number(item.unitPrice) * qty)}
-                        </strong>
-
-                        <button
-                          type="button"
-                          className={styles["orders-details-button"]}
-                          disabled={addingOrder}
-                          onClick={() => removeItem(item.itemId)}
-                        >
-                          Remove
-                        </button>
-                      </div>
+                      )}
                     </div>
-                  );
-                })}
-              </div>
-            </>
-          )}
 
-          {/* 4. Delivery details */}
 
-          <h3 className={styles["orders-detail-section-title"]}>
-            Delivery Details
-          </h3>
+                  </div>
 
-          <label className={fieldClass("governorate")}>
-            <span>Governorate * {badge("governorate")}</span>
-
-            <select
-              id="ao-governorate"
-              value={form.governorate}
-              onChange={(event) => {
-                applyGovernorate(event.target.value);
-                clearMark("governorate");
-              }}
-              required
-              disabled={addingOrder}
-            >
-              <option value="">Select a governorate</option>
-
-              {governorates.map((governorate) => (
-                <option key={governorate} value={governorate}>
-                  {governorate}
-                </option>
-              ))}
-            </select>
-          </label>
-
-          <label className={fieldClass("shippingAddress")}>
-            <span>Shipping Address * {badge("shippingAddress")}</span>
-
-            <textarea
-              id="ao-address"
-              rows="3"
-              value={form.shippingAddress}
-              onChange={(event) =>
-                userEdit("shippingAddress", event.target.value)
-              }
-              maxLength={1000}
-              required
-              disabled={addingOrder}
-              autoComplete="street-address"
-              placeholder="Enter the full delivery address"
-            />
-          </label>
-
-          <div className={styles["orders-form-field"]}>
-            <label htmlFor="ao-shipping">
-              Shipping Cost (EGP) *{" "}
-              {shippingOverridden && (
-                <em
-                  className={
-                    styles["ao-badge"] + " " + styles["ao-badge-review"]
-                  }
-                >
-                  Manual
-                </em>
+                  <button
+                    type="button"
+                    className={styles["orders-details-button"]}
+                    onClick={handleAddItem}
+                    disabled={
+                      addingOrder ||
+                      !form.productId ||
+                      !Number.isInteger(Number(form.quantity)) ||
+                      Number(form.quantity) < 1
+                    }
+                  >
+                    <HiOutlinePlus aria-hidden="true" />
+                    Add Product
+                  </button>
+                </>
               )}
+
+              {/* Selected products and actual product photos */}
+
+              {form.items.length > 0 && (
+                <>
+                  <h3 className={styles["orders-detail-title"]}>
+                    Selected Products ({form.items.length})
+                  </h3>
+                  <div className={styles["orders-detail-items"]}>
+                    {form.items.map((item) => {
+                      const qty = Number(item.quantity);
+                      const max = Number(item.availableStock);
+
+                      return (
+                        <div
+                          className={styles["orders-detail-item"]}
+                          key={item.itemId}
+                        >
+                          <div className={styles["ao-selected-product"]}>
+                            <ProductImage
+                              imagePath={item.imagePath}
+                              name={item.name}
+                              itemId={item.itemId}
+                            />
+
+                            <div className={styles["ao-selected-product-details"]}>
+                              <strong>{item.name}</strong>
+
+                              <span>Unit Price: {formatMoney(item.unitPrice)}</span>
+
+                              <div className={styles["ao-stepper"]}>
+                                <button
+                                  type="button"
+                                  aria-label="Decrease quantity"
+                                  disabled={addingOrder || qty <= 1}
+                                  onClick={() =>
+                                    changeItemQuantity(item.itemId, String(qty - 1))
+                                  }
+                                >
+                                  −
+                                </button>
+
+                                <input
+                                  type="number"
+                                  inputMode="numeric"
+                                  aria-label="Quantity"
+                                  min="1"
+                                  max={item.availableStock}
+                                  step="1"
+                                  value={item.quantity}
+                                  required
+                                  disabled={addingOrder}
+                                  onChange={(event) =>
+                                    changeItemQuantity(
+                                      item.itemId,
+                                      event.target.value,
+                                    )
+                                  }
+                                />
+
+                                <button
+                                  type="button"
+                                  aria-label="Increase quantity"
+                                  disabled={addingOrder || qty >= max}
+                                  onClick={() =>
+                                    changeItemQuantity(item.itemId, String(qty + 1))
+                                  }
+                                >
+                                  +
+                                </button>
+                              </div>
+
+                              {qty >= max && (
+                                <small className={styles["ao-field-msg"]}>
+                                  Maximum available stock reached ({max}).
+                                </small>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Actual photo is separate from the catalog image. */}
+                          <RealImagePicker
+                            file={item.realImageFile || null}
+                            onChange={(file) => {
+                              setItemRealImage(item.itemId, file);
+                            }}
+                            disabled={addingOrder}
+                          />
+
+                          <div className={styles["ao-selected-product-actions"]}>
+                            <strong>
+                              {formatMoney(Number(item.unitPrice) * qty)}
+                            </strong>
+
+                            <button
+                              type="button"
+                              className={styles["orders-details-button"]}
+                              disabled={addingOrder}
+                              onClick={() => removeItem(item.itemId)}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </div>
+
+          </div>
+
+          <div className={styles.row}>
+            {/* 4. Delivery details */}
+            <h3 className={styles["orders-detail-title"]}>
+              Delivery Details
+            </h3>
+
+            <label className={fieldClass("governorate")}>
+              <span>Governorate * {badge("governorate")}</span>
+
+              <select
+                id="ao-governorate"
+                value={form.governorate}
+                onChange={(event) => {
+                  applyGovernorate(event.target.value);
+                  clearMark("governorate");
+                }}
+                required
+                disabled={addingOrder}
+              >
+                <option value="">Select a governorate</option>
+
+                {governorates.map((governorate) => (
+                  <option key={governorate} value={governorate}>
+                    {governorate}
+                  </option>
+                ))}
+              </select>
             </label>
 
-            <input
-              id="ao-shipping"
-              type="number"
-              inputMode="decimal"
-              min="0"
-              step="0.01"
-              value={form.shippingCost}
-              readOnly={!canEditShipping}
-              onChange={(event) => {
-                updateFormField("shippingCost", event.target.value);
+            <label className={fieldClass("shippingAddress")}>
+              <span>Shipping Address * {badge("shippingAddress")}</span>
 
-                setShippingOverridden(true);
-              }}
-              required
-              disabled={addingOrder}
-            />
+              <textarea
+                id="ao-address"
+                rows="3"
+                value={form.shippingAddress}
+                onChange={(event) =>
+                  userEdit("shippingAddress", event.target.value)
+                }
+                maxLength={1000}
+                required
+                disabled={addingOrder}
+                autoComplete="street-address"
+                placeholder="Enter the full delivery address"
+              />
+            </label>
 
-            {!canEditShipping ? (
-              <small
-                className={styles["ao-field-msg"] + " " + styles["is-muted"]}
-              >
-                Set automatically from the governorate.
-              </small>
-            ) : (
-              shippingOverridden &&
-              defaultFee != null && (
-                <button
-                  type="button"
-                  className={styles["ao-link"]}
-                  onClick={() => applyGovernorate(form.governorate)}
+            <div className={styles["orders-form-field"]}>
+              <label htmlFor="ao-shipping">
+                Shipping Cost (EGP) *{" "}
+                {shippingOverridden && (
+                  <em
+                    className={
+                      styles["ao-badge"] + " " + styles["ao-badge-review"]
+                    }
+                  >
+                    Manual
+                  </em>
+                )}
+              </label>
+
+              <input
+                id="ao-shipping"
+                type="number"
+                inputMode="decimal"
+                min="0"
+                step="0.01"
+                value={form.shippingCost}
+                readOnly={!canEditShipping}
+                onChange={(event) => {
+                  updateFormField("shippingCost", event.target.value);
+
+                  setShippingOverridden(true);
+                }}
+                required
+                disabled={addingOrder}
+              />
+
+              {!canEditShipping ? (
+                <small
+                  className={styles["ao-field-msg"] + " " + styles["is-muted"]}
                 >
-                  Reset to default ({formatMoney(defaultFee)})
-                </button>
-              )
-            )}
+                  Set automatically from the governorate.
+                </small>
+              ) : (
+                shippingOverridden &&
+                defaultFee != null && (
+                  <button
+                    type="button"
+                    className={styles["ao-link"]}
+                    onClick={() => applyGovernorate(form.governorate)}
+                  >
+                    Reset to default ({formatMoney(defaultFee)})
+                  </button>
+                )
+              )}
+            </div>
+
+            <label className={fieldClass("customerNote")}>
+              <span>Customer Notes (Optional) {badge("customerNote")}</span>
+
+              <textarea
+                rows="3"
+                value={form.customerNote}
+                onChange={(event) => userEdit("customerNote", event.target.value)}
+                maxLength={2000}
+                disabled={addingOrder}
+                placeholder="Enter any additional instructions"
+              />
+            </label>
           </div>
 
-          <label className={fieldClass("customerNote")}>
-            <span>Customer Notes (Optional) {badge("customerNote")}</span>
+          <div className={styles.row}>
+            {/* 5. Order summary */}
+            <h3 className={styles["orders-detail-title"]}>
+              Order Summary
+            </h3>
 
-            <textarea
-              rows="3"
-              value={form.customerNote}
-              onChange={(event) => userEdit("customerNote", event.target.value)}
-              maxLength={2000}
-              disabled={addingOrder}
-              placeholder="Enter any additional instructions"
-            />
-          </label>
+            <div className={styles["orders-detail-total"]}>
+              <span>Products Subtotal</span>
+              <strong>{formatMoney(estimatedSubtotal)}</strong>
+            </div>
 
-          {/* 5. Order summary */}
+            <div className={styles["orders-detail-total"]}>
+              <span>Shipping</span>
+              <strong>{formatMoney(validShippingCost)}</strong>
+            </div>
 
-          <h3 className={styles["orders-detail-section-title"]}>
-            Order Summary
-          </h3>
-
-          <div className={styles["orders-detail-total"]}>
-            <span>Products Subtotal</span>
-            <strong>{formatMoney(estimatedSubtotal)}</strong>
-          </div>
-
-          <div className={styles["orders-detail-total"]}>
-            <span>Shipping</span>
-            <strong>{formatMoney(validShippingCost)}</strong>
-          </div>
-
-          <div className={styles["orders-detail-total"]}>
-            <span>Grand Total</span>
-            <strong>{formatMoney(estimatedTotal)}</strong>
+            <div className={styles["orders-detail-total"]}>
+              <span>Grand Total</span>
+              <strong>{formatMoney(estimatedTotal)}</strong>
+            </div>
           </div>
 
           {totalDiff !== null &&

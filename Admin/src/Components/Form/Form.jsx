@@ -20,7 +20,7 @@ export function Form({ children, onSubmit, width = "fit" }) {
   );
 }
 
-export function FieldInputGroup({ label = {}, inputOptions = {}, note = "" , classess}) {
+export function FieldInputGroup({ label = {}, inputOptions = {}, note = "", classess }) {
 
   const {
     handleChange,
@@ -33,15 +33,10 @@ export function FieldInputGroup({ label = {}, inputOptions = {}, note = "" , cla
   return (
     <div className={`${styles.fieldInputGroup} ${classess}`}>
 
-      {Object.keys(label).length > 0 || note &&
       <div className={styles.fieldInputGroupTop}>
-        {Object.keys(label).length > 0 && (
-          <label htmlFor={inputOptions.id}>{label.name}</label>
-        )}
-
+        <label htmlFor={inputOptions.id}>{label.name}</label>
         {note && <span>{note}</span>}
       </div>
-      }
 
       <div className={styles.fieldInputGroupDown}>
         <input
@@ -62,15 +57,20 @@ export function FieldInputGroup({ label = {}, inputOptions = {}, note = "" , cla
           onChange={(e) => {
             inputOptions.onChange?.(e);
           }}
-          onBlur={(e) =>
-            handleChange(e.target.value,inputOptions)
+          onBlur={(e) => {
+            handleChange(e.target.value, inputOptions);
+            inputOptions.onBlur
           }
+          }
+          onFocus={inputOptions.onFocus}
           autoFocus={inputOptions.focus || false}
+          min={inputOptions.min}
+          stip={inputOptions.stip}
         />
 
         {statusMessage && (
           <span
-            className={`${styles.statusMessage} ${valid  ? styles.valid : styles.inValid}`}
+            className={`${styles.statusMessage} ${valid ? styles.valid : styles.inValid}`}
           >
             {statusMessage}
           </span>

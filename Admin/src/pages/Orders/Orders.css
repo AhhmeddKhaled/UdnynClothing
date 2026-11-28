@@ -168,8 +168,7 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.orders-search:focus-within,
-.orders-product-search:focus-within {
+.orders-search:focus-within {
   border-color: var(--color-gold);
   box-shadow: 0 0 0 3px rgb(190 155 83 / 12%);
 }

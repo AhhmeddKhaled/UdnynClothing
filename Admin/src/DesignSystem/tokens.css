@@ -50,6 +50,10 @@
   --z-modal: 1000;
   --z-toast: 1100;
 
+  /* Weight */
+  --regular: 400;
+  --bold: 700;
+
   /* Legacy aliases — keep existing component names */
   --color-plum: var(--color-accent);
   --color-plum-deep: var(--color-accent-hover);

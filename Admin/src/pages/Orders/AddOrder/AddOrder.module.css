@@ -1,91 +1,58 @@
 /* #########################################
 Add Order Page 
 ========================================= */
-.add-order-page {
-  --add-order-accent: var(--color-accent, #0284c7);
-  --add-order-field-text: var(--color-ink, #1e293b);
-  --add-order-muted: var(--color-muted, #64748b);
-  --add-order-field-border: var(--color-line, #e2e8f0);
-  --add-order-field-bg: var(--color-paper, #ffffff);
-
-  --ao-border: var(--color-line, #e2e8f0);
-  --ao-surface: var(--color-card, #ffffff);
-  --ao-surface-muted: var(--color-paper, #f8fafc);
-
-  --ao-danger: var(--status-error-text, #b42335);
-  --ao-danger-border: var(--status-error-border, #efb8c0);
-  --ao-danger-soft: var(--status-error-bg, #fff0f1);
-
-  --ao-ok: var(--status-success-text, #216c42);
-  --ao-ok-border: var(--status-success-border, #b6dfc7);
-  --ao-ok-soft: var(--status-success-bg, #effaf3);
-
-  --ao-warn: var(--status-warning-text, #815c12);
-  --ao-warn-border: var(--status-warning-border, #ead29b);
-  --ao-warn-soft: var(--status-warning-bg, #fff9e8);
-
-  width: 100%;
-  min-width: 0;
-  padding-bottom: 32px;
-  color: var(--add-order-field-text);
-}
-
-.add-order-page .add-order-form {
-  width: 100%;
-  max-width: 100%;
-  margin-top: 20px;
-  overflow: visible;
-  border: 1px solid var(--color-border, #e5e5ed);
-  border-radius: 16px;
-  background: var(--color-surface, #ffffff);
-  color: var(--add-order-field-text);
-  box-shadow: var(--shadow-sm, 0 4px 18px rgba(30, 25, 50, 0.05));
-}
 
 .add-order-page .orders-modal-content {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  padding: 26px;
+
+  .row {
+    border: 1px solid var(--color-line);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-md);
+    background-color: var(--color-paper);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+
+    .orders-detail-title {
+      font-size: var(--text-md);
+      font-weight: var(--bold);
+      color: var(--color-ink);
+      text-transform: capitalize;
+      margin-bottom: var(--space-2);
+    }
+  }
 }
 
-.add-order-page .orders-detail-section-title {
-  margin: 12px 0 2px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--color-border, #e5e5ed);
-  color: var(--add-order-field-text);
-  font-size: 17px;
-  font-weight: 700;
-  line-height: 1.6;
+.customerMessage {
 }
 
-.add-order-page .orders-detail-section-title:first-child {
-  margin-top: 0;
-}
-
-/* Form layout */
-
-.add-order-page .orders-form-grid {
+.customerDetails {
+.orders-form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
   align-items: start;
 }
 
-.add-order-page .orders-form-field {
+.orders-form-field {
   display: flex;
   flex-direction: column;
   gap: 8px;
   width: 100%;
   min-width: 0;
   color: var(--add-order-field-text);
-  font-size: 14px;
+  font-size: var(--text-sm);
   font-weight: 600;
+}
 }
 
 .add-order-page .orders-form-field > span,
 .add-order-page .orders-form-field > label {
   line-height: 1.6;
+  background-color: red;
 }
 
 /* All form controls */
@@ -271,43 +238,8 @@ Add Order Page
   z-index: 5;
 }
 
-.add-order-page .orders-product-search {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  min-height: 46px;
-  padding: 0 8px 0 12px;
-  border-radius: 10px;
-  background-color: var(--add-order-field-bg);
-  color: var(--add-order-muted);
-}
 
-.add-order-page .orders-product-search:focus-within {
-  border-color: var(--add-order-accent);
-  box-shadow: 0 0 0 3px var(--color-accent-soft, rgba(114, 84, 168, 0.15));
-}
 
-.add-order-page .orders-product-search > svg {
-  flex: 0 0 auto;
-  width: 19px;
-  height: 19px;
-}
-
-.add-order-page .orders-product-search input {
-  min-height: 44px;
-  padding: 8px 0;
-  border: 0;
-  border-radius: 0;
-  outline: none;
-  background: transparent;
-  box-shadow: none;
-}
-
-.add-order-page .orders-product-search input:focus {
-  border: 0;
-  box-shadow: none;
-}
 
 .add-order-page .ao-scan-btn {
   display: inline-grid;
@@ -409,12 +341,7 @@ Add Order Page
   line-height: 1.6;
 }
 
-.add-order-page .orders-product-search-empty {
-  margin: 0;
-  padding: 16px;
-  color: var(--add-order-muted);
-  text-align: center;
-}
+
 
 /* Action buttons */
 
@@ -821,12 +748,13 @@ Add Order Page
 /* Dark theme: support common theme class placements */
 
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page {
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page {
   --add-order-field-bg: #20202b;
   --add-order-field-text: #f1eff8;
   --add-order-field-border: #414151;
@@ -850,52 +778,66 @@ Add Order Page
 }
 
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .add-order-form {
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  .add-order-form {
   background-color: #181821;
   border-color: #353543;
   color: #f1eff8;
 }
 
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .orders-form-field input,
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  .orders-form-field
+  input,
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .orders-form-field select,
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  .orders-form-field
+  select,
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .orders-form-field textarea,
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  .orders-form-field
+  textarea,
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .orders-product-search,
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .orders-product-search input {
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  input {
   background-color: #20202b;
   color: #f1eff8;
   color-scheme: dark;
@@ -904,138 +846,174 @@ Add Order Page
 /* Keep the extracted / needs-review tints in dark mode (the rule above
    would otherwise flatten them). */
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .orders-form-field.ao-autofilled input,
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  .orders-form-field.ao-autofilled
+  input,
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .orders-form-field.ao-autofilled select,
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  .orders-form-field.ao-autofilled
+  select,
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .orders-form-field.ao-autofilled textarea {
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  .orders-form-field.ao-autofilled
+  textarea {
   background-color: var(--ao-ok-soft);
   border-color: var(--ao-ok-border);
 }
 
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .orders-form-field.ao-needs-review input,
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  .orders-form-field.ao-needs-review
+  input,
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .orders-form-field.ao-needs-review select,
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  .orders-form-field.ao-needs-review
+  select,
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .orders-form-field.ao-needs-review textarea {
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  .orders-form-field.ao-needs-review
+  textarea {
   background-color: var(--ao-warn-soft);
   border-color: var(--ao-warn-border);
 }
 
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .orders-form-field input[readonly] {
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  .orders-form-field
+  input[readonly] {
   background-color: #181821;
 }
 
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .orders-product-results {
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  .orders-product-results {
   background-color: #20202b;
   border-color: #414151;
   color: #f1eff8;
 }
 
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .orders-product-result {
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  .orders-product-result {
   background-color: transparent;
   color: #f1eff8;
   border-bottom-color: #414151;
 }
 
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .orders-product-result strong {
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  .orders-product-result
+  strong {
   color: #f1eff8;
 }
 
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .orders-product-result:hover:not(:disabled) {
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  .orders-product-result:hover:not(:disabled) {
   background-color: #303044;
 }
 
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .orders-form-error {
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  .orders-form-error {
   background-color: #351e29;
   border-color: #78404e;
   color: #ffb5c1;
 }
 
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .add-order-bar {
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  .add-order-bar {
   box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.35);
 }
 
 :where(
-  html[data-theme="dark"],
-  body[data-theme="dark"],
-  html.dark,
-  body.dark,
-  .dark
-) .add-order-page .ao-scanner-card {
+    html[data-theme="dark"],
+    body[data-theme="dark"],
+    html.dark,
+    body.dark,
+    .dark
+  )
+  .add-order-page
+  .ao-scanner-card {
   box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.55);
 }
 
@@ -1080,7 +1058,6 @@ Add Order Page
   .add-order-page .orders-form-field input,
   .add-order-page .orders-form-field select,
   .add-order-page .orders-form-field textarea,
-  .add-order-page .orders-product-search input,
   .add-order-page .ao-paste textarea,
   .add-order-page .ao-stepper input {
     font-size: 16px;

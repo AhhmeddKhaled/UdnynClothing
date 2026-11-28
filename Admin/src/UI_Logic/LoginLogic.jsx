@@ -12,8 +12,9 @@ export default function useLoginLogic() {
     const [showPassword, setShowPassword] = useState(false);
     const [statusMessage, setStatusMessage] = useState("");
     const [emailValid, setEmailValid] = useState(false);
+    const [phoneValid, setPhoneValid] = useState(false);
     const [passwordValid, setPasswordValid] = useState(false);
-
+    const [valid, setvalid] = useState(false);
     const navigate = useNavigate();
 
     const handleChange = (value, inputOptions) => {
@@ -21,22 +22,19 @@ export default function useLoginLogic() {
 
         if (inputOptions.type === "email") {
             setEmailValid(result.emailValid);
-            console.log(emailValid);
-            
         }
 
         if (inputOptions.type === "password") {
             setPasswordValid(result.passwordValid);
-            console.log(passwordValid);
-            
+        }
+
+        if (inputOptions.type === "tel") {
+            setPhoneValid(result.phoneValid);
+            setvalid(phoneValid);
         }
 
         setStatusMessage(result.message);
     };
-
-    const valid = emailValid || passwordValid;
-    console.log(valid);
-    
 
     const handleShowPassword = () => {
         setShowPassword(!showPassword);
@@ -65,6 +63,7 @@ export default function useLoginLogic() {
         valid,
         emailValid,
         passwordValid,
+        phoneValid,
         statusMessage,
         email,
         setEmail,
